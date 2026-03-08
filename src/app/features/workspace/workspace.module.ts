@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { WorkspaceRoutingModule } from './workspace-routing.module';
 import { SlideComponent } from './components/slide/slide.component';
-import { WorkspaceComponent } from './workspace/workspace.component';
+import { WorkspaceComponent } from './pages/workspace/workspace.component';
 
 
 @NgModule({

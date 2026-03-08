@@ -14,13 +14,6 @@ const routes: Routes = [
         (m) => m.WorkspaceRoutingModule,
       ),
   },
-  {
-    path: 'test',
-    loadChildren: () =>
-      import('./features/konva-test/konva-test-routing.module').then(
-        (m) => m.KonvaTestRoutingModule,
-      ),
-  },
 ];
 
 @NgModule({

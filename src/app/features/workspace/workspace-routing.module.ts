@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { WorkspaceComponent } from './workspace/workspace.component';
+import { WorkspaceComponent } from './pages/workspace/workspace.component';
 
 const routes: Routes = [
   {
