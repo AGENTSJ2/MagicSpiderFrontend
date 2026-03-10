@@ -24,8 +24,6 @@ export class SlideComponent implements AfterViewInit {
       pixelRatio: 1,
     };
     this.setUpSlide(config);
-    console.log(this.slideService.presentationEvents$);
-    
     this.slideService.presentationEvents$.subscribe((event)=>{
       this.addText()
     })
@@ -92,7 +90,7 @@ export class SlideComponent implements AfterViewInit {
     const text = new Konva.Text({
       x: 10,
       y: 10,
-      text: 'Hello',
+      text: 'New Text',
       fontSize: 30,
       draggable: true,
     });
@@ -101,5 +99,9 @@ export class SlideComponent implements AfterViewInit {
       this.layer.batchDraw();
     });
     this.layer.add(text);
+  }
+  updateText()
+  {
+    
   }
 }
