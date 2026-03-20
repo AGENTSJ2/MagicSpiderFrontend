@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
-import { WorkspaceModule } from './features/workspace/workspace.module';
+import { SlidePresentationModule } from './features/slide-presentation/slide-presentation.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +14,7 @@ import { WorkspaceModule } from './features/workspace/workspace.module';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    WorkspaceModule
+    SlidePresentationModule
   ],
   providers: [],
   bootstrap: [AppComponent]

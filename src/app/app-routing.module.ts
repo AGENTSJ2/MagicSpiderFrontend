@@ -10,8 +10,8 @@ const routes: Routes = [
   {
     path: 'workspace',
     loadChildren: () =>
-      import('./features/workspace/workspace-routing.module').then(
-        (m) => m.WorkspaceRoutingModule,
+      import('./features/slide-presentation/slide-presentation-routing.module').then(
+        (m) => m.SlidePresentationRoutingModule,
       ),
   },
 ];
