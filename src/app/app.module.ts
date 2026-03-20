@@ -14,7 +14,7 @@ import { SlidePresentationModule } from './features/slide-presentation/slide-pre
   imports: [
     BrowserModule,
     AppRoutingModule,
-    SlidePresentationModule
+    SlidePresentationModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

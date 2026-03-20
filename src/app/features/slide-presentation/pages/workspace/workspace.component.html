@@ -31,15 +31,23 @@
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">
         <div class="parent-slide-wrapper">
-          <app-slide ></app-slide>
+          @if(presentation.slides.length == 0)
+          {
+            <div class="d-flex justify-content-center align-items-center">
+              add some slides
+            </div>
+          }
+          @else {
+            <app-slide [slide]="getActiveSlide()"></app-slide>
+          }
         </div>
       </div>
       <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
         <div class="slide-preview-wrapper">
           slide 1
         </div>
-        <button class="add-slide">
-          <i class="fi fi-ss-add"></i>
+        <button class="add-slide" (click)="addSlide()">
+          <i class="fi fi-ss-add" ></i>
         </button>
       </div>
     </div>

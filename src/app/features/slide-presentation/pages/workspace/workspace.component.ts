@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Presentation } from '../../models/presenatation.model';
-import { PresentationEventType, SlideService } from '../../services/slide.service';
+import { Presentation } from '../../domain/models/presenatation.model';
+import { SlideService } from '../../services/slide.service';
+import { PresentationEventType, TextEvent } from '../../domain/models/presentationEvents.model';
 
 @Component({
   selector: 'app-workspace',
@@ -11,24 +12,29 @@ export class WorkspaceComponent implements OnInit{
   presentation!:Presentation;
   constructor(private slideService:SlideService){}
   ngOnInit(): void {
-    this.presentation = {
-      id:"p1",
-      config:{
-        ratio:{num:16,den:9},
-        pixelRatio:1
-      },
-      slides:[{
-        slideId:'1',
-        components:[]
-      }]
-    }
+    this.presentation = new Presentation();
   }
   handleAddText()
   {
-    this.slideService.addText({
-      presentationId:this.presentation.id,
-      slideId:this.presentation.slides[0].slideId,
-      type:PresentationEventType.ADD_TEXT
-    })
+    const textEvent :TextEvent = new TextEvent(
+      {
+        presentationId:this.presentation.id,
+        slideId:this.presentation.slides[0].slideId,
+        textContent:'New Text',
+        eventType:PresentationEventType.ADD_TEXT
+      }
+    ) 
+    this.slideService.presentationEventBus(textEvent)
   }
+  slideIdx:number = -1;
+  getActiveSlide()
+  {
+    return this.presentation.slides[this.slideIdx];
+  }
+  addSlide(){
+    const slide = this.slideService.getSlide();
+    this.slideIdx++;
+    this.presentation.slides.push(slide);
+  }
+
 }
