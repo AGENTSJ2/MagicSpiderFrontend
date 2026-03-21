@@ -1,13 +1,14 @@
 import Konva from "konva";
 import TextController from "../../controllers/text.controller";
 import { Slide } from "./slide.model";
+import { ICanvasComponent } from "./ICanvasComponent";
 
-export class TextComponent {
+export class TextComponent  implements ICanvasComponent {
     x!: number;
     y!: number;
     textContent!: string;
     fontSize!: number;
-    textNode: Konva.Text;
+    node: Konva.Text;
     slide!: Slide;
     controller!: TextController;
     containerDiv!: HTMLDivElement;
@@ -20,7 +21,7 @@ export class TextComponent {
         this.slide = init.slide!;
         this.containerDiv = init.containerDiv!;
 
-        this.textNode = new Konva.Text({
+        this.node = new Konva.Text({
             x: this.x,
             y: this.y,
             text: this.textContent,
@@ -32,7 +33,7 @@ export class TextComponent {
             slide: this.slide,
             containerDiv: this.containerDiv,
             content: this.textContent,
-            textNode: this.textNode
+            textNode: this.node
         });
     }
 }

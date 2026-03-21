@@ -24,7 +24,7 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     };
     this.observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        this.slideService.resizeSlide(this.slide, { divElm: this.cont.nativeElement, config: config });
+        this.slide.controller.triggerResize({ divElm: this.cont.nativeElement, config: config });
       }
     });
     this.observer.observe(this.cont.nativeElement);
@@ -45,11 +45,11 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   }
 
   addText(textContent: string) {
-    const temp = new TextComponent({
+    const text = new TextComponent({
       slide: this.slide,
       containerDiv: this.cont.nativeElement,
       textContent: textContent,
     })
-
+    this.slide.controller.addComponent(text);
   }
 }

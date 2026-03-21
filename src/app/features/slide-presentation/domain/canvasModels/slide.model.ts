@@ -1,10 +1,15 @@
-import Konva from "konva";
+import SlideController from "../../controllers/slide.controller";
+import { Shape } from "konva/lib/Shape";
 
-export interface Slide {
-    slideId: string;
-    components: Konva.Node[];
-    layer: Konva.Layer;
-    transformer: Konva.Transformer;
-    stage:Konva.Stage;
-    mainCover:Konva.Rect;
+export class Slide {
+    slideId!: string;
+    components!: Shape[];
+    controller!:SlideController;
+
+    constructor(init:Partial<Slide>)
+    {
+        this.slideId = init.slideId ?? '';
+        this.components = init.components ?? [];
+        this.controller = new SlideController();
+    }
 }

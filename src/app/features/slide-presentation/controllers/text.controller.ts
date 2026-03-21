@@ -19,7 +19,6 @@ export default class TextController {
         this.containerDiv = init.containerDiv;
         this.text = init.textNode;
         this.registerEvents();
-        this.slide.layer.add(this.text);
         this.boundRespondToClick = this.respondToClick.bind(this);
     }
     private respondToClick(event: MouseEvent) {
@@ -31,9 +30,7 @@ export default class TextController {
     }
     registerEvents() {
         this.text.on('click', () => {
-            this.slide.transformer.nodes([this.text]);
-            this.slide.transformer.enabledAnchors([]);
-            this.slide.layer.batchDraw();
+            this.slide.controller.selectComponent(this.text);
         });
         this.text.on("dblclick", () => {
             const { x, y } = this.text.getAbsolutePosition();
