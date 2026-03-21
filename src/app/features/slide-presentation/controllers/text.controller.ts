@@ -30,7 +30,7 @@ export default class TextController {
     }
     registerEvents() {
         this.text.on('click', () => {
-            this.slide.controller.selectComponent(this.text);
+            this.slide.controller.selectComponent(this.text,{anchors:[]});
         });
         this.text.on("dblclick", () => {
             const { x, y } = this.text.getAbsolutePosition();

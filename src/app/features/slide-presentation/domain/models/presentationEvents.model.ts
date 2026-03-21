@@ -1,3 +1,5 @@
+import { ShapeType } from "../canvasModels/shapeComponent.model";
+
 export class PresentationEvent {
     presentationId: string;
     slideId: string;
@@ -14,6 +16,15 @@ export class TextEvent extends PresentationEvent {
     constructor(init:TextEvent) {
         super(init)
         this.textContent = init.textContent;
+    }
+}
+export class ShapeEvent extends PresentationEvent
+{
+    shapeType!:ShapeType;
+    constructor(init:ShapeEvent)
+    {
+        super(init);
+        this.shapeType = init.shapeType;
     }
 }
 export enum PresentationEventType {

@@ -1,40 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { SlideService } from '../../services/slide.service';
-import { PresentationEventType, TextEvent } from '../../domain/models/presentationEvents.model';
+import { PresentationEventType, ShapeEvent as ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
+import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 
 @Component({
   selector: 'app-workspace',
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss'
 })
-export class WorkspaceComponent implements OnInit{
-  presentation!:Presentation;
-  constructor(private slideService:SlideService){}
+export class WorkspaceComponent implements OnInit {
+  presentation!: Presentation;
+  constructor(private slideService: SlideService) { }
   ngOnInit(): void {
     this.presentation = new Presentation();
   }
-  handleAddText()
-  {
-    const textEvent :TextEvent = new TextEvent(
+  handleAddText() {
+    const textEvent: TextEvent = new TextEvent(
       {
-        presentationId:this.presentation.id,
-        slideId:this.presentation.slides[0].slideId,
-        textContent:'New Text',
-        eventType:PresentationEventType.ADD_TEXT
+        presentationId: this.presentation.id,
+        slideId: this.presentation.slides[0].slideId,
+        textContent: 'New Text',
+        eventType: PresentationEventType.ADD_TEXT
       }
-    ) 
+    )
     this.slideService.presentationEventBus(textEvent)
   }
-  slideIdx:number = -1;
-  getActiveSlide()
-  {
+  slideIdx: number = -1;
+  getActiveSlide() {
     return this.presentation.slides[this.slideIdx];
   }
-  addSlide(){
+  addSlide() {
     const slide = this.slideService.getSlide();
     this.slideIdx++;
     this.presentation.slides.push(slide);
   }
-
+  addShape() {
+    const shapeEvent: ShapeEvent = new ShapeEvent(
+      {
+        presentationId: this.presentation.id,
+        slideId: this.presentation.slides[0].slideId,
+        shapeType: ShapeType.RECT,
+        eventType: PresentationEventType.ADD_SHAPE
+      }
+    );
+    this.slideService.presentationEventBus(shapeEvent);
+  }
 }

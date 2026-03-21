@@ -85,9 +85,19 @@ export default class SlideController {
         this.layer.batchDraw()
         this.stage.draw();
     }
-    selectComponent(node: Shape) {
+    private readonly Anchors = [
+        "top-left",
+        "top-center",
+        "top-right",
+        "middle-left",
+        "middle-right",
+        "bottom-left",
+        "bottom-center",
+        "bottom-right"
+    ];
+    selectComponent(node: Shape, options?: { anchors: string[] }) {
         this.transformer.nodes([node]);
-        this.transformer.enabledAnchors([]);
+        this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
         this.layer.batchDraw();
     }
     addComponent(node: ICanvasComponent) {

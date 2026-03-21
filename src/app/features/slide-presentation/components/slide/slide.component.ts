@@ -2,8 +2,9 @@ import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, O
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
 import { SlideService } from '../../services/slide.service';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { TextEvent } from '../../domain/models/presentationEvents.model';
+import { ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
 import { TextComponent } from '../../domain/canvasModels/textComponent.model';
+import ShapeComponent, { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 @Component({
   selector: 'app-slide',
   templateUrl: './slide.component.html',
@@ -41,6 +42,10 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
         this.addText(event.textContent);
         return;
       }
+      if(event instanceof ShapeEvent)
+      {
+        this.addShape(event.shapeType);
+      }
     })
   }
 
@@ -51,5 +56,14 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
       textContent: textContent,
     })
     this.slide.controller.addComponent(text);
+  }
+  addShape(shapeType:ShapeType)
+  {
+    const shape = new ShapeComponent({
+      slide: this.slide,
+      containerDiv: this.cont.nativeElement,
+      shapeType:shapeType,
+    })
+    this.slide.controller.addComponent(shape);
   }
 }
