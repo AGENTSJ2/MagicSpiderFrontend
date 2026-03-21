@@ -45,7 +45,7 @@ export default class SlideController {
                 'bottom-right',
             ],
             keepRatio: true,
-            centeredScaling: true,
+            centeredScaling: false,
             rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
             rotateAnchorOffset: 60,
             borderStroke: '#4A90E2',
@@ -95,9 +95,19 @@ export default class SlideController {
         "bottom-center",
         "bottom-right"
     ];
+    isNodeSelected(node:Shape):boolean
+    {
+        return this.transformer.nodes().some((nd)=>nd==node);
+    }
     selectComponent(node: Shape, options?: { anchors: string[] }) {
         this.transformer.nodes([node]);
         this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
+        this.layer.batchDraw();
+    }
+    removeSelectionOfComponent(node: Shape) {
+        let selected = this.transformer.nodes();
+        selected = selected.filter((nd) => nd != node);
+        this.transformer.nodes(selected);
         this.layer.batchDraw();
     }
     addComponent(node: ICanvasComponent) {

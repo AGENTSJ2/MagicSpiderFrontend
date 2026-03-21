@@ -1,56 +1,74 @@
 import Konva from "konva";
 import { Slide } from "../domain/canvasModels/slide.model";
+import CanvasControllers from "./canvas.controller";
 
-export default class TextController {
+export default class TextController extends CanvasControllers {
     private textareaToEditText: HTMLTextAreaElement | undefined;
     private readonly positionSlack = 5;
     private slide!: Slide;
     private containerDiv!: HTMLDivElement;
-    private boundRespondToClick!: (event: MouseEvent) => void;
-    text!: Konva.Text;
+    node!: Konva.Text;
 
     constructor(init: {
         slide: Slide,
         containerDiv: HTMLDivElement,
         content: string,
-        textNode:Konva.Text
+        textNode: Konva.Text
     }) {
+        super();
         this.slide = init.slide;
         this.containerDiv = init.containerDiv;
-        this.text = init.textNode;
+        this.node = init.textNode;
         this.registerEvents();
-        this.boundRespondToClick = this.respondToClick.bind(this);
     }
-    private respondToClick(event: MouseEvent) {
+    private destroy() {
+        this.node.remove();
+        this.slide.controller.removeSelectionOfComponent(this.node);
+        document.removeEventListener('keydown', this.handleKeyboardStrokes);
+    }
+
+    private boundRespondToClick = (event: MouseEvent) => {
         if (this.textareaToEditText && event.target != this.textareaToEditText) {
-            this.text.text(this.textareaToEditText.value);
+            this.node.text(this.textareaToEditText.value);
             this.textareaToEditText.remove();
             document.removeEventListener('mousedown', this.boundRespondToClick);
         }
     }
+    private handleKeyboardStrokes = (event: KeyboardEvent) => {
+        if (event.key === 'Delete' && this.slide.controller.isNodeSelected(this.node)) {
+            this.destroy();
+
+        }
+    }
+
     registerEvents() {
-        this.text.on('click', () => {
-            this.slide.controller.selectComponent(this.text,{anchors:[]});
+        this.node.on('click', () => {
+            this.slide.controller.selectComponent(this.node, { anchors: [] });
         });
-        this.text.on("dblclick", () => {
-            const { x, y } = this.text.getAbsolutePosition();
+        this.node.on("dblclick", () => {
+            this.slide.controller.removeSelectionOfComponent(this.node);
+            const { x, y } = this.node.getAbsolutePosition();
             // creating textarea
             this.textareaToEditText = document.createElement("textarea");
-            this.textareaToEditText.value = this.text.text();
+            this.textareaToEditText.value = this.node.text();
             this.textareaToEditText.style.position = "absolute";
             this.textareaToEditText.style.left = x + "px";
             this.textareaToEditText.style.top = (y - this.positionSlack) + "px";
             this.textareaToEditText.style.width = 'auto';
             this.textareaToEditText.style.height = 'auto';
-            this.textareaToEditText.style.fontSize = this.text.fontSize() + "px";
-            this.textareaToEditText.style.fontFamily = this.text.fontFamily();
+            this.textareaToEditText.style.fontSize = this.node.fontSize() + "px";
+            this.textareaToEditText.style.fontFamily = this.node.fontFamily();
             this.containerDiv.appendChild(this.textareaToEditText);
             this.textareaToEditText.focus();
             // click event seems to run as it was set inside dblClick hence mousedown is used 
             document.addEventListener('mousedown', this.boundRespondToClick);
         });
-        this.text.on("dragend", () => {
+        this.node.on("dragend", () => {
             console.log("Drag ended");
         });
+        document.addEventListener('keydown', this.handleKeyboardStrokes);
+
     }
+
+
 }

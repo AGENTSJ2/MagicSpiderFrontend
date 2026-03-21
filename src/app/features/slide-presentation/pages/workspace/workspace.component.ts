@@ -14,6 +14,8 @@ export class WorkspaceComponent implements OnInit {
   constructor(private slideService: SlideService) { }
   ngOnInit(): void {
     this.presentation = new Presentation();
+    this.addSlide(); // TODO REMOVE
+
   }
   handleAddText() {
     const textEvent: TextEvent = new TextEvent(
