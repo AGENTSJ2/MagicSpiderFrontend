@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Presentation } from '../../domain/models/presenatation.model';
+import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { SlideService } from '../../services/slide.service';
 import { PresentationEventType, TextEvent } from '../../domain/models/presentationEvents.model';
 

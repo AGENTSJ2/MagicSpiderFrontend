@@ -1,4 +1,4 @@
-import { DocumentConfiguration } from "./documentConfiguration.model";
+import { DocumentConfiguration } from "../models/documentConfiguration.model";
 import { Slide } from "./slide.model";
 
 export class Presentation {

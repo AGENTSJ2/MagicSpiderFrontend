@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import Konva from 'konva';
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
 import { SlideService } from '../../services/slide.service';
-import { Slide } from '../../domain/models/slide.model';
+import { Slide } from '../../domain/canvasModels/slide.model';
 import { TextEvent } from '../../domain/models/presentationEvents.model';
-import TextController from '../../controllers/textController.model';
+import { TextComponent } from '../../domain/canvasModels/textComponent.model';
 @Component({
   selector: 'app-slide',
   templateUrl: './slide.component.html',
@@ -45,35 +44,11 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     })
   }
 
-  private handleSelectNode(node: Konva.Node) {
-    this.slide.transformer.nodes([node]);
-
-    const className = node.getClassName();
-    switch (className) {
-      case 'Text':
-        this.slide.transformer.enabledAnchors([]);
-        break;
-      default:
-        this.slide.transformer.enabledAnchors([
-          'top-left',
-          'top-center',
-          'top-right',
-          'middle-left',
-          'middle-right',
-          'bottom-left',
-          'bottom-center',
-          'bottom-right',
-        ]);
-    }
-    this.slide.layer.batchDraw();
-  }
-
   addText(textContent: string) {
-
-    const temp = new TextController({
+    const temp = new TextComponent({
       slide: this.slide,
       containerDiv: this.cont.nativeElement,
-      content: textContent
+      textContent: textContent,
     })
 
   }

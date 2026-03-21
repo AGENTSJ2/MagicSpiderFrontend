@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PresentationEvent } from '../domain/models/presentationEvents.model';
 import Konva from 'konva';
-import { Slide } from '../domain/models/slide.model';
+import { Slide } from '../domain/canvasModels/slide.model';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 
 @Injectable({ providedIn: 'root' })

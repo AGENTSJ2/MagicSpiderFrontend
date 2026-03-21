@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { Slide } from "../domain/models/slide.model";
+import { Slide } from "../domain/canvasModels/slide.model";
 
 export default class TextController {
     private textareaToEditText: HTMLTextAreaElement | undefined;
@@ -12,17 +12,12 @@ export default class TextController {
     constructor(init: {
         slide: Slide,
         containerDiv: HTMLDivElement,
-        content: string
+        content: string,
+        textNode:Konva.Text
     }) {
         this.slide = init.slide;
         this.containerDiv = init.containerDiv;
-        this.text = new Konva.Text({
-            x: 10,
-            y: 10,
-            text: init.content,
-            fontSize: 50,
-            draggable: true,
-        });
+        this.text = init.textNode;
         this.registerEvents();
         this.slide.layer.add(this.text);
         this.boundRespondToClick = this.respondToClick.bind(this);
