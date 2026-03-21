@@ -4,7 +4,7 @@ import { DocumentConfiguration } from '../../domain/models/documentConfiguration
 import { SlideService } from '../../services/slide.service';
 import { Slide } from '../../domain/models/slide.model';
 import { TextEvent } from '../../domain/models/presentationEvents.model';
-import TextController from '../../domain/controllers/textController.model';
+import TextController from '../../controllers/textController.model';
 @Component({
   selector: 'app-slide',
   templateUrl: './slide.component.html',

@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { Slide } from "../models/slide.model";
+import { Slide } from "../domain/models/slide.model";
 
 export default class TextController {
     private textareaToEditText: HTMLTextAreaElement | undefined;
