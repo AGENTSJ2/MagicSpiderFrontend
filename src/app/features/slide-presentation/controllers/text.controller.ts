@@ -21,6 +21,7 @@ export default class TextController extends CanvasControllers {
         this.node = init.textNode;
         this.registerEvents();
     }
+    
     private destroy() {
         this.node.remove();
         this.slide.controller.removeSelectionOfComponent(this.node);
@@ -34,10 +35,10 @@ export default class TextController extends CanvasControllers {
             document.removeEventListener('mousedown', this.boundRespondToClick);
         }
     }
+
     private handleKeyboardStrokes = (event: KeyboardEvent) => {
         if (event.key === 'Delete' && this.slide.controller.isNodeSelected(this.node)) {
             this.destroy();
-
         }
     }
 

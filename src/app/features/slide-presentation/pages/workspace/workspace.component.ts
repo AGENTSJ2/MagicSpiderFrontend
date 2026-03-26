@@ -3,6 +3,7 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { SlideService } from '../../services/slide.service';
 import { PresentationEventType, ShapeEvent as ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
+import { Slide } from '../../domain/canvasModels/slide.model';
 
 @Component({
   selector: 'app-workspace',
@@ -11,11 +12,11 @@ import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 })
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
+  activeSlide?:Slide;
   constructor(private slideService: SlideService) { }
   ngOnInit(): void {
     this.presentation = new Presentation();
     this.addSlide(); // TODO REMOVE
-
   }
   handleAddText() {
     const textEvent: TextEvent = new TextEvent(
@@ -28,14 +29,10 @@ export class WorkspaceComponent implements OnInit {
     )
     this.slideService.presentationEventBus(textEvent)
   }
-  slideIdx: number = -1;
-  getActiveSlide() {
-    return this.presentation.slides[this.slideIdx];
-  }
   addSlide() {
     const slide = this.slideService.getSlide();
-    this.slideIdx++;
     this.presentation.slides.push(slide);
+    this.selectSlide(slide);
   }
   addShape() {
     const shapeEvent: ShapeEvent = new ShapeEvent(
@@ -47,5 +44,13 @@ export class WorkspaceComponent implements OnInit {
       }
     );
     this.slideService.presentationEventBus(shapeEvent);
+  }
+  selectSlide(slide:Slide)
+  {
+    this.activeSlide = undefined;
+    setTimeout(()=>{
+      this.activeSlide = slide;
+    })
+    
   }
 }

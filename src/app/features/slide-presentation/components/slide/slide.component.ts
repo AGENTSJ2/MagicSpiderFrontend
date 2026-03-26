@@ -5,6 +5,7 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 import { ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
 import { TextComponent } from '../../domain/canvasModels/textComponent.model';
 import ShapeComponent, { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-slide',
   templateUrl: './slide.component.html',
@@ -15,8 +16,9 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   cont!: ElementRef<HTMLDivElement>;
   @Input() slide!: Slide;
   private observer!: ResizeObserver;
+  private slideEventSubscription!: Subscription;
   constructor(private slideService: SlideService) { }
-
+  
   ngAfterViewInit(): void {
     // 16 : 9 (normal slide ratio)
     const config: DocumentConfiguration = {
@@ -34,16 +36,17 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.observer.disconnect();
+    this.slideEventSubscription?.unsubscribe();
   }
 
   private listenToPresentationEvents() {
-    this.slideService.presentationEvents$.subscribe((event) => {
+    this.slideEventSubscription = this.slideService.presentationEvents$.subscribe((event) => {
+
       if (event instanceof TextEvent) {
         this.addText(event.textContent);
         return;
       }
-      if(event instanceof ShapeEvent)
-      {
+      if (event instanceof ShapeEvent) {
         this.addShape(event.shapeType);
       }
     })
@@ -57,12 +60,11 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     })
     this.slide.controller.addComponent(text);
   }
-  addShape(shapeType:ShapeType)
-  {
+  addShape(shapeType: ShapeType) {
     const shape = new ShapeComponent({
       slide: this.slide,
       containerDiv: this.cont.nativeElement,
-      shapeType:shapeType,
+      shapeType: shapeType,
     })
     this.slide.controller.addComponent(shape);
   }

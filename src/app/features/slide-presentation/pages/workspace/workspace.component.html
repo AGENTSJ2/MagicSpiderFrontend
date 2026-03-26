@@ -38,14 +38,18 @@
             </div>
           }
           @else {
-            <app-slide [slide]="getActiveSlide()"></app-slide>
+
+            <app-slide *ngIf="activeSlide?.slideId" [slide]="activeSlide!"></app-slide>
           }
         </div>
       </div>
       <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
-        <div class="slide-preview-wrapper">
-          slide 1
-        </div>
+        @for (item of presentation.slides; track $index) {
+
+          <div class="slide-preview-wrapper" (click)="selectSlide(item)">
+            slide {{$index}}
+          </div>
+        }
         <button class="add-slide" (click)="addSlide()">
           <i class="fi fi-ss-add" ></i>
         </button>
