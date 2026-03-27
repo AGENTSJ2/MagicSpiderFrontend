@@ -8,10 +8,10 @@ export class TextComponent  implements ICanvasComponent {
     y!: number;
     textContent!: string;
     fontSize!: number;
+
     node: Konva.Text;
     slide!: Slide;
     controller!: TextController;
-    containerDiv!: HTMLDivElement;
 
     constructor(init: Partial<TextComponent>) {
         this.x = init.x ?? 10;
@@ -19,7 +19,6 @@ export class TextComponent  implements ICanvasComponent {
         this.textContent = init.textContent ?? "New Text";
         this.fontSize = init.fontSize ?? 50;
         this.slide = init.slide!;
-        this.containerDiv = init.containerDiv!;
 
         this.node = new Konva.Text({
             x: this.x,
@@ -31,7 +30,6 @@ export class TextComponent  implements ICanvasComponent {
 
         this.controller = new TextController({
             slide: this.slide,
-            containerDiv: this.containerDiv,
             content: this.textContent,
             textNode: this.node
         });

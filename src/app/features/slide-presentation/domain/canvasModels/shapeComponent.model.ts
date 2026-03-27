@@ -19,11 +19,9 @@ export default class ShapeComponent implements ICanvasComponent {
     node!: Shape;
     controller!: ShapeController;
     slide!: Slide;
-    containerDiv!: HTMLDivElement;
 
     constructor(init: Partial<ShapeComponent>) {
         this.slide = init.slide!;
-        this.containerDiv = init.containerDiv!;
         this.shapeType = init.shapeType!;
         this.x = init.x ?? 10;
         this.y = init.y ?? 10;

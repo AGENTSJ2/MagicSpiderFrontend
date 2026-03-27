@@ -1,8 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
-import { SlideService } from '../../services/slide.service';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
+import { ShapeEvent, TextEvent } from '../../domain/EventModels/presentationEvents.model';
 import { TextComponent } from '../../domain/canvasModels/textComponent.model';
 import ShapeComponent, { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Subscription } from 'rxjs';
@@ -16,8 +15,7 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   cont!: ElementRef<HTMLDivElement>;
   @Input() slide!: Slide;
   private observer!: ResizeObserver;
-  private slideEventSubscription!: Subscription;
-  constructor(private slideService: SlideService) { }
+  constructor() { }
   
   ngAfterViewInit(): void {
     // 16 : 9 (normal slide ratio)
@@ -31,41 +29,9 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
       }
     });
     this.observer.observe(this.cont.nativeElement);
-    this.listenToPresentationEvents();
   }
 
   ngOnDestroy() {
     this.observer.disconnect();
-    this.slideEventSubscription?.unsubscribe();
-  }
-
-  private listenToPresentationEvents() {
-    this.slideEventSubscription = this.slideService.presentationEvents$.subscribe((event) => {
-
-      if (event instanceof TextEvent) {
-        this.addText(event.textContent);
-        return;
-      }
-      if (event instanceof ShapeEvent) {
-        this.addShape(event.shapeType);
-      }
-    })
-  }
-
-  addText(textContent: string) {
-    const text = new TextComponent({
-      slide: this.slide,
-      containerDiv: this.cont.nativeElement,
-      textContent: textContent,
-    })
-    this.slide.controller.addComponent(text);
-  }
-  addShape(shapeType: ShapeType) {
-    const shape = new ShapeComponent({
-      slide: this.slide,
-      containerDiv: this.cont.nativeElement,
-      shapeType: shapeType,
-    })
-    this.slide.controller.addComponent(shape);
   }
 }

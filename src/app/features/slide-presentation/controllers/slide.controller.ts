@@ -5,17 +5,38 @@ import { Transformer } from "konva/lib/shapes/Transformer";
 import { Stage } from "konva/lib/Stage";
 import { DocumentConfiguration } from "../domain/models/documentConfiguration.model";
 import { ICanvasComponent } from "../domain/canvasModels/ICanvasComponent";
+import { Subject } from "rxjs";
+import { PresentationEvent, PresentationEventType, ShapeEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { TextComponent } from "../domain/canvasModels/textComponent.model";
+import ShapeComponent, { ShapeType } from "../domain/canvasModels/shapeComponent.model";
+import { Slide } from "../domain/canvasModels/slide.model";
 
 export default class SlideController {
     transformer!: Transformer;
     layer!: Layer;
     mainCover!: Rect;
     stage!: Stage;
+    private slide: Slide;
+    private eventBus: Subject<PresentationEvent>;
+    private readonly Anchors = [
+        "top-left",
+        "top-center",
+        "top-right",
+        "middle-left",
+        "middle-right",
+        "bottom-left",
+        "bottom-center",
+        "bottom-right"
+    ];
 
-    constructor() {
+    constructor(init: { eventBus: Subject<PresentationEvent>, slide: Slide }) {
+        this.eventBus = init.eventBus;
+        this.slide = init.slide;
         this.setUp();
         this.registerEvents();
+        this.ListenPresentationEvents();
     }
+
     private setUp() {
         this.stage = new Stage({
             container: document.createElement('div'),
@@ -61,6 +82,7 @@ export default class SlideController {
         this.layer.add(this.mainCover);
         this.layer.add(this.transformer);
     }
+
     private registerEvents() {
         this.stage.on('mousedown', (e) => {
             // if clicked on empty area
@@ -72,6 +94,33 @@ export default class SlideController {
         }
         );
     }
+
+    private ListenPresentationEvents() {
+        this.eventBus.subscribe((event: PresentationEvent) => {
+
+            switch (event.eventType) {
+                case (PresentationEventType.ADD_TEXT):
+                    const textEv = event as TextEvent;
+                    const textNode = new TextComponent({
+                        slide: this.slide,
+                        textContent: textEv.currentConfig.text,
+                    })
+                    this.addComponent(textNode);
+                    break;
+                case (PresentationEventType.ADD_SHAPE):
+                    const shpEvent = event as ShapeEvent;
+                    const shape = new ShapeComponent({
+                        slide: this.slide,
+                        shapeType: shpEvent.shapeType,
+                    })
+                    this.addComponent(shape);
+                    break;
+                default:
+                    break;
+            }
+        })
+    }
+
     triggerResize(options: { divElm: HTMLDivElement, config: DocumentConfiguration }) {
         const containerWidth = options.divElm.offsetWidth;
         const containerHeight =
@@ -85,31 +134,24 @@ export default class SlideController {
         this.layer.batchDraw()
         this.stage.draw();
     }
-    private readonly Anchors = [
-        "top-left",
-        "top-center",
-        "top-right",
-        "middle-left",
-        "middle-right",
-        "bottom-left",
-        "bottom-center",
-        "bottom-right"
-    ];
-    isNodeSelected(node:Shape):boolean
-    {
-        return this.transformer.nodes().some((nd)=>nd==node);
+
+    isNodeSelected(node: Shape): boolean {
+        return this.transformer.nodes().some((nd) => nd == node);
     }
+
     selectComponent(node: Shape, options?: { anchors: string[] }) {
         this.transformer.nodes([node]);
         this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
         this.layer.batchDraw();
     }
+
     removeSelectionOfComponent(node: Shape) {
         let selected = this.transformer.nodes();
         selected = selected.filter((nd) => nd != node);
         this.transformer.nodes(selected);
         this.layer.batchDraw();
     }
+
     addComponent(node: ICanvasComponent) {
         this.layer.add(node.node);
     }

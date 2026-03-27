@@ -1,3 +1,4 @@
+import { PresentationController } from "../../controllers/presentation.controller";
 import { DocumentConfiguration } from "../models/documentConfiguration.model";
 import { Slide } from "./slide.model";
 
@@ -5,7 +6,8 @@ export class Presentation {
     id: string;
     slides: Slide[];
     config: DocumentConfiguration;
-
+    controller:PresentationController = new PresentationController();
+    
     constructor(init?: Partial<Presentation>) {
         this.id = init?.id ?? crypto.randomUUID();
         this.slides = init?.slides ?? [];

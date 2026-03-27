@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { SlideService } from '../../services/slide.service';
-import { PresentationEventType, ShapeEvent as ShapeEvent, TextEvent } from '../../domain/models/presentationEvents.model';
+import { PresentationEventType, ShapeEvent as ShapeEvent, TextEvent } from '../../domain/EventModels/presentationEvents.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 
@@ -13,7 +12,7 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
   activeSlide?:Slide;
-  constructor(private slideService: SlideService) { }
+  constructor() { }
   ngOnInit(): void {
     this.presentation = new Presentation();
     this.addSlide(); // TODO REMOVE
@@ -23,14 +22,17 @@ export class WorkspaceComponent implements OnInit {
       {
         presentationId: this.presentation.id,
         slideId: this.presentation.slides[0].slideId,
-        textContent: 'New Text',
+        currentConfig:{
+          text:"New Text"
+        },
+        previousConfig:undefined,
         eventType: PresentationEventType.ADD_TEXT
       }
     )
-    this.slideService.presentationEventBus(textEvent)
+    this.presentation.controller.publishEvent(textEvent)
   }
   addSlide() {
-    const slide = this.slideService.getSlide();
+    const slide = this.presentation.controller.addSlide();
     this.presentation.slides.push(slide);
     this.selectSlide(slide);
   }
@@ -43,7 +45,7 @@ export class WorkspaceComponent implements OnInit {
         eventType: PresentationEventType.ADD_SHAPE
       }
     );
-    this.slideService.presentationEventBus(shapeEvent);
+    this.presentation.controller.publishEvent(shapeEvent);
   }
   selectSlide(slide:Slide)
   {

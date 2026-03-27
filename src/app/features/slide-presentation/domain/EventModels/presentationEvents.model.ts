@@ -1,3 +1,4 @@
+import { TextConfig } from "konva/lib/shapes/Text";
 import { ShapeType } from "../canvasModels/shapeComponent.model";
 
 export class PresentationEvent {
@@ -12,10 +13,12 @@ export class PresentationEvent {
     }
 }
 export class TextEvent extends PresentationEvent {
-    textContent: string;
+    currentConfig:TextConfig;
+    previousConfig?:TextConfig;
     constructor(init:TextEvent) {
         super(init)
-        this.textContent = init.textContent;
+        this.currentConfig = init.currentConfig;
+        this.previousConfig = init.previousConfig;
     }
 }
 export class ShapeEvent extends PresentationEvent

@@ -11,17 +11,16 @@ export default class TextController extends CanvasControllers {
 
     constructor(init: {
         slide: Slide,
-        containerDiv: HTMLDivElement,
         content: string,
         textNode: Konva.Text
     }) {
         super();
         this.slide = init.slide;
-        this.containerDiv = init.containerDiv;
+        this.containerDiv = init.slide.containerDiv;
         this.node = init.textNode;
         this.registerEvents();
     }
-    
+
     private destroy() {
         this.node.remove();
         this.slide.controller.removeSelectionOfComponent(this.node);
@@ -44,7 +43,19 @@ export default class TextController extends CanvasControllers {
 
     registerEvents() {
         this.node.on('click', () => {
-            this.slide.controller.selectComponent(this.node, { anchors: [] });
+            this.slide.controller.selectComponent(this.node, {
+                anchors: ["middle-left","middle-right",]
+            });
+        });
+        this.node.on("transform", () => {
+            const scaleX = this.node.scaleX();
+
+            // Convert scale → width/height
+            this.node.width(this.node.width() * scaleX);
+
+            // Reset scale (IMPORTANT)
+            this.node.scaleX(1);
+            this.node.scaleY(1);
         });
         this.node.on("dblclick", () => {
             this.slide.controller.removeSelectionOfComponent(this.node);
