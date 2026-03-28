@@ -9,6 +9,7 @@ export class PresentationController extends CanvasControllers {
     private eventBus: PresentationEventStream = new PresentationEventStream();
     private eventHistory: PresentationEvent[] = [];
     private eventIdx: number = -1;
+    private readonly MAX_HISTORY_LENGTH = 100;
     constructor(private presentation: Presentation) {
         super();
         this.registerEvent();
@@ -18,25 +19,24 @@ export class PresentationController extends CanvasControllers {
     private registerEvent() {
         document.addEventListener('keydown', (event: KeyboardEvent) => {
             if (event.ctrlKey && event.key.toLowerCase() === 'z') {
+                if (this.eventIdx <= 0) {
+                    return;
+                }
                 const lastEvent = this.eventHistory[this.eventIdx];
-                let undoEvent:PresentationEvent| undefined;
+                let undoEvent: PresentationEvent | undefined;
 
-                if(lastEvent instanceof TextEvent)
-                {
+                if (lastEvent instanceof TextEvent) {
                     undoEvent = new TextEvent({
                         ...lastEvent,
-                        currentConfig:lastEvent.previousConfig,
-                        trackHistory:false,
-                        eventType:PresentationEventType.UPDATE_TEXT
+                        currentConfig: lastEvent.previousConfig,
+                        trackHistory: false,
+                        eventType: PresentationEventType.UPDATE_TEXT
                     })
                 }
                 this.publishEvent(
                     undoEvent!
                 )
                 this.eventIdx--;
-                console.log(this.eventHistory,lastEvent);
-                
-                console.log('Undo');
             }
 
             if (event.ctrlKey && event.key.toLowerCase() === 'y') {
@@ -47,12 +47,21 @@ export class PresentationController extends CanvasControllers {
 
     private listenPresentationEvents() {
         this.eventBus.subscribe((event) => {
+            if(this.eventHistory.length)
+            console.log(this.eventHistory,this.eventHistory[0].eventType);
             if (event.trackHistory) {
+                if (this.eventIdx != this.eventHistory.length - 1) { // some operation is performed after undo / redo hence reset
+                    this.eventHistory.splice(this.eventIdx + 1)
+                }
+                if (this.eventHistory.length >= this.MAX_HISTORY_LENGTH) {
+                    this.eventHistory.shift(); // remove from the start 
+                }
                 this.eventHistory.push(event);
                 this.eventIdx = this.eventHistory.length - 1;
             }
+
             switch (event.eventType) {
-                case PresentationEventType.ADD_SLIDE:                    
+                case PresentationEventType.ADD_SLIDE:
                     const slide: Partial<Slide> = {
                         presentationId: this.presentation.id,
                         slideId: crypto.randomUUID().toString(),
@@ -61,7 +70,7 @@ export class PresentationController extends CanvasControllers {
                     const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus });
                     this.presentation.slides.push(ConfiguredSlide);
                     break;
-                default :
+                default:
                     return;
             }
         });

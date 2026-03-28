@@ -101,6 +101,7 @@ export default class SlideController {
             if (event.slideId != this.slide.slideId) {
                 return;
             }
+            this.transformer.moveToTop(); // always move to top 
             let node: Shape | undefined;
             switch (event.eventType) {
                 case (PresentationEventType.ADD_TEXT):
