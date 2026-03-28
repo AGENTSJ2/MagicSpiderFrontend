@@ -6,7 +6,7 @@ export class Presentation {
     id: string;
     slides: Slide[];
     config: DocumentConfiguration;
-    controller:PresentationController = new PresentationController();
+    controller:PresentationController = new PresentationController(this);
     
     constructor(init?: Partial<Presentation>) {
         this.id = init?.id ?? crypto.randomUUID();

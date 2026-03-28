@@ -1,23 +1,24 @@
 import Konva from "konva";
 import { Slide } from "../domain/canvasModels/slide.model";
 import CanvasControllers from "./canvas.controller";
-import { PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
 import { Subscription } from "rxjs";
+import { TextConfig } from "konva/lib/shapes/Text";
 
 export default class TextController extends CanvasControllers {
     private textareaToEditText: HTMLTextAreaElement | undefined;
     private readonly positionSlack = 5;
     private slide: Slide;
     private containerDiv: HTMLDivElement;
-    private eventBus:PresentationEventStream;
-    private eventSubscription!:Subscription;
+    private eventBus: PresentationEventStream;
+    private eventSubscription!: Subscription;
     node: Konva.Text;
 
     constructor(init: {
         slide: Slide,
         content: string,
         textNode: Konva.Text,
-        eventBus:PresentationEventStream
+        eventBus: PresentationEventStream
     }) {
         super();
         this.eventBus = init.eventBus;
@@ -38,14 +39,28 @@ export default class TextController extends CanvasControllers {
     private boundRespondToClick = (event: MouseEvent) => {
         if (this.textareaToEditText && event.target != this.textareaToEditText) {
             let currentAttrs = this.node.getAttrs();
-            // this.eventBus.next(
-            //     new TextEvent(
-            //         {
-            //             presentationId:this.slide.
-            //         }
-            //     )
-            // );
-            this.node.text(this.textareaToEditText.value);
+            this.eventBus.next(
+                new TextEvent(
+                    {
+                        nodeId: this.node._id.toString(),
+                        presentationId: this.slide.presentationId,
+                        slideId: this.slide.slideId,
+                        previousConfig: {
+                            attrs: currentAttrs,
+                            zIndex: this.node.getZIndex()
+                        },
+                        currentConfig: {
+                            attrs: {
+                                ...currentAttrs,
+                                text: this.textareaToEditText.value
+                            },
+                            zIndex: this.node.getZIndex()
+                        },
+                        eventType: PresentationEventType.UPDATE_TEXT,
+                        trackHistory:true
+                    }
+                )
+            );
             this.textareaToEditText.remove();
             document.removeEventListener('mousedown', this.boundRespondToClick);
         }
@@ -60,7 +75,7 @@ export default class TextController extends CanvasControllers {
     private registerEvents() {
         this.node.on('click', () => {
             this.slide.controller.selectComponent(this.node, {
-                anchors: ["middle-left","middle-right",]
+                anchors: ["middle-left", "middle-right",]
             });
         });
         this.node.on("transform", () => {
@@ -98,19 +113,29 @@ export default class TextController extends CanvasControllers {
 
     }
 
-    private listenPresentationEventStream()
-    {
-        this.eventSubscription = this.eventBus.subscribe((event)=>{
-            if(!(event instanceof TextEvent))
-            {
+    private listenPresentationEventStream() {
+        this.eventSubscription = this.eventBus.subscribe((event) => {
+            if (!(event instanceof TextEvent) || event.nodeId != this.node._id.toString()) {
                 return;
             }
-            switch(event.eventType)
-            {
-                case PresentationEventType.UPDATE_TEXT :
+            switch (event.eventType) {
+                case PresentationEventType.UPDATE_TEXT:
+                    const textEvent = event as TextEvent
+                    this.applyConfigurations(textEvent.currentConfig);
                     break;
             }
         });
     }
 
+    applyConfigurations(config?: ComponentConfig<TextConfig>) {
+        if(!config)
+        {
+            this.destroy();
+            return;
+        }
+        this.node.setAttrs(
+            config
+        )
+        this.node.zIndex(config.zIndex)
+    }
 }

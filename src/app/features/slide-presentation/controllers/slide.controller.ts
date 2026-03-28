@@ -98,6 +98,10 @@ export default class SlideController {
 
     private ListenPresentationEvents() {
         this.eventBusSubscription = this.eventBus.subscribe((event: PresentationEvent) => {
+            if(event.slideId!=this.slide.slideId)
+            {
+                return;
+            }
             let node: Shape | undefined;
             switch (event.eventType) {
                 case (PresentationEventType.ADD_TEXT):
@@ -120,8 +124,9 @@ export default class SlideController {
                     node = shape.node;
                     break;
                 default:
-                    break;
+                    return; 
             }
+            event.nodeId = node!._id.toString();
             event.currentConfig = { attrs: node!.getAttrs(), zIndex: node!.getZIndex() };
             event.previousConfig = undefined;            
         })
