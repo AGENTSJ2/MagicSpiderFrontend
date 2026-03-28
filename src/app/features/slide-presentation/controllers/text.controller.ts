@@ -5,9 +5,9 @@ import CanvasControllers from "./canvas.controller";
 export default class TextController extends CanvasControllers {
     private textareaToEditText: HTMLTextAreaElement | undefined;
     private readonly positionSlack = 5;
-    private slide!: Slide;
-    private containerDiv!: HTMLDivElement;
-    node!: Konva.Text;
+    private slide: Slide;
+    private containerDiv: HTMLDivElement;
+    node: Konva.Text;
 
     constructor(init: {
         slide: Slide,

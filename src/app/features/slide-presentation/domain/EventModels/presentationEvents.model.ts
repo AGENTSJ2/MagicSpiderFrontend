@@ -1,5 +1,6 @@
 import { TextConfig } from "konva/lib/shapes/Text";
 import { ShapeType } from "../canvasModels/shapeComponent.model";
+import { Subject } from "rxjs";
 
 export class PresentationEvent {
     presentationId: string;
@@ -12,6 +13,11 @@ export class PresentationEvent {
         this.eventType = init.eventType;
     }
 }
+export class PresentationEventStream extends Subject<PresentationEvent>
+{
+
+}
+
 export class TextEvent extends PresentationEvent {
     currentConfig:TextConfig;
     previousConfig?:TextConfig;

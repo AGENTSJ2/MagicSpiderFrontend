@@ -5,6 +5,7 @@ import { Line } from "konva/lib/shapes/Line";
 import { Rect } from "konva/lib/shapes/Rect";
 import ShapeController from "../../controllers/shape.controller";
 import { Slide } from "./slide.model";
+import { PresentationEventStream } from "../EventModels/presentationEvents.model";
 
 export default class ShapeComponent implements ICanvasComponent {
     x!: number;
@@ -20,7 +21,7 @@ export default class ShapeComponent implements ICanvasComponent {
     controller!: ShapeController;
     slide!: Slide;
 
-    constructor(init: Partial<ShapeComponent>) {
+    constructor(init: Partial<ShapeComponent> & {eventBus:PresentationEventStream}) {
         this.slide = init.slide!;
         this.shapeType = init.shapeType!;
         this.x = init.x ?? 10;
@@ -60,7 +61,8 @@ export default class ShapeComponent implements ICanvasComponent {
         this.controller = new ShapeController(
             {
                 shape: this.node,
-                slide: this.slide
+                slide: this.slide,
+                eventBus:init.eventBus 
             }
         );
     }

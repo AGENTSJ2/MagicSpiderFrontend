@@ -1,11 +1,11 @@
 import { Observable, Subject } from "rxjs";
 import CanvasControllers from "./canvas.controller";
-import { PresentationEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream } from "../domain/EventModels/presentationEvents.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 
 export class PresentationController extends CanvasControllers {
 
-    private eventBus: Subject<PresentationEvent> = new Subject();
+    private eventBus: PresentationEventStream = new PresentationEventStream();
     private eventHistory: PresentationEvent[] = [];
 
     constructor() {
@@ -23,7 +23,7 @@ export class PresentationController extends CanvasControllers {
                 console.log('Redo');
             }
         });
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
     publishEvent(event: PresentationEvent) {
         this.eventHistory.push(event);
@@ -40,5 +40,10 @@ export class PresentationController extends CanvasControllers {
         };
         const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus});
         return ConfiguredSlide;
+    }
+
+    destroy()
+    {
+        this.eventBus.complete();
     }
 }

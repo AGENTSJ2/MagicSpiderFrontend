@@ -5,11 +5,11 @@ import { Transformer } from "konva/lib/shapes/Transformer";
 import { Stage } from "konva/lib/Stage";
 import { DocumentConfiguration } from "../domain/models/documentConfiguration.model";
 import { ICanvasComponent } from "../domain/canvasModels/ICanvasComponent";
-import { Subject } from "rxjs";
-import { PresentationEvent, PresentationEventType, ShapeEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
 import { TextComponent } from "../domain/canvasModels/textComponent.model";
-import ShapeComponent, { ShapeType } from "../domain/canvasModels/shapeComponent.model";
+import ShapeComponent from "../domain/canvasModels/shapeComponent.model";
 import { Slide } from "../domain/canvasModels/slide.model";
+import { Subscription } from "rxjs";
 
 export default class SlideController {
     transformer!: Transformer;
@@ -17,7 +17,8 @@ export default class SlideController {
     mainCover!: Rect;
     stage!: Stage;
     private slide: Slide;
-    private eventBus: Subject<PresentationEvent>;
+    private eventBus: PresentationEventStream;
+    private eventBusSubscription!: Subscription;
     private readonly Anchors = [
         "top-left",
         "top-center",
@@ -29,7 +30,7 @@ export default class SlideController {
         "bottom-right"
     ];
 
-    constructor(init: { eventBus: Subject<PresentationEvent>, slide: Slide }) {
+    constructor(init: { eventBus: PresentationEventStream, slide: Slide }) {
         this.eventBus = init.eventBus;
         this.slide = init.slide;
         this.setUp();
@@ -96,7 +97,7 @@ export default class SlideController {
     }
 
     private ListenPresentationEvents() {
-        this.eventBus.subscribe((event: PresentationEvent) => {
+        this.eventBusSubscription =  this.eventBus.subscribe((event: PresentationEvent) => {
 
             switch (event.eventType) {
                 case (PresentationEventType.ADD_TEXT):
@@ -112,6 +113,7 @@ export default class SlideController {
                     const shape = new ShapeComponent({
                         slide: this.slide,
                         shapeType: shpEvent.shapeType,
+                        eventBus:this.eventBus
                     })
                     this.addComponent(shape);
                     break;
@@ -122,6 +124,7 @@ export default class SlideController {
     }
 
     triggerResize(options: { divElm: HTMLDivElement, config: DocumentConfiguration }) {
+        this.slide.containerDiv = options.divElm;
         const containerWidth = options.divElm.offsetWidth;
         const containerHeight =
             options.divElm.offsetWidth *
@@ -154,5 +157,10 @@ export default class SlideController {
 
     addComponent(node: ICanvasComponent) {
         this.layer.add(node.node);
+    }
+
+    destroy()
+    {
+        this.eventBusSubscription.unsubscribe();
     }
 }

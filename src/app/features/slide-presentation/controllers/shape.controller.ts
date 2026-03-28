@@ -1,13 +1,16 @@
 import { Shape } from "konva/lib/Shape";
 import { Slide } from "../domain/canvasModels/slide.model";
 import CanvasControllers from "./canvas.controller";
+import { Subject } from "rxjs";
+import { PresentationEvent, PresentationEventStream } from "../domain/EventModels/presentationEvents.model";
 
 export default class ShapeController extends CanvasControllers {
     node!: Shape;
     slide!: Slide;
     constructor(init: {
         shape: Shape,
-        slide: Slide
+        slide: Slide,
+        eventBus:PresentationEventStream
     }) {
         super();
         this.node = init.shape;
