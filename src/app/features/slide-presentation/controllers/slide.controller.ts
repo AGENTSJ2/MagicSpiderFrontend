@@ -98,8 +98,7 @@ export default class SlideController {
 
     private ListenPresentationEvents() {
         this.eventBusSubscription = this.eventBus.subscribe((event: PresentationEvent) => {
-            if(event.slideId!=this.slide.slideId)
-            {
+            if (event.slideId != this.slide.slideId) {
                 return;
             }
             let node: Shape | undefined;
@@ -124,11 +123,11 @@ export default class SlideController {
                     node = shape.node;
                     break;
                 default:
-                    return; 
+                    return;
             }
             event.nodeId = node!._id.toString();
             event.currentConfig = { attrs: node!.getAttrs(), zIndex: node!.getZIndex() };
-            event.previousConfig = undefined;            
+            event.previousConfig = undefined;
         })
     }
 

@@ -36,23 +36,24 @@ export default class TextController extends CanvasControllers {
         this.eventSubscription.unsubscribe();
     }
 
-    private getEventObject(data: { eventType: PresentationEventType, newConfig: ComponentConfig<TextConfig> }): TextEvent {
-        let currentAttrs = this.node.getAttrs();
+    private getEventObject(data: { eventType: PresentationEventType, newConfig: ComponentConfig<TextConfig>, previousConfig?: ComponentConfig<TextConfig> }): TextEvent {
+        const currentAttrs = this.node.getAttrs();
+        const prevConfig = data.previousConfig ? structuredClone(data.previousConfig) : {
+            attrs: structuredClone(currentAttrs),
+            zIndex: this.node.getZIndex(),
+        };
         const event = new TextEvent(
             {
                 nodeId: this.node._id.toString(),
                 presentationId: this.slide.presentationId,
                 slideId: this.slide.slideId,
-                previousConfig: {
-                    attrs: structuredClone(currentAttrs),
-                    zIndex: this.node.getZIndex(),
-                },
+                previousConfig: prevConfig,
                 currentConfig: {
-                    attrs:{
+                    attrs: {
                         ...currentAttrs,
                         ...data.newConfig.attrs
                     },
-                    zIndex:data.newConfig.zIndex
+                    zIndex: data.newConfig.zIndex
                 },
                 eventType: data.eventType,
                 trackHistory: true
@@ -93,17 +94,17 @@ export default class TextController extends CanvasControllers {
             const scaleX = this.node.scaleX();
             // Convert scale → width/height
             const newWidth = this.node.width() * scaleX;
-            const updatedConfig:ComponentConfig<TextConfig> = {
-                attrs:{
-                    width:newWidth,
-                    scaleX:1,
-                    scaleY:1,
+            const updatedConfig: ComponentConfig<TextConfig> = {
+                attrs: {
+                    width: newWidth,
+                    scaleX: 1,
+                    scaleY: 1,
                 },
                 zIndex: this.node.getZIndex()
-            } 
+            }
             this.eventBus.next(
                 this.getEventObject({
-                    eventType:PresentationEventType.UPDATE_TEXT,
+                    eventType: PresentationEventType.UPDATE_TEXT,
                     newConfig: updatedConfig
                 })
             )
@@ -126,10 +127,31 @@ export default class TextController extends CanvasControllers {
             // click event seems to run as it was set inside dblClick hence mousedown is used 
             document.addEventListener('mousedown', this.boundRespondToClick);
         });
-        let XBeforeDrag:number = 0;
-        let YBeforeDrag:number = 0;
-        this.node.on("drags", () => {
-            
+        let XBeforeDrag: number = this.node.x();
+        let YBeforeDrag: number = this.node.y();
+        this.node.on("dragstart", () => {
+            XBeforeDrag = this.node.x();
+            YBeforeDrag = this.node.y();
+        });
+        this.node.on("dragend", () => {
+            this.eventBus.next(
+                this.getEventObject({
+                    eventType: PresentationEventType.UPDATE_TEXT,
+                    newConfig: {
+                        attrs: { }, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
+                        zIndex: this.node.zIndex()
+                    },
+                    previousConfig: {
+                        attrs: {
+                            x: XBeforeDrag,
+                            y: YBeforeDrag
+                        },
+                        zIndex: this.node.zIndex()
+                    }
+                })
+            );
+            XBeforeDrag = this.node.x();
+            YBeforeDrag = this.node.y();
         });
         document.addEventListener('keydown', this.handleKeyboardStrokes);
 
@@ -150,7 +172,7 @@ export default class TextController extends CanvasControllers {
     }
 
     applyConfigurations(config?: ComponentConfig<TextConfig>) {
-        if (!config) {
+        if (!config) { // config null means deletion of node (designed to perform undo operations on create operation)
             this.destroy();
             return;
         }
