@@ -12,11 +12,14 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
   activeSlide?:Slide;
+  
   constructor() { }
+
   ngOnInit(): void {
     this.presentation = new Presentation();
     this.addSlide(); // TODO REMOVE
   }
+
   handleAddText() {
     const textEvent: TextEvent = new TextEvent(
       {
@@ -31,6 +34,7 @@ export class WorkspaceComponent implements OnInit {
     )
     this.presentation.controller.publishEvent(textEvent)
   }
+  
   addSlide() {
     this.presentation.controller.publishEvent(
       new SlideEvent({
@@ -41,11 +45,12 @@ export class WorkspaceComponent implements OnInit {
         eventType:PresentationEventType.ADD_SLIDE,
       })
     )
-    if(this.presentation.slides.length == 0)
+    if(this.presentation.slides.length == 1)
     {
       this.selectSlide(this.presentation.slides[0]);
     }
   }
+  
   addShape() {
     const shapeEvent: ShapeEvent = new ShapeEvent(
       {
@@ -61,12 +66,13 @@ export class WorkspaceComponent implements OnInit {
     );
     this.presentation.controller.publishEvent(shapeEvent);
   }
+  
   selectSlide(slide:Slide)
   {
     this.activeSlide = undefined;
     setTimeout(()=>{
       this.activeSlide = slide;
     })
-    
   }
+
 }

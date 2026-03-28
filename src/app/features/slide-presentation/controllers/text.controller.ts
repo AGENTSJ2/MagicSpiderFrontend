@@ -36,30 +36,41 @@ export default class TextController extends CanvasControllers {
         this.eventSubscription.unsubscribe();
     }
 
+    private getEventObject(data: { eventType: PresentationEventType, newConfig: ComponentConfig<TextConfig> }): TextEvent {
+        let currentAttrs = this.node.getAttrs();
+        const event = new TextEvent(
+            {
+                nodeId: this.node._id.toString(),
+                presentationId: this.slide.presentationId,
+                slideId: this.slide.slideId,
+                previousConfig: {
+                    attrs: structuredClone(currentAttrs),
+                    zIndex: this.node.getZIndex(),
+                },
+                currentConfig: {
+                    attrs:{
+                        ...currentAttrs,
+                        ...data.newConfig.attrs
+                    },
+                    zIndex:data.newConfig.zIndex
+                },
+                eventType: data.eventType,
+                trackHistory: true
+            }
+        );
+        return event;
+    }
+
     private boundRespondToClick = (event: MouseEvent) => {
         if (this.textareaToEditText && event.target != this.textareaToEditText) {
-            let currentAttrs = this.node.getAttrs();
+            const updatedConfig = {
+                attrs: {
+                    text: this.textareaToEditText.value,
+                },
+                zIndex: this.node.getZIndex(),
+            };
             this.eventBus.next(
-                new TextEvent(
-                    {
-                        nodeId: this.node._id.toString(),
-                        presentationId: this.slide.presentationId,
-                        slideId: this.slide.slideId,
-                        previousConfig: {
-                            attrs: currentAttrs,
-                            zIndex: this.node.getZIndex()
-                        },
-                        currentConfig: {
-                            attrs: {
-                                ...currentAttrs,
-                                text: this.textareaToEditText.value
-                            },
-                            zIndex: this.node.getZIndex()
-                        },
-                        eventType: PresentationEventType.UPDATE_TEXT,
-                        trackHistory:true
-                    }
-                )
+                this.getEventObject({ eventType: PresentationEventType.UPDATE_TEXT, newConfig: updatedConfig })
             );
             this.textareaToEditText.remove();
             document.removeEventListener('mousedown', this.boundRespondToClick);
@@ -80,13 +91,22 @@ export default class TextController extends CanvasControllers {
         });
         this.node.on("transform", () => {
             const scaleX = this.node.scaleX();
-
             // Convert scale → width/height
-            this.node.width(this.node.width() * scaleX);
-
-            // Reset scale (IMPORTANT)
-            this.node.scaleX(1);
-            this.node.scaleY(1);
+            const newWidth = this.node.width() * scaleX;
+            const updatedConfig:ComponentConfig<TextConfig> = {
+                attrs:{
+                    width:newWidth,
+                    scaleX:1,
+                    scaleY:1,
+                },
+                zIndex: this.node.getZIndex()
+            } 
+            this.eventBus.next(
+                this.getEventObject({
+                    eventType:PresentationEventType.UPDATE_TEXT,
+                    newConfig: updatedConfig
+                })
+            )
         });
         this.node.on("dblclick", () => {
             this.slide.controller.removeSelectionOfComponent(this.node);
@@ -106,8 +126,10 @@ export default class TextController extends CanvasControllers {
             // click event seems to run as it was set inside dblClick hence mousedown is used 
             document.addEventListener('mousedown', this.boundRespondToClick);
         });
-        this.node.on("dragend", () => {
-            console.log("Drag ended");
+        let XBeforeDrag:number = 0;
+        let YBeforeDrag:number = 0;
+        this.node.on("drags", () => {
+            
         });
         document.addEventListener('keydown', this.handleKeyboardStrokes);
 
@@ -128,8 +150,7 @@ export default class TextController extends CanvasControllers {
     }
 
     applyConfigurations(config?: ComponentConfig<TextConfig>) {
-        if(!config)
-        {
+        if (!config) {
             this.destroy();
             return;
         }

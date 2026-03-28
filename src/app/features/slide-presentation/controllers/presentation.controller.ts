@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 import CanvasControllers from "./canvas.controller";
-import { PresentationEvent, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Presentation } from "../domain/canvasModels/presenatation.model";
 
@@ -18,6 +18,24 @@ export class PresentationController extends CanvasControllers {
     private registerEvent() {
         document.addEventListener('keydown', (event: KeyboardEvent) => {
             if (event.ctrlKey && event.key.toLowerCase() === 'z') {
+                const lastEvent = this.eventHistory[this.eventIdx];
+                let undoEvent:PresentationEvent| undefined;
+
+                if(lastEvent instanceof TextEvent)
+                {
+                    undoEvent = new TextEvent({
+                        ...lastEvent,
+                        currentConfig:lastEvent.previousConfig,
+                        trackHistory:false,
+                        eventType:PresentationEventType.UPDATE_TEXT
+                    })
+                }
+                this.publishEvent(
+                    undoEvent!
+                )
+                this.eventIdx--;
+                console.log(this.eventHistory,lastEvent);
+                
                 console.log('Undo');
             }
 
@@ -31,9 +49,10 @@ export class PresentationController extends CanvasControllers {
         this.eventBus.subscribe((event) => {
             if (event.trackHistory) {
                 this.eventHistory.push(event);
+                this.eventIdx = this.eventHistory.length - 1;
             }
             switch (event.eventType) {
-                case PresentationEventType.ADD_SLIDE:
+                case PresentationEventType.ADD_SLIDE:                    
                     const slide: Partial<Slide> = {
                         presentationId: this.presentation.id,
                         slideId: crypto.randomUUID().toString(),
