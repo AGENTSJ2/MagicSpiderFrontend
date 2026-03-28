@@ -97,29 +97,33 @@ export default class SlideController {
     }
 
     private ListenPresentationEvents() {
-        this.eventBusSubscription =  this.eventBus.subscribe((event: PresentationEvent) => {
-
+        this.eventBusSubscription = this.eventBus.subscribe((event: PresentationEvent) => {
+            let node: Shape | undefined;
             switch (event.eventType) {
                 case (PresentationEventType.ADD_TEXT):
-                    const textEv = event as TextEvent;
                     const textNode = new TextComponent({
                         slide: this.slide,
-                        textContent: textEv.currentConfig.text,
+                        textContent: "New Text",
+                        eventBus: this.eventBus
                     })
                     this.addComponent(textNode);
+                    node = textNode.node;
                     break;
                 case (PresentationEventType.ADD_SHAPE):
                     const shpEvent = event as ShapeEvent;
                     const shape = new ShapeComponent({
                         slide: this.slide,
                         shapeType: shpEvent.shapeType,
-                        eventBus:this.eventBus
+                        eventBus: this.eventBus
                     })
                     this.addComponent(shape);
+                    node = shape.node;
                     break;
                 default:
                     break;
             }
+            event.currentConfig = { attrs: node!.getAttrs(), zIndex: node!.getZIndex() };
+            event.previousConfig = undefined;            
         })
     }
 
@@ -159,8 +163,7 @@ export default class SlideController {
         this.layer.add(node.node);
     }
 
-    destroy()
-    {
+    destroy() {
         this.eventBusSubscription.unsubscribe();
     }
 }

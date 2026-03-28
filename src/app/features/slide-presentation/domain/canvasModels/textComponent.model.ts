@@ -2,6 +2,7 @@ import Konva from "konva";
 import TextController from "../../controllers/text.controller";
 import { Slide } from "./slide.model";
 import { ICanvasComponent } from "./ICanvasComponent";
+import { PresentationEventStream } from "../EventModels/presentationEvents.model";
 
 export class TextComponent  implements ICanvasComponent {
     x: number;
@@ -13,7 +14,7 @@ export class TextComponent  implements ICanvasComponent {
     slide: Slide;
     controller: TextController;
 
-    constructor(init: Partial<TextComponent>) {
+    constructor(init: Partial<TextComponent> & {eventBus:PresentationEventStream}) {
         this.x = init.x ?? 10;
         this.y = init.y ?? 10;
         this.textContent = init.textContent ?? "New Text";
@@ -26,11 +27,11 @@ export class TextComponent  implements ICanvasComponent {
             fontSize: this.fontSize,
             draggable: true,
         });
-
         this.controller = new TextController({
             slide: this.slide,
             content: this.textContent,
             textNode: this.node,
+            eventBus:init.eventBus
         });
     }
 }

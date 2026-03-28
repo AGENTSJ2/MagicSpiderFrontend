@@ -1,34 +1,50 @@
 import Konva from "konva";
 import { Slide } from "../domain/canvasModels/slide.model";
 import CanvasControllers from "./canvas.controller";
+import { PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { Subscription } from "rxjs";
 
 export default class TextController extends CanvasControllers {
     private textareaToEditText: HTMLTextAreaElement | undefined;
     private readonly positionSlack = 5;
     private slide: Slide;
     private containerDiv: HTMLDivElement;
+    private eventBus:PresentationEventStream;
+    private eventSubscription!:Subscription;
     node: Konva.Text;
 
     constructor(init: {
         slide: Slide,
         content: string,
-        textNode: Konva.Text
+        textNode: Konva.Text,
+        eventBus:PresentationEventStream
     }) {
         super();
+        this.eventBus = init.eventBus;
         this.slide = init.slide;
         this.containerDiv = init.slide.containerDiv;
         this.node = init.textNode;
         this.registerEvents();
+        this.listenPresentationEventStream();
     }
 
     private destroy() {
         this.node.remove();
         this.slide.controller.removeSelectionOfComponent(this.node);
         document.removeEventListener('keydown', this.handleKeyboardStrokes);
+        this.eventSubscription.unsubscribe();
     }
 
     private boundRespondToClick = (event: MouseEvent) => {
         if (this.textareaToEditText && event.target != this.textareaToEditText) {
+            let currentAttrs = this.node.getAttrs();
+            // this.eventBus.next(
+            //     new TextEvent(
+            //         {
+            //             presentationId:this.slide.
+            //         }
+            //     )
+            // );
             this.node.text(this.textareaToEditText.value);
             this.textareaToEditText.remove();
             document.removeEventListener('mousedown', this.boundRespondToClick);
@@ -41,7 +57,7 @@ export default class TextController extends CanvasControllers {
         }
     }
 
-    registerEvents() {
+    private registerEvents() {
         this.node.on('click', () => {
             this.slide.controller.selectComponent(this.node, {
                 anchors: ["middle-left","middle-right",]
@@ -82,5 +98,19 @@ export default class TextController extends CanvasControllers {
 
     }
 
+    private listenPresentationEventStream()
+    {
+        this.eventSubscription = this.eventBus.subscribe((event)=>{
+            if(!(event instanceof TextEvent))
+            {
+                return;
+            }
+            switch(event.eventType)
+            {
+                case PresentationEventType.UPDATE_TEXT :
+                    break;
+            }
+        });
+    }
 
 }

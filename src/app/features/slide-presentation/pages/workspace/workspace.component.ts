@@ -22,9 +22,7 @@ export class WorkspaceComponent implements OnInit {
       {
         presentationId: this.presentation.id,
         slideId: this.presentation.slides[0].slideId,
-        currentConfig:{
-          text:"New Text"
-        },
+        currentConfig:{ attrs:{},zIndex:0},
         previousConfig:undefined,
         eventType: PresentationEventType.ADD_TEXT
       }
@@ -42,6 +40,8 @@ export class WorkspaceComponent implements OnInit {
         presentationId: this.presentation.id,
         slideId: this.presentation.slides[0].slideId,
         shapeType: ShapeType.RECT,
+        currentConfig: {attrs:{},zIndex:0},
+        previousConfig:undefined,
         eventType: PresentationEventType.ADD_SHAPE
       }
     );
