@@ -8,7 +8,7 @@ export class PresentationEvent {
     presentationId: string;
     slideId: string;
     eventType:PresentationEventType;
-    currentConfig?:ComponentConfig<ShapeConfig> ;
+    currentConfig?:ComponentConfig<ShapeConfig>;
     previousConfig?:ComponentConfig<ShapeConfig>;
     trackHistory:boolean;
     constructor(init:PresentationEvent) {
@@ -27,15 +27,7 @@ export interface ComponentConfig<T>{
 }
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
-export class TextEvent extends PresentationEvent {
-    override currentConfig?: ComponentConfig<TextConfig>;
-    override previousConfig?: ComponentConfig<TextConfig>;
-    constructor(init:TextEvent) {
-        super(init)
-        this.currentConfig = init.currentConfig;
-        this.previousConfig = init.previousConfig;
-    }
-}
+
 export class ShapeEvent extends PresentationEvent
 {
     shapeType!:ShapeType;

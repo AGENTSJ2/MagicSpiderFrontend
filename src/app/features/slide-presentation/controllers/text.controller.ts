@@ -1,10 +1,11 @@
 import Konva from "konva";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
-import { ComponentConfig, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
 import { Subscription } from "rxjs";
 import { TextConfig } from "konva/lib/shapes/Text";
 import { ShapeConfig } from "konva/lib/Shape";
+import { TextEvent } from "../domain/EventModels/textEvent.model";
 
 export default class TextController extends BaseController {
     private textareaToEditText: HTMLTextAreaElement | undefined;

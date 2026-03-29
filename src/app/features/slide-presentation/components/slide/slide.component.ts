@@ -1,10 +1,6 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { ShapeEvent, TextEvent } from '../../domain/EventModels/presentationEvents.model';
-import { TextComponent } from '../../domain/canvasModels/textComponent.model';
-import ShapeComponent, { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
-import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-slide',
   templateUrl: './slide.component.html',

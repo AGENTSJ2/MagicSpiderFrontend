@@ -5,11 +5,12 @@ import { Transformer } from "konva/lib/shapes/Transformer";
 import { Stage } from "konva/lib/Stage";
 import { DocumentConfiguration } from "../domain/models/documentConfiguration.model";
 import { ICanvasComponent } from "../domain/canvasModels/ICanvasComponent";
-import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent } from "../domain/EventModels/presentationEvents.model";
 import { TextComponent } from "../domain/canvasModels/textComponent.model";
 import ShapeComponent from "../domain/canvasModels/shapeComponent.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Subscription } from "rxjs";
+import { TextEvent } from "../domain/EventModels/textEvent.model";
 
 export default class SlideController {
     transformer!: Transformer;

@@ -1,8 +1,9 @@
 import { Observable } from "rxjs";
 import BaseController from "./base.controller";
-import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent, SlideEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, SlideEvent } from "../domain/EventModels/presentationEvents.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Presentation } from "../domain/canvasModels/presenatation.model";
+import { TextEvent } from "../domain/EventModels/textEvent.model";
 
 export class PresentationController {
 
