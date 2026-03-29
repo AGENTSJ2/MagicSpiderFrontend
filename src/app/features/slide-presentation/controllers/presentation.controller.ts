@@ -1,10 +1,10 @@
 import { Observable } from "rxjs";
 import BaseController from "./base.controller";
-import { PresentationEvent, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent, SlideEvent, TextEvent } from "../domain/EventModels/presentationEvents.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Presentation } from "../domain/canvasModels/presenatation.model";
 
-export class PresentationController  {
+export class PresentationController {
 
     private eventBus: PresentationEventStream = new PresentationEventStream();
     private eventHistory: PresentationEvent[] = [];
@@ -30,7 +30,7 @@ export class PresentationController  {
                         ...lastEvent,
                         currentConfig: lastEvent.previousConfig,
                         trackHistory: false,
-                        eventType: PresentationEventType.UPDATE_TEXT
+                        eventType: PresentationEventType.UPDATE
                     })
                 }
                 this.publishEvent(
@@ -57,19 +57,15 @@ export class PresentationController  {
                 this.eventHistory.push(event);
                 this.eventIdx = this.eventHistory.length - 1;
             }
-
-            switch (event.eventType) {
-                case PresentationEventType.ADD_SLIDE:
-                    const slide: Partial<Slide> = {
-                        presentationId: this.presentation.id,
-                        slideId: crypto.randomUUID().toString(),
-                        components: [],
-                    };
-                    const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus });
-                    this.presentation.slides.push(ConfiguredSlide);
-                    break;
-                default:
-                    return;
+            if ((event instanceof SlideEvent) && (event.eventType == PresentationEventType.ADD)) {
+                console.log(event);
+                const slide: Partial<Slide> = {
+                    presentationId: this.presentation.id,
+                    slideId: crypto.randomUUID().toString(),
+                    components: [],
+                };
+                const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus });
+                this.presentation.slides.push(ConfiguredSlide);
             }
         });
     }

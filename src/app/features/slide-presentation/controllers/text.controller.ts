@@ -66,7 +66,7 @@ export default class TextController extends BaseController {
                 return;
             }
             switch (event.eventType) {
-                case PresentationEventType.UPDATE_TEXT:
+                case PresentationEventType.UPDATE:
                     const textEvent = event as TextEvent
                     this.applyConfigurations(textEvent.currentConfig);
                     break;
@@ -126,7 +126,7 @@ export default class TextController extends BaseController {
                 zIndex: this.node.getZIndex(),
             };
             this.eventBus.next(
-                this.getEventObject({ eventType: PresentationEventType.UPDATE_TEXT, newConfig: updatedConfig })
+                this.getEventObject({ eventType: PresentationEventType.UPDATE, newConfig: updatedConfig })
             );
             this.textareaToEditText.remove();
             document.removeEventListener('mousedown', this.boundRespondToClick);
@@ -138,7 +138,7 @@ export default class TextController extends BaseController {
             this.eventBus.next(
                 this.getEventObject(
                     {
-                        eventType: PresentationEventType.SELECT_NODE,
+                        eventType: PresentationEventType.SELECT,
                         newConfig: { attrs: {}, zIndex: this.node.zIndex() },
                     }
                 )
@@ -171,7 +171,7 @@ export default class TextController extends BaseController {
             };
             this.eventBus.next(
                 this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
+                    eventType: PresentationEventType.UPDATE,
                     newConfig: updatedConfig,
                     trackHistory: false
                 })
@@ -199,7 +199,7 @@ export default class TextController extends BaseController {
             }
             this.eventBus.next(
                 this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
+                    eventType: PresentationEventType.UPDATE,
                     newConfig: updatedConfig,
                     previousConfig: prevConfig
                 })
@@ -217,7 +217,7 @@ export default class TextController extends BaseController {
         this.node.on("dragend", () => {
             this.eventBus.next(
                 this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
+                    eventType: PresentationEventType.UPDATE,
                     newConfig: {
                         attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
                         zIndex: this.node.zIndex()

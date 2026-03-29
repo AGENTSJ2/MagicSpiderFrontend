@@ -55,16 +55,8 @@ export class SlideEvent extends PresentationEvent {
     }
 }
 export enum PresentationEventType {
-    ADD_TEXT,
-    UPDATE_TEXT,
-    MOVE_TEXT,
-    REMOVE_TEXT,
-
-    ADD_SHAPE,
- 
-    ADD_IMAGE,
-
-    ADD_SLIDE,
-
-    SELECT_NODE
+    ADD,
+    UPDATE,
+    REMOVE,
+    SELECT
 }

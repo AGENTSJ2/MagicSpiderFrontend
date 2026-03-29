@@ -11,8 +11,8 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 })
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
-  activeSlide?:Slide;
-  
+  activeSlide?: Slide;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -23,54 +23,55 @@ export class WorkspaceComponent implements OnInit {
   handleAddText() {
     const textEvent: TextEvent = new TextEvent(
       {
-        nodeId:"",
+        nodeId: "",
         presentationId: this.presentation.id,
         slideId: this.activeSlide!.slideId,
-        currentConfig:{ attrs:{},zIndex:0},
-        previousConfig:undefined,
-        eventType: PresentationEventType.ADD_TEXT,
-        trackHistory : true
+        currentConfig: { attrs: {}, zIndex: 0 },
+        previousConfig: undefined,
+        eventType: PresentationEventType.ADD,
+        trackHistory: true
       }
     )
     this.presentation.controller.publishEvent(textEvent)
   }
-  
+
   addSlide() {
+    const slideEvent = new SlideEvent({
+      presentationId: this.presentation.id,
+      slideId: "",
+      nodeId: '',
+      trackHistory: true,
+      eventType: PresentationEventType.ADD,
+    });
     this.presentation.controller.publishEvent(
-      new SlideEvent({
-        presentationId:this.presentation.id,
-        slideId:"",
-        nodeId:'',
-        trackHistory:true,
-        eventType:PresentationEventType.ADD_SLIDE,
-      })
+      slideEvent
     )
-    if(this.presentation.slides.length == 1)
-    {
+    console.log(slideEvent instanceof SlideEvent);
+    
+    if (this.presentation.slides.length == 1) {
       this.selectSlide(this.presentation.slides[0]);
     }
   }
-  
+
   addShape() {
     const shapeEvent: ShapeEvent = new ShapeEvent(
       {
-        nodeId:'',
+        nodeId: '',
         presentationId: this.presentation.id,
         slideId: this.presentation.slides[0].slideId,
         shapeType: ShapeType.RECT,
-        currentConfig: {attrs:{},zIndex:0},
-        previousConfig:undefined,
-        eventType: PresentationEventType.ADD_SHAPE,
-        trackHistory:true
+        currentConfig: { attrs: {}, zIndex: 0 },
+        previousConfig: undefined,
+        eventType: PresentationEventType.ADD,
+        trackHistory: true
       }
     );
     this.presentation.controller.publishEvent(shapeEvent);
   }
-  
-  selectSlide(slide:Slide)
-  {
+
+  selectSlide(slide: Slide) {
     this.activeSlide = undefined;
-    setTimeout(()=>{
+    setTimeout(() => {
       this.activeSlide = slide;
     })
   }

@@ -104,37 +104,18 @@ export default class SlideController {
             this.transformer.moveToTop(); // always move to top 
             let node: Shape | undefined;
             switch (event.eventType) {
-                case (PresentationEventType.SELECT_NODE):
+                case (PresentationEventType.SELECT):
                     const nodeId = event.nodeId;
-                    let targetNode = this.slide.components.find((nd)=>nd._id.toString() == nodeId);
+                    let targetNode = this.slide.components.find((nd) => nd._id.toString() == nodeId);
                     this.selectComponent(targetNode!);
                     node = targetNode;
                     break;
-                case (PresentationEventType.ADD_TEXT):
-                    const textNode = new TextComponent({
-                        slide: this.slide,
-                        textContent: "New Text",
-                        eventBus: this.eventBus
-                    })
-                    this.addComponent(textNode);
-                    node = textNode.node;
-                    break;
-                case (PresentationEventType.ADD_SHAPE):
-                    const shpEvent = event as ShapeEvent;
-                    const shape = new ShapeComponent({
-                        slide: this.slide,
-                        shapeType: shpEvent.shapeType,
-                        eventBus: this.eventBus
-                    })
-                    this.addComponent(shape);
-                    node = shape.node;
+                case (PresentationEventType.ADD):
+                    this.handleAddNode(event);
                     break;
                 default:
                     return;
             }
-            event.nodeId = node!._id.toString();
-            event.currentConfig = { attrs: node!.getAttrs(), zIndex: node!.getZIndex() };
-            event.previousConfig = event.previousConfig;
         })
     }
 
@@ -177,5 +158,27 @@ export default class SlideController {
 
     destroy() {
         this.eventBusSubscription.unsubscribe();
+    }
+
+    private handleAddNode(event: PresentationEvent) {
+        let node: ICanvasComponent | undefined;
+        if (event instanceof TextEvent) {
+            node = new TextComponent({
+                slide: this.slide,
+                textContent: "New Text",
+                eventBus: this.eventBus
+            })
+        }
+        if (event instanceof ShapeEvent) {
+            node = new ShapeComponent({
+                slide: this.slide,
+                shapeType: event.shapeType,
+                eventBus: this.eventBus
+            })
+        }
+        this.addComponent(node!);
+        event.nodeId = node!.node!._id.toString();
+        event.currentConfig = { attrs: node!.node!.getAttrs(), zIndex: node!.node!.getZIndex() };
+        event.previousConfig = event.previousConfig;
     }
 }
