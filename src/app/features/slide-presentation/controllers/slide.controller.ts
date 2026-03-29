@@ -104,6 +104,12 @@ export default class SlideController {
             this.transformer.moveToTop(); // always move to top 
             let node: Shape | undefined;
             switch (event.eventType) {
+                case (PresentationEventType.SELECT_NODE):
+                    const nodeId = event.nodeId;
+                    let targetNode = this.slide.components.find((nd)=>nd._id.toString() == nodeId);
+                    this.selectComponent(targetNode!);
+                    node = targetNode;
+                    break;
                 case (PresentationEventType.ADD_TEXT):
                     const textNode = new TextComponent({
                         slide: this.slide,
@@ -166,6 +172,7 @@ export default class SlideController {
 
     addComponent(node: ICanvasComponent) {
         this.layer.add(node.node);
+        this.slide.components.push(node.node);
     }
 
     destroy() {

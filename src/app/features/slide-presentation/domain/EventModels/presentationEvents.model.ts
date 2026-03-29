@@ -64,5 +64,7 @@ export enum PresentationEventType {
  
     ADD_IMAGE,
 
-    ADD_SLIDE
+    ADD_SLIDE,
+
+    SELECT_NODE
 }

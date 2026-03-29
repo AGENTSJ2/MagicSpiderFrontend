@@ -1,17 +1,17 @@
 import { Observable } from "rxjs";
-import CanvasControllers from "./canvas.controller";
+import BaseController from "./base.controller";
 import { PresentationEvent, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Presentation } from "../domain/canvasModels/presenatation.model";
 
-export class PresentationController extends CanvasControllers {
+export class PresentationController  {
 
     private eventBus: PresentationEventStream = new PresentationEventStream();
     private eventHistory: PresentationEvent[] = [];
     private eventIdx: number = -1;
     private readonly MAX_HISTORY_LENGTH = 100;
     constructor(private presentation: Presentation) {
-        super();
+
         this.registerEvent();
         this.listenPresentationEvents();
     }
@@ -47,8 +47,6 @@ export class PresentationController extends CanvasControllers {
 
     private listenPresentationEvents() {
         this.eventBus.subscribe((event) => {
-            if(this.eventHistory.length)
-            console.log(this.eventHistory,this.eventHistory[0].eventType);
             if (event.trackHistory) {
                 if (this.eventIdx != this.eventHistory.length - 1) { // some operation is performed after undo / redo hence reset
                     this.eventHistory.splice(this.eventIdx + 1)
