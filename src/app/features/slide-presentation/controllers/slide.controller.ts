@@ -134,7 +134,7 @@ export default class SlideController {
             }
             event.nodeId = node!._id.toString();
             event.currentConfig = { attrs: node!.getAttrs(), zIndex: node!.getZIndex() };
-            event.previousConfig = undefined;
+            event.previousConfig = event.previousConfig;
         })
     }
 
