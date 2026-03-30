@@ -19,21 +19,21 @@ export class AddTextEvent extends TextEvent {
 
 }
 export class UpdateTextEvent extends TextEvent {
-    constructor(init:AddTextEvent)
+    constructor(init:TextEvent)
     {
         super(init);
     }
 }
 
 export class RemoveTextEvent extends TextEvent {
-    constructor(init:AddTextEvent)
+    constructor(init:TextEvent)
     {
         super(init);
     }
 }
 
 export class SelectTextEvent extends TextEvent {
-    constructor(init:AddTextEvent)
+    constructor(init:TextEvent)
     {
         super(init);
     }

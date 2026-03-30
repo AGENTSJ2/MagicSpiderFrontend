@@ -1,7 +1,7 @@
 import Konva from "konva";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
-import { ComponentConfig, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream, PresentationEventType, UndoEvent } from "../domain/EventModels/presentationEvents.model";
 import { Subscription } from "rxjs";
 import { TextConfig } from "konva/lib/shapes/Text";
 import { ShapeConfig } from "konva/lib/Shape";
@@ -55,10 +55,7 @@ export default class TextController extends BaseController {
             // click event seems to run as it was set inside dblClick hence mousedown is used 
             document.addEventListener('mousedown', this.boundRespondToClick);
         });
-
-
         document.addEventListener('keydown', this.handleKeyboardStrokes);
-
     }
 
     private listenPresentationEventStream() {
@@ -66,10 +63,12 @@ export default class TextController extends BaseController {
             if (!(event instanceof TextEvent) || event.nodeId != this.node._id.toString()) {
                 return;
             }
-            if (event instanceof UpdateTextEvent) {
-                this.applyConfigurations(event.currentConfig);
+            if(event instanceof RemoveTextEvent)
+            {
+                this.destroy();
                 return;
             }
+            this.applyConfigurations(event.currentConfig);
         });
     }
     private applyConfigurations(config?: ComponentConfig<TextConfig>) {

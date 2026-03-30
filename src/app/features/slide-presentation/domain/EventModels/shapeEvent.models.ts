@@ -1,4 +1,15 @@
-import { ShapeEvent } from "./presentationEvents.model";
+import { ShapeType } from "../canvasModels/shapeComponent.model";
+import { PresentationEvent } from "./presentationEvents.model";
+
+export class ShapeEvent extends PresentationEvent
+{
+    shapeType!:ShapeType;
+    constructor(init:ShapeEvent)
+    {
+        super(init);
+        this.shapeType = init.shapeType;
+    }
+}
 
 export class AddShapeEvent extends ShapeEvent{
     constructor(init:ShapeEvent)

@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { ShapeEvent as ShapeEvent, SlideEvent } from '../../domain/EventModels/presentationEvents.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 import { AddTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
 import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
-import { AddShapeEvent } from '../../domain/EventModels/shapeEvent.models';
+import { AddShapeEvent, ShapeEvent } from '../../domain/EventModels/shapeEvent.models';
 
 @Component({
   selector: 'app-workspace',
