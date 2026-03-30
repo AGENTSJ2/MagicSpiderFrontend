@@ -4,6 +4,7 @@ import { PresentationEvent, PresentationEventStream, PresentationEventType, Slid
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Presentation } from "../domain/canvasModels/presenatation.model";
 import { TextEvent } from "../domain/EventModels/textEvent.model";
+import { AddSlideEvent } from "../domain/EventModels/slideEvent.model";
 
 export class PresentationController {
 
@@ -27,11 +28,11 @@ export class PresentationController {
                 let undoEvent: PresentationEvent | undefined;
 
                 if (lastEvent instanceof TextEvent) {
-                    undoEvent = new TextEvent({
+                    const EventClass = lastEvent.constructor as new (init: TextEvent) => TextEvent; // all wrong from here
+                    undoEvent = new EventClass({
                         ...lastEvent,
                         currentConfig: lastEvent.previousConfig,
                         trackHistory: false,
-                        eventType: PresentationEventType.UPDATE
                     })
                 }
                 this.publishEvent(
@@ -56,17 +57,20 @@ export class PresentationController {
                     this.eventHistory.shift(); // remove from the start 
                 }
                 this.eventHistory.push(event);
+                console.log(this.eventHistory);
+                
                 this.eventIdx = this.eventHistory.length - 1;
             }
-            if ((event instanceof SlideEvent) && (event.eventType == PresentationEventType.ADD)) {
-                console.log(event);
-                const slide: Partial<Slide> = {
-                    presentationId: this.presentation.id,
-                    slideId: crypto.randomUUID().toString(),
-                    components: [],
-                };
-                const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus });
-                this.presentation.slides.push(ConfiguredSlide);
+            if (event instanceof SlideEvent) {
+                if (event instanceof AddSlideEvent) {
+                    const slide: Partial<Slide> = {
+                        presentationId: this.presentation.id,
+                        slideId: crypto.randomUUID().toString(),
+                        components: [],
+                    };
+                    const ConfiguredSlide = new Slide({ ...slide, eventBus: this.eventBus });
+                    this.presentation.slides.push(ConfiguredSlide);
+                }
             }
         });
     }

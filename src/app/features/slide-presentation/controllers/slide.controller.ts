@@ -5,12 +5,13 @@ import { Transformer } from "konva/lib/shapes/Transformer";
 import { Stage } from "konva/lib/Stage";
 import { DocumentConfiguration } from "../domain/models/documentConfiguration.model";
 import { ICanvasComponent } from "../domain/canvasModels/ICanvasComponent";
-import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent } from "../domain/EventModels/presentationEvents.model";
+import { PresentationEvent, PresentationEventStream, PresentationEventType, ShapeEvent, SlideEvent } from "../domain/EventModels/presentationEvents.model";
 import { TextComponent } from "../domain/canvasModels/textComponent.model";
 import ShapeComponent from "../domain/canvasModels/shapeComponent.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import { Subscription } from "rxjs";
-import { TextEvent } from "../domain/EventModels/textEvent.model";
+import { AddTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from "../domain/EventModels/textEvent.model";
+import { AddShapeEvent, SelectShapeEvent } from "../domain/EventModels/shapeEvent.models";
 
 export default class SlideController {
     transformer!: Transformer;
@@ -104,21 +105,55 @@ export default class SlideController {
             }
             this.transformer.moveToTop(); // always move to top 
             let node: Shape | undefined;
-            switch (event.eventType) {
-                case (PresentationEventType.SELECT):
-                    const nodeId = event.nodeId;
-                    let targetNode = this.slide.components.find((nd) => nd._id.toString() == nodeId);
-                    this.selectComponent(targetNode!);
-                    node = targetNode;
-                    break;
-                case (PresentationEventType.ADD):
-                    this.handleAddNode(event);
-                    break;
-                default:
-                    return;
-            }
+            if(event instanceof TextEvent)
+            {
+                this.handleTextEvents(event);
+            };
+            if(event instanceof ShapeEvent)
+            {
+                this.handleShapeEvents(event);
+            };
+            if(event instanceof SlideEvent)
+            {
+                this.handleSlideEvents(event);
+            };
         })
     }
+    protected handleTextEvents(event:TextEvent)
+    {
+        if(event instanceof SelectTextEvent)
+        {
+            const nodeId = event.nodeId;
+            let targetNode = this.slide.components.find((nd) => nd._id.toString() == nodeId);
+            this.selectComponent(targetNode!);
+            return;
+        }
+        if(event instanceof AddTextEvent)
+        {
+            this.handleAddNode(event);
+            return;
+        }
+    }
+    protected handleShapeEvents(event:ShapeEvent)
+    {
+        if(event instanceof SelectShapeEvent)
+        {
+            const nodeId = event.nodeId;
+            let targetNode = this.slide.components.find((nd) => nd._id.toString() == nodeId);
+            this.selectComponent(targetNode!);
+            return;
+        }
+        if(event instanceof AddShapeEvent)
+        {
+            this.handleAddNode(event);
+            return;
+        }
+    }
+    protected handleSlideEvents(event:SlideEvent)
+    {
+
+    }
+
 
     triggerResize(options: { divElm: HTMLDivElement, config: DocumentConfiguration }) {
         this.slide.containerDiv = options.divElm;

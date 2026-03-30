@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { PresentationEventType, ShapeEvent as ShapeEvent, SlideEvent } from '../../domain/EventModels/presentationEvents.model';
+import { ShapeEvent as ShapeEvent, SlideEvent } from '../../domain/EventModels/presentationEvents.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { TextEvent } from '../../domain/EventModels/textEvent.model';
+import { AddTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
+import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
+import { AddShapeEvent } from '../../domain/EventModels/shapeEvent.models';
 
 @Component({
   selector: 'app-workspace',
@@ -22,14 +24,13 @@ export class WorkspaceComponent implements OnInit {
   }
 
   handleAddText() {
-    const textEvent: TextEvent = new TextEvent(
+    const textEvent: TextEvent = new AddTextEvent(
       {
         nodeId: "",
         presentationId: this.presentation.id,
         slideId: this.activeSlide!.slideId,
         currentConfig: { attrs: {}, zIndex: 0 },
         previousConfig: undefined,
-        eventType: PresentationEventType.ADD,
         trackHistory: true
       }
     )
@@ -37,25 +38,23 @@ export class WorkspaceComponent implements OnInit {
   }
 
   addSlide() {
-    const slideEvent = new SlideEvent({
+    const slideEvent = new AddSlideEvent({
       presentationId: this.presentation.id,
       slideId: "",
       nodeId: '',
       trackHistory: true,
-      eventType: PresentationEventType.ADD,
+      
     });
     this.presentation.controller.publishEvent(
       slideEvent
     )
-    console.log(slideEvent instanceof SlideEvent);
-    
     if (this.presentation.slides.length == 1) {
       this.selectSlide(this.presentation.slides[0]);
     }
   }
 
   addShape() {
-    const shapeEvent: ShapeEvent = new ShapeEvent(
+    const shapeEvent: ShapeEvent = new AddShapeEvent(
       {
         nodeId: '',
         presentationId: this.presentation.id,
@@ -63,7 +62,6 @@ export class WorkspaceComponent implements OnInit {
         shapeType: ShapeType.RECT,
         currentConfig: { attrs: {}, zIndex: 0 },
         previousConfig: undefined,
-        eventType: PresentationEventType.ADD,
         trackHistory: true
       }
     );

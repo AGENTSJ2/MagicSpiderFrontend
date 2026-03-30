@@ -5,7 +5,7 @@ import { ComponentConfig, PresentationEventStream, PresentationEventType } from 
 import { Subscription } from "rxjs";
 import { TextConfig } from "konva/lib/shapes/Text";
 import { ShapeConfig } from "konva/lib/Shape";
-import { TextEvent } from "../domain/EventModels/textEvent.model";
+import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from "../domain/EventModels/textEvent.model";
 
 export default class TextController extends BaseController {
     private textareaToEditText: HTMLTextAreaElement | undefined;
@@ -66,11 +66,9 @@ export default class TextController extends BaseController {
             if (!(event instanceof TextEvent) || event.nodeId != this.node._id.toString()) {
                 return;
             }
-            switch (event.eventType) {
-                case PresentationEventType.UPDATE:
-                    const textEvent = event as TextEvent
-                    this.applyConfigurations(textEvent.currentConfig);
-                    break;
+            if (event instanceof UpdateTextEvent) {
+                this.applyConfigurations(event.currentConfig);
+                return;
             }
         });
     }
@@ -98,24 +96,84 @@ export default class TextController extends BaseController {
             attrs: structuredClone(currentAttrs),
             zIndex: this.node.getZIndex(),
         };
-        const event = new TextEvent(
-            {
-                nodeId: this.node._id.toString(),
-                presentationId: this.slide.presentationId,
-                slideId: this.slide.slideId,
-                previousConfig: prevConfig,
-                currentConfig: {
-                    attrs: {
-                        ...currentAttrs,
-                        ...data.newConfig.attrs
-                    },
-                    zIndex: data.newConfig.zIndex
-                },
-                eventType: data.eventType,
-                trackHistory: data.trackHistory == undefined ? true : data.trackHistory
-            }
-        );
-        return event;
+        let event: TextEvent | undefined;
+        switch (data.eventType) {
+            case PresentationEventType.ADD:
+                event = new AddTextEvent(
+                    {
+                        nodeId: this.node._id.toString(),
+                        presentationId: this.slide.presentationId,
+                        slideId: this.slide.slideId,
+                        previousConfig: prevConfig,
+                        currentConfig: {
+                            attrs: {
+                                ...currentAttrs,
+                                ...data.newConfig.attrs
+                            },
+                            zIndex: data.newConfig.zIndex
+                        },
+                        trackHistory: data.trackHistory == undefined ? true : data.trackHistory
+                    }
+                );
+                break;
+            case PresentationEventType.UPDATE:
+                event = new UpdateTextEvent(
+                    {
+                        nodeId: this.node._id.toString(),
+                        presentationId: this.slide.presentationId,
+                        slideId: this.slide.slideId,
+                        previousConfig: prevConfig,
+                        currentConfig: {
+                            attrs: {
+                                ...currentAttrs,
+                                ...data.newConfig.attrs
+                            },
+                            zIndex: data.newConfig.zIndex
+                        },
+                        trackHistory: data.trackHistory == undefined ? true : data.trackHistory
+                    }
+                );
+                break;
+            case PresentationEventType.REMOVE:
+                event = new RemoveTextEvent(
+                    {
+                        nodeId: this.node._id.toString(),
+                        presentationId: this.slide.presentationId,
+                        slideId: this.slide.slideId,
+                        previousConfig: prevConfig,
+                        currentConfig: {
+                            attrs: {
+                                ...currentAttrs,
+                                ...data.newConfig.attrs
+                            },
+                            zIndex: data.newConfig.zIndex
+                        },
+                        trackHistory: data.trackHistory == undefined ? true : data.trackHistory
+                    }
+                );
+                break;
+            case PresentationEventType.SELECT:
+                event = new SelectTextEvent(
+                    {
+                        nodeId: this.node._id.toString(),
+                        presentationId: this.slide.presentationId,
+                        slideId: this.slide.slideId,
+                        previousConfig: prevConfig,
+                        currentConfig: {
+                            attrs: {
+                                ...currentAttrs,
+                                ...data.newConfig.attrs
+                            },
+                            zIndex: data.newConfig.zIndex
+                        },
+                        trackHistory: data.trackHistory == undefined ? true : data.trackHistory
+                    }
+                );
+                break;
+
+        }
+
+        return event!;
     }
 
     private boundRespondToClick = (event: MouseEvent) => {
