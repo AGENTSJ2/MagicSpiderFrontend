@@ -2,34 +2,27 @@ import Konva from "konva";
 import TextController from "../../controllers/text.controller";
 import { Slide } from "./slide.model";
 import { ICanvasComponent } from "./ICanvasComponent";
-import { PresentationEventStream } from "../EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream } from "../EventModels/presentationEvents.model";
+import { TextConfig } from "konva/lib/shapes/Text";
 
 export class TextComponent  implements ICanvasComponent {
-    x: number;
-    y: number;
-    textContent!: string;
-    fontSize!: number;
-
     node: Konva.Text;
+    config:ComponentConfig<TextConfig>;
     slide: Slide;
     controller: TextController;
-
-    constructor(init: Partial<TextComponent> & {eventBus:PresentationEventStream}) {
-        this.x = init.x ?? 10;
-        this.y = init.y ?? 10;
-        this.textContent = init.textContent ?? "New Text";
-        this.fontSize = init.fontSize ?? 50;
+    constructor(init: Partial<TextComponent> & {eventBus:PresentationEventStream}) {        
+        this.config = init.config!;
         this.slide = init.slide!;
         this.node = new Konva.Text({
-            x: this.x,
-            y: this.y,
-            text: this.textContent,
-            fontSize: this.fontSize,
+            ...this.config.attrs,
+            x: init.config?.attrs.x ?? 10,
+            y: init.config?.attrs.y ?? 10,
+            text: init.config?.attrs.text ?? "New Text",
+            fontSize: init.config?.attrs.fontSize ?? 50,
             draggable: true,
         });
         this.controller = new TextController({
             slide: this.slide,
-            content: this.textContent,
             textNode: this.node,
             eventBus:init.eventBus
         });

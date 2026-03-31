@@ -105,7 +105,6 @@ export default class SlideController {
                 return;
             }
             this.transformer.moveToTop(); // always move to top 
-            let node: Shape | undefined;
             if(event instanceof TextEvent)
             {
                 this.handleTextEvents(event);
@@ -129,7 +128,7 @@ export default class SlideController {
             this.selectComponent(targetNode!);
             return;
         }
-        if(event instanceof AddTextEvent)
+        if(event instanceof AddTextEvent)  
         {
             this.handleAddNode(event);
             return;
@@ -150,6 +149,7 @@ export default class SlideController {
             return;
         }
     }
+    
     protected handleSlideEvents(event:SlideEvent)
     {
 
@@ -199,12 +199,12 @@ export default class SlideController {
 
     private handleAddNode(event: PresentationEvent) {
         let node: ICanvasComponent | undefined;
-        if (event instanceof TextEvent) {
+        if (event instanceof AddTextEvent) {
             node = new TextComponent({
+                config:event.currentConfig,
                 slide: this.slide,
-                textContent: "New Text",
                 eventBus: this.eventBus
-            })
+            });
         }
         if (event instanceof ShapeEvent) {
             node = new ShapeComponent({

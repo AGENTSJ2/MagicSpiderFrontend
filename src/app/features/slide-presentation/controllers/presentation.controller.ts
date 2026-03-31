@@ -6,7 +6,13 @@ import {
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
-import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from '../domain/EventModels/textEvent.model';
+import {
+  AddTextEvent,
+  RemoveTextEvent,
+  SelectTextEvent,
+  TextEvent,
+  UpdateTextEvent,
+} from '../domain/EventModels/textEvent.model';
 import {
   AddSlideEvent,
   SlideEvent,
@@ -73,7 +79,6 @@ export class PresentationController {
         this.eventHistory.push(event);
         this.eventIdx = this.eventHistory.length - 1;
       }
-
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
           const slide: Partial<Slide> = {
@@ -100,21 +105,23 @@ export class PresentationController {
     });
   }
   private handleUndoTextEvent(event: TextEvent) {
-    if(event instanceof AddTextEvent)
-    {
-        const removeEvent = new RemoveTextEvent(
-            {
-                ...event
-            }
-        );
-        this.publishEvent(
-            removeEvent
-        )
-        return;
+    if (event instanceof AddTextEvent) {
+      const removeEvent = new RemoveTextEvent({
+        ...event,
+      });
+      this.publishEvent(removeEvent);
+      return;
     }
-    if(event instanceof UpdateTextEvent || event instanceof SelectTextEvent )
-    {
-        this.publishEvent(event);
+    if (event instanceof RemoveTextEvent) {
+      const addEvent = new AddTextEvent({
+        ...event,
+        currentConfig: event.previousConfig,
+      });
+      this.publishEvent(addEvent);
+      return;
+    }
+    if (event instanceof UpdateTextEvent || event instanceof SelectTextEvent) {
+      this.publishEvent(event);
     }
   }
 
