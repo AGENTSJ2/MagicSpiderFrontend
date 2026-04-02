@@ -1,8 +1,8 @@
 import { Shape, ShapeConfig } from "konva/lib/Shape";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
-import { ComponentConfig, PresentationEvent, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
-import { AddShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from "../domain/EventModels/shapeEvent.models";
+import { ComponentConfig, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
+import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from "../domain/EventModels/shapeEvent.models";
 import { ShapeType } from "../domain/canvasModels/shapeComponent.model";
 
 export default class ShapeController extends BaseController {
@@ -24,46 +24,29 @@ export default class ShapeController extends BaseController {
         this.shapeType = init.shapeType
     }
 
-    private destroy() {
+    protected override destroy() {
         this.node.remove();
         this.slide.controller.removeSelectionOfComponent(this.node);
         document.removeEventListener('keydown', this.handleKeyboardStrokes);
     }
 
     protected registerEvents() {
-        this.handleNodeClick();
-        this.handleTransformEvents()
-        this.node.on("dblclick", () => {
-            const { x, y } = this.node.getAbsolutePosition();
-        });
-        this.node.on("dragend", () => {
-            console.log("Drag ended");
-        });
+        super.handleNodeClick();
+        super.handleTransformEvents();
         document.addEventListener('keydown', this.handleKeyboardStrokes);
-        // this.node.on('transform', () => {
-        //     const scaleX = this.node.scaleX();
-        //     const scaleY = this.node.scaleY();
-        //     // Apply scale to actual size
-        //     this.node.width(this.node.width() * scaleX);
-        //     this.node.height(this.node.height() * scaleY);
-
-        //     // Reset scale
-        //     this.node.scaleX(1);
-        //     this.node.scaleY(1);
-        // });
     }
 
-    protected listenPresentationEventStream()
-    {
-        this.eventBus.subscribe((event)=>{
-            if(!(event instanceof ShapeEvent) || event.nodeId != this.node.id())
-            {
+    protected listenPresentationEventStream() {
+        this.eventBus.subscribe((event) => {
+            if (!(event instanceof ShapeEvent) || event.nodeId != this.node.id()) {
                 return;
             }
-            if(event instanceof UpdateShapeEvent)
-            {
-                console.log(event);
+            if (event instanceof UpdateShapeEvent) {
                 this.applyConfigurations(event.currentConfig!);
+                return;
+            }
+            if (event instanceof RemoveShapeEvent) {
+                this.destroy();
                 return;
             }
         })
@@ -81,7 +64,10 @@ export default class ShapeController extends BaseController {
             trackHistory: true,
             nodeId: this.node.id(),
             shapeType: this.shapeType,
-            currentConfig:data.newConfig,
+            currentConfig: {
+                attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig },
+                zIndex: data.newConfig.zIndex
+            },
             previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),
         };
 
@@ -98,22 +84,28 @@ export default class ShapeController extends BaseController {
                 return new UpdateShapeEvent(
                     { ...defaultEvent },
                 );
+            case PresentationEventType.REMOVE:
+                return new RemoveShapeEvent(
+                    { ...defaultEvent },
+                );
             default:
                 return new ShapeEvent({
-                   ...defaultEvent
+                    ...defaultEvent
                 });
         }
     }
 
-    protected applyConfigurations(config:ComponentConfig<ShapeConfig>)
-    {
+    protected applyConfigurations(config: ComponentConfig<ShapeConfig>) {
         this.node.setAttrs(config);
         this.node.zIndex(config.zIndex);
     }
 
-    private handleKeyboardStrokes = (event: KeyboardEvent) => {
-        if (event.key === 'Delete' && this.slide.controller.isNodeSelected(this.node)) {
-            this.destroy();
+    protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
+        if (
+            event.key === 'Delete' &&
+            this.slide.controller.isNodeSelected(this.node)
+        ) {
+            super.handleRemove();
         }
-    }
+    };
 }

@@ -13,6 +13,12 @@ export default abstract class BaseController {
      * Override this if you need custom behavior.
      */
     protected abstract registerEvents(): void;
+
+    protected abstract destroy(): void;
+
+    protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
+
+
     protected abstract getEventObject(data: {
         eventType: PresentationEventType;
         newConfig: ComponentConfig<ShapeConfig>;
@@ -87,10 +93,20 @@ export default abstract class BaseController {
                     eventType: PresentationEventType.UPDATE,
                     newConfig: updatedConfig,
                     previousConfig: prevConfig,
-                    trackHistory:true
+                    trackHistory: true
                 }),
             );
         });
     }
+
+    protected handleRemove() {
+        this.eventBus.next(
+            this.getEventObject({
+                eventType: PresentationEventType.REMOVE,
+                newConfig: { attrs: {}, zIndex: this.node.getZIndex() },
+            }),
+        );
+    }
+
 
 } 

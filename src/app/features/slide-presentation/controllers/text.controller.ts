@@ -8,7 +8,6 @@ import {
 } from '../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
-import { ShapeConfig } from 'konva/lib/Shape';
 import {
   AddTextEvent,
   RemoveTextEvent,
@@ -30,7 +29,7 @@ export default class TextController extends BaseController {
     textNode: Konva.Text;
     eventBus: PresentationEventStream;
   }) {
-    super({ node: init.textNode,eventBus:init.eventBus });
+    super({ node: init.textNode, eventBus: init.eventBus });
     this.slide = init.slide;
     this.containerDiv = init.slide.containerDiv;
     this.node = init.textNode;
@@ -42,7 +41,7 @@ export default class TextController extends BaseController {
     this.handleNodeClick();
     this.handleTransformEvents();
     this.handleDragEvents();
-
+    document.addEventListener('keydown', this.handleKeyboardStrokes);
     this.node.on('dblclick', () => {
       this.slide.controller.removeSelectionOfComponent(this.node);
       const { x, y } = this.node.getAbsolutePosition();
@@ -61,7 +60,6 @@ export default class TextController extends BaseController {
       // click event seems to run as it was set inside dblClick hence mousedown is used
       document.addEventListener('mousedown', this.boundRespondToClick);
     });
-    document.addEventListener('keydown', this.handleKeyboardStrokes);
   }
 
   private listenPresentationEventStream() {
@@ -90,7 +88,7 @@ export default class TextController extends BaseController {
     this.node.zIndex(config.zIndex);
   }
 
-  private destroy() {
+  protected override destroy() {
     this.node.remove();
     this.slide.controller.removeSelectionOfComponent(this.node);
     document.removeEventListener('keydown', this.handleKeyboardStrokes);
@@ -103,79 +101,48 @@ export default class TextController extends BaseController {
     previousConfig?: ComponentConfig<TextConfig>;
     trackHistory?: boolean;
   }): TextEvent {
-    const currentAttrs = structuredClone(this.node.getAttrs());
-    const prevConfig = data.previousConfig
-      ? structuredClone(data.previousConfig)
-      : {
-          attrs: structuredClone(currentAttrs),
-          zIndex: this.node.getZIndex(),
-        };
+    const defaultEvent: TextEvent = {
+      nodeId: this.node._id.toString(),
+      presentationId: this.slide.presentationId,
+      slideId: this.slide.slideId,
+      previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),
+      trackHistory:
+        data.trackHistory == undefined ? true : data.trackHistory,
+      currentConfig: {
+        attrs: {
+          ...structuredClone(this.node.getAttrs()),
+          ...data.newConfig.attrs,
+        },
+        zIndex: data.newConfig.zIndex,
+      },
+
+    }
+
     let event: TextEvent | undefined;
     switch (data.eventType) {
       case PresentationEventType.ADD:
         event = new AddTextEvent({
-          nodeId: this.node._id.toString(),
-          presentationId: this.slide.presentationId,
-          slideId: this.slide.slideId,
-          previousConfig: prevConfig,
-          currentConfig: {
-            attrs: {
-              ...currentAttrs,
-              ...data.newConfig.attrs,
-            },
-            zIndex: data.newConfig.zIndex,
-          },
-          trackHistory:
-            data.trackHistory == undefined ? true : data.trackHistory,
+          ...defaultEvent
         });
         break;
       case PresentationEventType.UPDATE:
         event = new UpdateTextEvent({
-          nodeId: this.node._id.toString(),
-          presentationId: this.slide.presentationId,
-          slideId: this.slide.slideId,
-          previousConfig: prevConfig,
-          currentConfig: {
-            attrs: {
-              ...currentAttrs,
-              ...data.newConfig.attrs,
-            },
-            zIndex: data.newConfig.zIndex,
-          },
-          trackHistory:
-            data.trackHistory == undefined ? true : data.trackHistory,
+          ...defaultEvent
         });
         break;
       case PresentationEventType.REMOVE:
         event = new RemoveTextEvent({
-          nodeId: this.node._id.toString(),
-          presentationId: this.slide.presentationId,
-          slideId: this.slide.slideId,
-          previousConfig: prevConfig,
+          ...defaultEvent,
           currentConfig: {
             attrs: {
             },
             zIndex: data.newConfig.zIndex,
           },
-          trackHistory:
-            data.trackHistory == undefined ? true : data.trackHistory,
         });
         break;
       case PresentationEventType.SELECT:
         event = new SelectTextEvent({
-          nodeId: this.node._id.toString(),
-          presentationId: this.slide.presentationId,
-          slideId: this.slide.slideId,
-          previousConfig: prevConfig,
-          currentConfig: {
-            attrs: {
-              ...currentAttrs,
-              ...data.newConfig.attrs,
-            },
-            zIndex: data.newConfig.zIndex,
-          },
-          trackHistory:
-            data.trackHistory == undefined ? true : data.trackHistory,
+          ...defaultEvent
         });
         break;
     }
@@ -211,67 +178,6 @@ export default class TextController extends BaseController {
     }
   };
 
-  // protected handleTransformEvents() {
-  //   let widthBeforeTransform: number = this.node.width();
-  //   let heightBeforeTransform: number = this.node.height();
-
-  //   this.node.on('transformstart', () => {
-  //     widthBeforeTransform = this.node.width();
-  //     heightBeforeTransform = this.node.height();
-  //   });
-
-  //   this.node.on('transform', () => {
-  //     const scaleX = this.node.scaleX();
-  //     const scaleY = this.node.scaleY();
-  //     const newWidth = this.node.width() * scaleX;
-  //     const newHeight = this.node.height() * scaleY;
-  //     const updatedConfig: ComponentConfig<ShapeConfig> = {
-  //       attrs: {
-  //         width: newWidth,
-  //         height: newHeight,
-  //         scaleX: 1,
-  //         scaleY: 1,
-  //       },
-  //       zIndex: this.node.getZIndex(),
-  //     };
-  //     this.eventBus.next(
-  //       this.getEventObject({
-  //         eventType: PresentationEventType.UPDATE,
-  //         newConfig: updatedConfig,
-  //         trackHistory: false,
-  //       }),
-  //     );
-  //   });
-
-  //   this.node.on('transformend', () => {
-  //     const updatedConfig: ComponentConfig<TextConfig> = {
-  //       attrs: {
-  //         width: this.node.width(),
-  //         height: this.node.height(),
-  //         scaleX: 1,
-  //         scaleY: 1,
-  //       },
-  //       zIndex: this.node.getZIndex(),
-  //     };
-  //     const prevConfig: ComponentConfig<TextConfig> = {
-  //       attrs: {
-  //         width: widthBeforeTransform,
-  //         height: heightBeforeTransform,
-  //         scaleX: 1,
-  //         scaleY: 1,
-  //       },
-  //       zIndex: this.node.getZIndex(),
-  //     };
-  //     this.eventBus.next(
-  //       this.getEventObject({
-  //         eventType: PresentationEventType.UPDATE,
-  //         newConfig: updatedConfig,
-  //         previousConfig: prevConfig,
-  //       }),
-  //     );
-  //   });
-  // }
-
   protected handleDragEvents() {
     let XBeforeDrag: number = this.node.x();
     let YBeforeDrag: number = this.node.y();
@@ -301,17 +207,12 @@ export default class TextController extends BaseController {
     });
   }
 
-  private handleKeyboardStrokes = (event: KeyboardEvent) => {
+  protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
     if (
       event.key === 'Delete' &&
       this.slide.controller.isNodeSelected(this.node)
     ) {
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.REMOVE,
-          newConfig: { attrs: {}, zIndex: this.node.getZIndex() },
-        }),
-      );
+      super.handleRemove();
     }
   };
 }

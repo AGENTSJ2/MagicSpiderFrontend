@@ -30,3 +30,10 @@ export class UpdateShapeEvent extends ShapeEvent{
         super(init);
     }
 }
+
+export class RemoveShapeEvent extends ShapeEvent{
+    constructor(init:ShapeEvent)
+    {
+        super(init);
+    }
+}
