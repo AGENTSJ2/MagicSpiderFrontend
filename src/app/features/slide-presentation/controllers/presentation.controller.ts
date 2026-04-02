@@ -47,16 +47,16 @@ export class PresentationController {
         let undoEvent: UndoEvent | undefined;
 
         // if (lastEvent instanceof TextEvent) {
-          const EventClass = lastEvent.constructor as new (
-            init: TextEvent,
-          ) => TextEvent; // all wrong from here
-          const newEvent = new EventClass({
-            ...lastEvent,
-            currentConfig: lastEvent.previousConfig,
-            trackHistory: false,
-          });
+        const EventClass = lastEvent.constructor as new (
+          init: TextEvent,
+        ) => TextEvent; // all wrong from here
+        const newEvent = new EventClass({
+          ...lastEvent,
+          currentConfig: lastEvent.previousConfig,
+          trackHistory: false,
+        });
 
-          undoEvent = new UndoEvent(newEvent);
+        undoEvent = new UndoEvent(newEvent);
         // }
         this.publishEvent(undoEvent!);
         this.eventIdx--;
@@ -69,7 +69,8 @@ export class PresentationController {
   }
 
   private listenPresentationEvents() {
-    this.eventBus.subscribe((event) => {      
+    this.eventBus.subscribe((event) => {
+
       if (event.trackHistory) {
         if (this.eventIdx != this.eventHistory.length - 1) {
           // some operation is performed after undo / redo hence reset
@@ -80,6 +81,8 @@ export class PresentationController {
         }
         this.eventHistory.push(event);
         this.eventIdx = this.eventHistory.length - 1;
+        console.log(this.eventHistory);
+
       }
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {

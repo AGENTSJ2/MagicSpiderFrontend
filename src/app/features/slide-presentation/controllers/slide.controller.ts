@@ -216,6 +216,7 @@ export default class SlideController {
     if (event instanceof ShapeEvent) {
       node = new ShapeComponent({
         slide: this.slide,
+        config:event.currentConfig,
         shapeType: event.shapeType,
         eventBus: this.eventBus,
       });
@@ -227,10 +228,10 @@ export default class SlideController {
     }
     this.addComponent(node!);
     event.nodeId = node!.node!._id.toString();
-    event.currentConfig = {
+    event.currentConfig = structuredClone({
       attrs: node!.node!.getAttrs(),
       zIndex: node!.node!.getZIndex(),
-    };
-    event.previousConfig = event.previousConfig;
+    });
+    event.previousConfig = structuredClone(event.previousConfig);
   }
 }

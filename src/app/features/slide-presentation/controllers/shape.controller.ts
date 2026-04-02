@@ -62,7 +62,7 @@ export default class ShapeController extends BaseController {
         const defaultEvent: ShapeEvent = {
             presentationId: this.slide.presentationId,
             slideId: this.slide.slideId,
-            trackHistory: true,
+            trackHistory: data.trackHistory == undefined ? true : data.trackHistory,
             nodeId: this.node.id(),
             shapeType: this.shapeType,
             currentConfig: {
