@@ -23,3 +23,10 @@ export class SelectShapeEvent extends ShapeEvent{
         super(init);
     }
 }
+
+export class UpdateShapeEvent extends ShapeEvent{
+    constructor(init:ShapeEvent)
+    {
+        super(init);
+    }
+}

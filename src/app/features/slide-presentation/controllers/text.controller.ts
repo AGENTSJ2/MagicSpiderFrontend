@@ -5,7 +5,6 @@ import {
   ComponentConfig,
   PresentationEventStream,
   PresentationEventType,
-  UndoEvent,
 } from '../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
@@ -23,7 +22,6 @@ export default class TextController extends BaseController {
   private readonly positionSlack = 5;
   private slide: Slide;
   private containerDiv: HTMLDivElement;
-  // private eventBus: PresentationEventStream;
   private eventSubscription!: Subscription;
   override node: Konva.Text;
 
@@ -33,7 +31,6 @@ export default class TextController extends BaseController {
     eventBus: PresentationEventStream;
   }) {
     super({ node: init.textNode,eventBus:init.eventBus });
-    // this.eventBus = init.eventBus;
     this.slide = init.slide;
     this.containerDiv = init.slide.containerDiv;
     this.node = init.textNode;
@@ -214,77 +211,66 @@ export default class TextController extends BaseController {
     }
   };
 
-  // protected handleNodeClick(): void {
-  //   this.node.on('click', () => {
+  // protected handleTransformEvents() {
+  //   let widthBeforeTransform: number = this.node.width();
+  //   let heightBeforeTransform: number = this.node.height();
+
+  //   this.node.on('transformstart', () => {
+  //     widthBeforeTransform = this.node.width();
+  //     heightBeforeTransform = this.node.height();
+  //   });
+
+  //   this.node.on('transform', () => {
+  //     const scaleX = this.node.scaleX();
+  //     const scaleY = this.node.scaleY();
+  //     const newWidth = this.node.width() * scaleX;
+  //     const newHeight = this.node.height() * scaleY;
+  //     const updatedConfig: ComponentConfig<ShapeConfig> = {
+  //       attrs: {
+  //         width: newWidth,
+  //         height: newHeight,
+  //         scaleX: 1,
+  //         scaleY: 1,
+  //       },
+  //       zIndex: this.node.getZIndex(),
+  //     };
   //     this.eventBus.next(
   //       this.getEventObject({
-  //         eventType: PresentationEventType.SELECT,
-  //         newConfig: { attrs: {}, zIndex: this.node.zIndex() },
+  //         eventType: PresentationEventType.UPDATE,
+  //         newConfig: updatedConfig,
+  //         trackHistory: false,
+  //       }),
+  //     );
+  //   });
+
+  //   this.node.on('transformend', () => {
+  //     const updatedConfig: ComponentConfig<TextConfig> = {
+  //       attrs: {
+  //         width: this.node.width(),
+  //         height: this.node.height(),
+  //         scaleX: 1,
+  //         scaleY: 1,
+  //       },
+  //       zIndex: this.node.getZIndex(),
+  //     };
+  //     const prevConfig: ComponentConfig<TextConfig> = {
+  //       attrs: {
+  //         width: widthBeforeTransform,
+  //         height: heightBeforeTransform,
+  //         scaleX: 1,
+  //         scaleY: 1,
+  //       },
+  //       zIndex: this.node.getZIndex(),
+  //     };
+  //     this.eventBus.next(
+  //       this.getEventObject({
+  //         eventType: PresentationEventType.UPDATE,
+  //         newConfig: updatedConfig,
+  //         previousConfig: prevConfig,
   //       }),
   //     );
   //   });
   // }
-
-  protected handleTransformEvents() {
-    let widthBeforeTransform: number = this.node.width();
-    let heightBeforeTransform: number = this.node.height();
-
-    this.node.on('transformstart', () => {
-      widthBeforeTransform = this.node.width();
-      heightBeforeTransform = this.node.height();
-    });
-
-    this.node.on('transform', () => {
-      const scaleX = this.node.scaleX();
-      const scaleY = this.node.scaleY();
-      const newWidth = this.node.width() * scaleX;
-      const newHeight = this.node.height() * scaleY;
-      const updatedConfig: ComponentConfig<ShapeConfig> = {
-        attrs: {
-          width: newWidth,
-          height: newHeight,
-          scaleX: 1,
-          scaleY: 1,
-        },
-        zIndex: this.node.getZIndex(),
-      };
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: updatedConfig,
-          trackHistory: false,
-        }),
-      );
-    });
-
-    this.node.on('transformend', () => {
-      const updatedConfig: ComponentConfig<TextConfig> = {
-        attrs: {
-          width: this.node.width(),
-          height: this.node.height(),
-          scaleX: 1,
-          scaleY: 1,
-        },
-        zIndex: this.node.getZIndex(),
-      };
-      const prevConfig: ComponentConfig<TextConfig> = {
-        attrs: {
-          width: widthBeforeTransform,
-          height: heightBeforeTransform,
-          scaleX: 1,
-          scaleY: 1,
-        },
-        zIndex: this.node.getZIndex(),
-      };
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: updatedConfig,
-          previousConfig: prevConfig,
-        }),
-      );
-    });
-  }
 
   protected handleDragEvents() {
     let XBeforeDrag: number = this.node.x();
