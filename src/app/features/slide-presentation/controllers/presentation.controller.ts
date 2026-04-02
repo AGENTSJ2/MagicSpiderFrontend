@@ -108,6 +108,7 @@ export class PresentationController {
     if (event instanceof AddTextEvent) {
       const removeEvent = new RemoveTextEvent({
         ...event,
+        trackHistory: false,
       });
       this.publishEvent(removeEvent);
       return;
@@ -116,12 +117,26 @@ export class PresentationController {
       const addEvent = new AddTextEvent({
         ...event,
         currentConfig: event.previousConfig,
+        trackHistory: false,
       });
       this.publishEvent(addEvent);
       return;
     }
-    if (event instanceof UpdateTextEvent || event instanceof SelectTextEvent) {
-      this.publishEvent(event);
+    if (event instanceof UpdateTextEvent) {
+      const newEvent = new UpdateTextEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
+    }
+    if (event instanceof SelectTextEvent) {
+      const newEvent = new SelectTextEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
     }
   }
 

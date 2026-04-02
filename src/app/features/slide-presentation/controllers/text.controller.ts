@@ -71,7 +71,7 @@ export default class TextController extends BaseController {
     this.eventSubscription = this.eventBus.subscribe((event) => {
       if (
         !(event instanceof TextEvent) ||
-        event.nodeId != this.node._id.toString()
+        event.nodeId != this.node.id()
       ) {
         return;
       }
