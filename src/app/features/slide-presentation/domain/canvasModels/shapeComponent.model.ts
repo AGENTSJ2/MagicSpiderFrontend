@@ -62,7 +62,8 @@ export default class ShapeComponent implements ICanvasComponent {
             {
                 shape: this.node,
                 slide: this.slide,
-                eventBus:init.eventBus 
+                eventBus:init.eventBus ,
+                shapeType:init.shapeType!
             }
         );
     }

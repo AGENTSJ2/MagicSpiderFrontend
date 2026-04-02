@@ -23,7 +23,7 @@ export default class TextController extends BaseController {
   private readonly positionSlack = 5;
   private slide: Slide;
   private containerDiv: HTMLDivElement;
-  private eventBus: PresentationEventStream;
+  // private eventBus: PresentationEventStream;
   private eventSubscription!: Subscription;
   override node: Konva.Text;
 
@@ -32,8 +32,8 @@ export default class TextController extends BaseController {
     textNode: Konva.Text;
     eventBus: PresentationEventStream;
   }) {
-    super({ node: init.textNode });
-    this.eventBus = init.eventBus;
+    super({ node: init.textNode,eventBus:init.eventBus });
+    // this.eventBus = init.eventBus;
     this.slide = init.slide;
     this.containerDiv = init.slide.containerDiv;
     this.node = init.textNode;
@@ -82,6 +82,7 @@ export default class TextController extends BaseController {
       this.applyConfigurations(event.currentConfig);
     });
   }
+
   private applyConfigurations(config?: ComponentConfig<TextConfig>) {
     if (!config) {
       // config null means deletion of node (designed to perform undo operations on create operation)
@@ -99,7 +100,7 @@ export default class TextController extends BaseController {
     this.eventSubscription.unsubscribe();
   }
 
-  private getEventObject(data: {
+  protected override getEventObject(data: {
     eventType: PresentationEventType;
     newConfig: ComponentConfig<TextConfig>;
     previousConfig?: ComponentConfig<TextConfig>;
@@ -213,16 +214,16 @@ export default class TextController extends BaseController {
     }
   };
 
-  protected handleNodeClick(): void {
-    this.node.on('click', () => {
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.SELECT,
-          newConfig: { attrs: {}, zIndex: this.node.zIndex() },
-        }),
-      );
-    });
-  }
+  // protected handleNodeClick(): void {
+  //   this.node.on('click', () => {
+  //     this.eventBus.next(
+  //       this.getEventObject({
+  //         eventType: PresentationEventType.SELECT,
+  //         newConfig: { attrs: {}, zIndex: this.node.zIndex() },
+  //       }),
+  //     );
+  //   });
+  // }
 
   protected handleTransformEvents() {
     let widthBeforeTransform: number = this.node.width();

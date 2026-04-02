@@ -17,7 +17,6 @@ import {
   AddTextEvent,
   SelectTextEvent,
   TextEvent,
-  UpdateTextEvent,
 } from '../domain/EventModels/textEvent.model';
 import {
   AddShapeEvent,
@@ -206,7 +205,7 @@ export default class SlideController {
 
   private handleAddNode(event: PresentationEvent) {
     let node: ICanvasComponent | undefined;
-    const isRejuvenation = event.nodeId.length != 0; // previously this node exsist hence there was an node id ,  brought back with undo or such operations
+    const isRejuvenation = event.nodeId.length != 0; // previously this node exists hence there was an node id ,  brought back with undo or such operations
     if (event instanceof AddTextEvent) {
       node = new TextComponent({
         config: event.currentConfig,
