@@ -81,8 +81,6 @@ export class PresentationController {
         }
         this.eventHistory.push(event);
         this.eventIdx = this.eventHistory.length - 1;
-        console.log(this.eventHistory);
-
       }
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
