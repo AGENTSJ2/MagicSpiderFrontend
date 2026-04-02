@@ -8,16 +8,18 @@ export default abstract class BaseController {
         this.node = init.node;
         this.eventBus = init.eventBus;
     }
+
     /**
      * Call all events inside this.
      * Override this if you need custom behavior.
      */
     protected abstract registerEvents(): void;
+    
+    protected abstract listenPresentationEventStream(): void;
 
     protected abstract destroy(): void;
 
     protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
-
 
     protected abstract getEventObject(data: {
         eventType: PresentationEventType;
@@ -34,6 +36,35 @@ export default abstract class BaseController {
                     newConfig: { attrs: {}, zIndex: this.node.zIndex() },
                 }),
             );
+        });
+    }
+
+    protected handleDragEvents() {
+        let XBeforeDrag: number = this.node.x();
+        let YBeforeDrag: number = this.node.y();
+        this.node.on('dragstart', () => {
+            XBeforeDrag = this.node.x();
+            YBeforeDrag = this.node.y();
+        });
+        this.node.on('dragend', () => {
+            this.eventBus.next(
+                this.getEventObject({
+                    eventType: PresentationEventType.UPDATE,
+                    newConfig: {
+                        attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
+                        zIndex: this.node.zIndex(),
+                    },
+                    previousConfig: {
+                        attrs: {
+                            x: XBeforeDrag,
+                            y: YBeforeDrag,
+                        },
+                        zIndex: this.node.zIndex(),
+                    },
+                }),
+            );
+            XBeforeDrag = this.node.x();
+            YBeforeDrag = this.node.y();
         });
     }
 
@@ -107,6 +138,4 @@ export default abstract class BaseController {
             }),
         );
     }
-
-
 } 

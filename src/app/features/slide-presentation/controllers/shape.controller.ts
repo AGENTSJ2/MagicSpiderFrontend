@@ -33,6 +33,7 @@ export default class ShapeController extends BaseController {
     protected registerEvents() {
         super.handleNodeClick();
         super.handleTransformEvents();
+        super.handleDragEvents();
         document.addEventListener('keydown', this.handleKeyboardStrokes);
     }
 

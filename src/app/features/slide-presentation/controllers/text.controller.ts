@@ -62,7 +62,7 @@ export default class TextController extends BaseController {
     });
   }
 
-  private listenPresentationEventStream() {
+  protected listenPresentationEventStream() {
     this.eventSubscription = this.eventBus.subscribe((event) => {
       if (
         !(event instanceof TextEvent) ||
@@ -70,11 +70,14 @@ export default class TextController extends BaseController {
       ) {
         return;
       }
+      if (event instanceof UpdateTextEvent) {
+        this.applyConfigurations(event.currentConfig);
+        return;
+      }
       if (event instanceof RemoveTextEvent) {
         this.destroy();
         return;
       }
-      this.applyConfigurations(event.currentConfig);
     });
   }
 
@@ -177,35 +180,6 @@ export default class TextController extends BaseController {
       document.removeEventListener('mousedown', this.boundRespondToClick);
     }
   };
-
-  protected handleDragEvents() {
-    let XBeforeDrag: number = this.node.x();
-    let YBeforeDrag: number = this.node.y();
-    this.node.on('dragstart', () => {
-      XBeforeDrag = this.node.x();
-      YBeforeDrag = this.node.y();
-    });
-    this.node.on('dragend', () => {
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: {
-            attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
-            zIndex: this.node.zIndex(),
-          },
-          previousConfig: {
-            attrs: {
-              x: XBeforeDrag,
-              y: YBeforeDrag,
-            },
-            zIndex: this.node.zIndex(),
-          },
-        }),
-      );
-      XBeforeDrag = this.node.x();
-      YBeforeDrag = this.node.y();
-    });
-  }
 
   protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
     if (

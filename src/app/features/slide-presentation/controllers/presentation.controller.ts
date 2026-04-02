@@ -17,6 +17,7 @@ import {
   AddSlideEvent,
   SlideEvent,
 } from '../domain/EventModels/slideEvent.model';
+import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
 
 export class PresentationController {
   private eventBus: PresentationEventStream = new PresentationEventStream();
@@ -45,7 +46,7 @@ export class PresentationController {
         const lastEvent = this.eventHistory[this.eventIdx];
         let undoEvent: UndoEvent | undefined;
 
-        if (lastEvent instanceof TextEvent) {
+        // if (lastEvent instanceof TextEvent) {
           const EventClass = lastEvent.constructor as new (
             init: TextEvent,
           ) => TextEvent; // all wrong from here
@@ -54,8 +55,9 @@ export class PresentationController {
             currentConfig: lastEvent.previousConfig,
             trackHistory: false,
           });
+
           undoEvent = new UndoEvent(newEvent);
-        }
+        // }
         this.publishEvent(undoEvent!);
         this.eventIdx--;
       }
@@ -67,7 +69,7 @@ export class PresentationController {
   }
 
   private listenPresentationEvents() {
-    this.eventBus.subscribe((event) => {
+    this.eventBus.subscribe((event) => {      
       if (event.trackHistory) {
         if (this.eventIdx != this.eventHistory.length - 1) {
           // some operation is performed after undo / redo hence reset
@@ -101,9 +103,14 @@ export class PresentationController {
           this.handleUndoTextEvent(event.event);
           return;
         }
+        if (event.event instanceof ShapeEvent) {
+          this.handleUndoShapeEvent(event.event);
+          return;
+        }
       }
     });
   }
+
   private handleUndoTextEvent(event: TextEvent) {
     if (event instanceof AddTextEvent) {
       const removeEvent = new RemoveTextEvent({
@@ -132,6 +139,42 @@ export class PresentationController {
     }
     if (event instanceof SelectTextEvent) {
       const newEvent = new SelectTextEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
+    }
+  }
+
+  private handleUndoShapeEvent(event: ShapeEvent) {
+    if (event instanceof AddShapeEvent) {
+      const removeEvent = new RemoveShapeEvent({
+        ...event,
+        trackHistory: false,
+      });
+      this.publishEvent(removeEvent);
+      return;
+    }
+    if (event instanceof RemoveShapeEvent) {
+      const addEvent = new AddShapeEvent({
+        ...event,
+        currentConfig: event.previousConfig,
+        trackHistory: false,
+      });
+      this.publishEvent(addEvent);
+      return;
+    }
+    if (event instanceof UpdateShapeEvent) {
+      const newEvent = new UpdateShapeEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
+    }
+    if (event instanceof SelectShapeEvent) {
+      const newEvent = new SelectShapeEvent({
         ...event,
       });
       newEvent.trackHistory = false;
