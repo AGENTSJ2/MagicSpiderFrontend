@@ -239,7 +239,7 @@ export default class SlideController {
       node?.node.id(node.node._id.toString());
     }
     this.addComponent(node!);
-    event.nodeId = node!.node!._id.toString();
+    event.nodeId = node!.node!.id();
     event.currentConfig = structuredClone({
       attrs: node!.node!.getAttrs(),
       zIndex: node!.node!.getZIndex(),

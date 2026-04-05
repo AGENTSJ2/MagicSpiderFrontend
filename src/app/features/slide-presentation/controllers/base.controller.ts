@@ -77,9 +77,7 @@ export default abstract class BaseController {
             heightBeforeTransform = this.node.height();
         });
 
-        this.node.on('transform', () => {
-            console.log(this.node._id,this.node.id());
-            
+        this.node.on('transform', () => {            
             const scaleX = this.node.scaleX();
             const scaleY = this.node.scaleY();
             const newWidth = this.node.width() * scaleX;
