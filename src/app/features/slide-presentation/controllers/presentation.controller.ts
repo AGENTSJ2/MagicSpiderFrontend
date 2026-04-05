@@ -46,7 +46,6 @@ export class PresentationController {
         const lastEvent = this.eventHistory[this.eventIdx];
         let undoEvent: UndoEvent | undefined;
 
-        // if (lastEvent instanceof TextEvent) {
         const EventClass = lastEvent.constructor as new (
           init: TextEvent,
         ) => TextEvent; // all wrong from here
@@ -57,7 +56,6 @@ export class PresentationController {
         });
 
         undoEvent = new UndoEvent(newEvent);
-        // }
         this.publishEvent(undoEvent!);
         this.eventIdx--;
       }
@@ -72,8 +70,6 @@ export class PresentationController {
     this.eventBus.subscribe((event) => {
 
       if (event.trackHistory) {
-        console.log(this.eventHistory);
-        
         if (this.eventIdx != this.eventHistory.length - 1) {
           // some operation is performed after undo / redo hence reset
           this.eventHistory.splice(this.eventIdx + 1);

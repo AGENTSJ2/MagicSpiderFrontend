@@ -1,7 +1,7 @@
-import Konva from "konva";
+import { Shape } from "konva/lib/Shape";
 
 export interface ICanvasComponent
 {
-    node:Konva.Shape;
+    node:Shape;
     destroy():void;
 }

@@ -81,8 +81,6 @@ export default class TextController extends BaseController {
     if (!config) {
       return;
     }
-    console.log(config);
-    
     this.node.setAttrs(config.attrs);
     this.node.zIndex(config.zIndex);
   }

@@ -154,7 +154,7 @@ export default class SlideController {
     if (event instanceof SelectShapeEvent) {
       const nodeId = event.nodeId;
       let targetNode = this.slide.components.find(
-        (nd) => nd.node._id.toString() == nodeId,
+        (nd) => nd.node.id() == nodeId,
       );
       this.selectComponent(targetNode!.node);
       return;

@@ -45,8 +45,6 @@ export default class ShapeComponent implements ICanvasComponent {
             default:
                 break;
         }
-        console.log(this.node);
-        
         this.controller = new ShapeController(
             {
                 shape: this.node,
