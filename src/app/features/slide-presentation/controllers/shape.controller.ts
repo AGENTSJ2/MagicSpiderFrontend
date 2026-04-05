@@ -24,7 +24,7 @@ export default class ShapeController extends BaseController {
         this.shapeType = init.shapeType
     }
 
-    protected override destroy() {
+    override destroy() {
         this.node.remove();
         this.slide.controller.removeSelectionOfComponent(this.node);
         document.removeEventListener('keydown', this.handleKeyboardStrokes);

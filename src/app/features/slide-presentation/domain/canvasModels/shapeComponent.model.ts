@@ -56,6 +56,11 @@ export default class ShapeComponent implements ICanvasComponent {
             }
         );
     }
+
+    destroy(): void {
+        this.controller.destroy();
+        this.node.destroy();
+    }
 }
 export enum ShapeType {
     LINE,

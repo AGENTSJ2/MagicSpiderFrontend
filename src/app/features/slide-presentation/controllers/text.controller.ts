@@ -74,24 +74,20 @@ export default class TextController extends BaseController {
         this.applyConfigurations(event.currentConfig);
         return;
       }
-      if (event instanceof RemoveTextEvent) {
-        this.destroy();
-        return;
-      }
     });
   }
 
   private applyConfigurations(config?: ComponentConfig<TextConfig>) {
     if (!config) {
-      // config null means deletion of node (designed to perform undo operations on create operation)
-      this.destroy();
       return;
     }
-    this.node.setAttrs(config);
+    console.log(config);
+    
+    this.node.setAttrs(config.attrs);
     this.node.zIndex(config.zIndex);
   }
 
-  protected override destroy() {
+  override destroy() {
     this.node.remove();
     this.slide.controller.removeSelectionOfComponent(this.node);
     document.removeEventListener('keydown', this.handleKeyboardStrokes);
@@ -105,7 +101,7 @@ export default class TextController extends BaseController {
     trackHistory?: boolean;
   }): TextEvent {
     const defaultEvent: TextEvent = {
-      nodeId: this.node._id.toString(),
+      nodeId: this.node.id(),
       presentationId: this.slide.presentationId,
       slideId: this.slide.slideId,
       previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),

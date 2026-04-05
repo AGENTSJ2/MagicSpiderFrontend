@@ -10,6 +10,7 @@ export class TextComponent  implements ICanvasComponent {
     config:ComponentConfig<TextConfig>;
     slide: Slide;
     controller: TextController;
+
     constructor(init: Partial<TextComponent> & {eventBus:PresentationEventStream}) {        
         this.config = init.config!;
         this.slide = init.slide!;
@@ -26,5 +27,9 @@ export class TextComponent  implements ICanvasComponent {
             textNode: this.node,
             eventBus:init.eventBus
         });
+    }
+    destroy(): void {
+        this.controller.destroy();
+        this.node.destroy();
     }
 }

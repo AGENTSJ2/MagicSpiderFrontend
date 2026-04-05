@@ -15,11 +15,13 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import { Subscription } from 'rxjs';
 import {
   AddTextEvent,
+  RemoveTextEvent,
   SelectTextEvent,
   TextEvent,
 } from '../domain/EventModels/textEvent.model';
 import {
   AddShapeEvent,
+  RemoveShapeEvent,
   SelectShapeEvent,
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
@@ -128,31 +130,41 @@ export default class SlideController {
       },
     );
   }
+
   protected handleTextEvents(event: TextEvent) {
     if (event instanceof SelectTextEvent) {
       const nodeId = event.nodeId;
       let targetNode = this.slide.components.find(
-        (nd) => nd._id.toString() == nodeId,
+        (nd) => nd.node.id() == nodeId,
       );
-      this.selectComponent(targetNode!);
+      this.selectComponent(targetNode!.node);
       return;
     }
     if (event instanceof AddTextEvent) {
       this.handleAddNode(event);
       return;
     }
+    if (event instanceof RemoveTextEvent) {
+      this.handleRemoveNode(event);
+      return;
+    }
   }
+
   protected handleShapeEvents(event: ShapeEvent) {
     if (event instanceof SelectShapeEvent) {
       const nodeId = event.nodeId;
       let targetNode = this.slide.components.find(
-        (nd) => nd._id.toString() == nodeId,
+        (nd) => nd.node._id.toString() == nodeId,
       );
-      this.selectComponent(targetNode!);
+      this.selectComponent(targetNode!.node);
       return;
     }
     if (event instanceof AddShapeEvent) {
       this.handleAddNode(event);
+      return;
+    }
+    if (event instanceof RemoveShapeEvent) {
+      this.handleRemoveNode(event);
       return;
     }
   }
@@ -196,7 +208,7 @@ export default class SlideController {
 
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
-    this.slide.components.push(node.node);
+    this.slide.components.push(node);
   }
 
   destroy() {
@@ -234,4 +246,14 @@ export default class SlideController {
     });
     event.previousConfig = structuredClone(event.previousConfig);
   }
+
+  private handleRemoveNode(event: PresentationEvent)
+  {
+    const index = this.slide.components.findIndex(x => x.node.id() === event.nodeId);
+    if (index == -1) {
+      return;
+    }
+    const removed = this.slide.components.splice(index, 1)[0];
+    removed.destroy();
+  } 
 }
