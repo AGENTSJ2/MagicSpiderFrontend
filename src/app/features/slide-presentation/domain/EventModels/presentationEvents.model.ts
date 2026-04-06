@@ -7,15 +7,13 @@ export class PresentationEvent {
     nodeId:string;
     presentationId: string;
     slideId: string;
-    eventType:PresentationEventType;
-    currentConfig?:ComponentConfig<ShapeConfig> ;
+    currentConfig?:ComponentConfig<ShapeConfig>;
     previousConfig?:ComponentConfig<ShapeConfig>;
     trackHistory:boolean;
     constructor(init:PresentationEvent) {
         this.nodeId = init.nodeId;
         this.presentationId = init.presentationId ?? '';
         this.slideId = init.slideId;
-        this.eventType = init.eventType;
         this.currentConfig = init.currentConfig;
         this.previousConfig = init.previousConfig;
         this.trackHistory = init.trackHistory;
@@ -27,44 +25,19 @@ export interface ComponentConfig<T>{
 }
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
-export class TextEvent extends PresentationEvent {
-    override currentConfig?: ComponentConfig<TextConfig>;
-    override previousConfig?: ComponentConfig<TextConfig>;
-    constructor(init:TextEvent) {
-        super(init)
-        this.currentConfig = init.currentConfig;
-        this.previousConfig = init.previousConfig;
-    }
-}
-export class ShapeEvent extends PresentationEvent
+export class UndoEvent extends PresentationEvent
 {
-    shapeType!:ShapeType;
-    constructor(init:ShapeEvent)
+    event:PresentationEvent;
+    constructor(init:PresentationEvent)
     {
         super(init);
-        this.shapeType = init.shapeType;
-    }
+        this.event = init;
+    };
 }
-export class SlideEvent extends PresentationEvent {
-    override currentConfig?: ComponentConfig<ShapeConfig>;
-    override previousConfig?: ComponentConfig<TextConfig>;
-    constructor(init:SlideEvent) {
-        super(init)
-        this.currentConfig = init.currentConfig;
-        this.previousConfig = init.previousConfig;
-    }
-}
+
 export enum PresentationEventType {
-    ADD_TEXT,
-    UPDATE_TEXT,
-    MOVE_TEXT,
-    REMOVE_TEXT,
-
-    ADD_SHAPE,
- 
-    ADD_IMAGE,
-
-    ADD_SLIDE,
-
-    SELECT_NODE
+    ADD,
+    UPDATE,
+    REMOVE,
+    SELECT
 }

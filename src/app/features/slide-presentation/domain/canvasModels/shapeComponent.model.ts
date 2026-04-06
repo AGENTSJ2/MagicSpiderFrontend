@@ -5,43 +5,31 @@ import { Line } from "konva/lib/shapes/Line";
 import { Rect } from "konva/lib/shapes/Rect";
 import ShapeController from "../../controllers/shape.controller";
 import { Slide } from "./slide.model";
-import { PresentationEventStream } from "../EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream } from "../EventModels/presentationEvents.model";
 
 export default class ShapeComponent implements ICanvasComponent {
-    x!: number;
-    y!: number;
-    width!: number;
-    height!: number;
-    fill!: string;
-    stroke!: string;
-    strokeWidth!: number;
-    shapeType!: ShapeType;
-
-    node!: Shape;
+    shapeType: ShapeType;
+    config:ComponentConfig<ShapeConfig>;
+    node: Shape;
     controller!: ShapeController;
-    slide!: Slide;
+    slide: Slide;
 
     constructor(init: Partial<ShapeComponent> & {eventBus:PresentationEventStream}) {
         this.slide = init.slide!;
         this.shapeType = init.shapeType!;
-        this.x = init.x ?? 10;
-        this.y = init.y ?? 10;
-        this.width = init.width ?? 100;
-        this.height = init.height ?? 100;
-        this.fill = init.fill ?? "white";
-        this.stroke = init.stroke ?? "black";
-        this.strokeWidth = init.strokeWidth ?? 1;
-
+        this.node = init.node!;
+        this.config = init.config!;
         // ✅ Proper config object
         const config = {
-            x: this.x,
-            y: this.y,
-            width: this.width,
-            height: this.height,
-            fill: this.fill,
-            stroke: this.stroke,
-            strokeWidth: this.strokeWidth,
-            draggable: true
+            ...this.config.attrs,
+            x: init.config?.attrs.x ?? 10,
+            y: init.config?.attrs.y ?? 10,
+            width: init.config?.attrs.width ?? 100,
+            height: init.config?.attrs.height ?? 100,
+            fill: init.config?.attrs.fill ?? "white",
+            stroke: init.config?.attrs.stroke ?? "black",
+            strokeWidth: init.config?.attrs.strokeWidth ?? 1,
+            draggable: true,
         };
 
         switch (init.shapeType) {
@@ -57,14 +45,19 @@ export default class ShapeComponent implements ICanvasComponent {
             default:
                 break;
         }
-
         this.controller = new ShapeController(
             {
                 shape: this.node,
                 slide: this.slide,
-                eventBus:init.eventBus 
+                eventBus:init.eventBus ,
+                shapeType:init.shapeType!
             }
         );
+    }
+
+    destroy(): void {
+        this.controller.destroy();
+        this.node.destroy();
     }
 }
 export enum ShapeType {

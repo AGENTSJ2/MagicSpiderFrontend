@@ -1,244 +1,186 @@
-import Konva from "konva";
-import { Slide } from "../domain/canvasModels/slide.model";
-import BaseController from "./base.controller";
-import { ComponentConfig, PresentationEventStream, PresentationEventType, TextEvent } from "../domain/EventModels/presentationEvents.model";
-import { Subscription } from "rxjs";
-import { TextConfig } from "konva/lib/shapes/Text";
-import { ShapeConfig } from "konva/lib/Shape";
+import Konva from 'konva';
+import { Slide } from '../domain/canvasModels/slide.model';
+import BaseController from './base.controller';
+import {
+  ComponentConfig,
+  PresentationEventStream,
+  PresentationEventType,
+} from '../domain/EventModels/presentationEvents.model';
+import { Subscription } from 'rxjs';
+import { TextConfig } from 'konva/lib/shapes/Text';
+import {
+  AddTextEvent,
+  RemoveTextEvent,
+  SelectTextEvent,
+  TextEvent,
+  UpdateTextEvent,
+} from '../domain/EventModels/textEvent.model';
 
 export default class TextController extends BaseController {
-    private textareaToEditText: HTMLTextAreaElement | undefined;
-    private readonly positionSlack = 5;
-    private slide: Slide;
-    private containerDiv: HTMLDivElement;
-    private eventBus: PresentationEventStream;
-    private eventSubscription!: Subscription;
-    override node: Konva.Text;
+  private textareaToEditText: HTMLTextAreaElement | undefined;
+  private readonly positionSlack = 5;
+  private slide: Slide;
+  private containerDiv: HTMLDivElement;
+  private eventSubscription!: Subscription;
+  override node: Konva.Text;
 
-    constructor(init: {
-        slide: Slide,
-        content: string,
-        textNode: Konva.Text,
-        eventBus: PresentationEventStream
-    }) {
-        super({ node: init.textNode });
-        this.eventBus = init.eventBus;
-        this.slide = init.slide;
-        this.containerDiv = init.slide.containerDiv;
-        this.node = init.textNode;
-        this.registerEvents();
-        this.listenPresentationEventStream();
+  constructor(init: {
+    slide: Slide;
+    textNode: Konva.Text;
+    eventBus: PresentationEventStream;
+  }) {
+    super({ node: init.textNode, eventBus: init.eventBus });
+    this.slide = init.slide;
+    this.containerDiv = init.slide.containerDiv;
+    this.node = init.textNode;
+    this.registerEvents();
+    this.listenPresentationEventStream();
+  }
+
+  protected registerEvents() {
+    this.handleNodeClick();
+    this.handleTransformEvents();
+    this.handleDragEvents();
+    document.addEventListener('keydown', this.handleKeyboardStrokes);
+    this.node.on('dblclick', () => {
+      this.slide.controller.removeSelectionOfComponent(this.node);
+      const { x, y } = this.node.getAbsolutePosition();
+      // creating textarea
+      this.textareaToEditText = document.createElement('textarea');
+      this.textareaToEditText.value = this.node.text();
+      this.textareaToEditText.style.position = 'absolute';
+      this.textareaToEditText.style.left = x + 'px';
+      this.textareaToEditText.style.top = y - this.positionSlack + 'px';
+      this.textareaToEditText.style.width = 'auto';
+      this.textareaToEditText.style.height = 'auto';
+      this.textareaToEditText.style.fontSize = this.node.fontSize() + 'px';
+      this.textareaToEditText.style.fontFamily = this.node.fontFamily();
+      this.containerDiv.appendChild(this.textareaToEditText);
+      this.textareaToEditText.focus();
+      // click event seems to run as it was set inside dblClick hence mousedown is used
+      document.addEventListener('mousedown', this.boundRespondToClick);
+    });
+  }
+
+  protected listenPresentationEventStream() {
+    this.eventSubscription = this.eventBus.subscribe((event) => {
+      if (
+        !(event instanceof TextEvent) ||
+        event.nodeId != this.node.id()
+      ) {
+        return;
+      }
+      if (event instanceof UpdateTextEvent) {
+        this.applyConfigurations(event.currentConfig);
+        return;
+      }
+    });
+  }
+
+  private applyConfigurations(config?: ComponentConfig<TextConfig>) {
+    if (!config) {
+      return;
+    }
+    this.node.setAttrs(config.attrs);
+    this.node.zIndex(config.zIndex);
+  }
+
+  override destroy() {
+    this.node.remove();
+    this.slide.controller.removeSelectionOfComponent(this.node);
+    document.removeEventListener('keydown', this.handleKeyboardStrokes);
+    this.eventSubscription.unsubscribe();
+  }
+
+  protected override getEventObject(data: {
+    eventType: PresentationEventType;
+    newConfig: ComponentConfig<TextConfig>;
+    previousConfig?: ComponentConfig<TextConfig>;
+    trackHistory?: boolean;
+  }): TextEvent {
+    const defaultEvent: TextEvent = {
+      nodeId: this.node.id(),
+      presentationId: this.slide.presentationId,
+      slideId: this.slide.slideId,
+      previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),
+      trackHistory:
+        data.trackHistory == undefined ? true : data.trackHistory,
+      currentConfig: {
+        attrs: {
+          ...structuredClone(this.node.getAttrs()),
+          ...data.newConfig.attrs,
+        },
+        zIndex: data.newConfig.zIndex,
+      },
+
     }
 
-    protected registerEvents() {
-
-        this.handleNodeClick();
-        this.handleTransformEvents();
-        this.handleDragEvents();
-
-        this.node.on("dblclick", () => {
-            this.slide.controller.removeSelectionOfComponent(this.node);
-            const { x, y } = this.node.getAbsolutePosition();
-            // creating textarea
-            this.textareaToEditText = document.createElement("textarea");
-            this.textareaToEditText.value = this.node.text();
-            this.textareaToEditText.style.position = "absolute";
-            this.textareaToEditText.style.left = x + "px";
-            this.textareaToEditText.style.top = (y - this.positionSlack) + "px";
-            this.textareaToEditText.style.width = 'auto';
-            this.textareaToEditText.style.height = 'auto';
-            this.textareaToEditText.style.fontSize = this.node.fontSize() + "px";
-            this.textareaToEditText.style.fontFamily = this.node.fontFamily();
-            this.containerDiv.appendChild(this.textareaToEditText);
-            this.textareaToEditText.focus();
-            // click event seems to run as it was set inside dblClick hence mousedown is used 
-            document.addEventListener('mousedown', this.boundRespondToClick);
+    let event: TextEvent | undefined;
+    switch (data.eventType) {
+      case PresentationEventType.ADD:
+        event = new AddTextEvent({
+          ...defaultEvent
         });
-
-
-        document.addEventListener('keydown', this.handleKeyboardStrokes);
-
-    }
-
-    private listenPresentationEventStream() {
-        this.eventSubscription = this.eventBus.subscribe((event) => {
-            if (!(event instanceof TextEvent) || event.nodeId != this.node._id.toString()) {
-                return;
-            }
-            switch (event.eventType) {
-                case PresentationEventType.UPDATE_TEXT:
-                    const textEvent = event as TextEvent
-                    this.applyConfigurations(textEvent.currentConfig);
-                    break;
-            }
+        break;
+      case PresentationEventType.UPDATE:
+        event = new UpdateTextEvent({
+          ...defaultEvent
         });
+        break;
+      case PresentationEventType.REMOVE:
+        event = new RemoveTextEvent({
+          ...defaultEvent,
+          currentConfig: {
+            attrs: {
+            },
+            zIndex: data.newConfig.zIndex,
+          },
+        });
+        break;
+      case PresentationEventType.SELECT:
+        event = new SelectTextEvent({
+          ...defaultEvent
+        });
+        break;
     }
-    private applyConfigurations(config?: ComponentConfig<TextConfig>) {
-        if (!config) { // config null means deletion of node (designed to perform undo operations on create operation)
-            this.destroy();
-            return;
-        }
-        this.node.setAttrs(
-            config
-        )
-        this.node.zIndex(config.zIndex)
-    }
+    return event!;
+  }
 
-    private destroy() {
-        this.node.remove();
-        this.slide.controller.removeSelectionOfComponent(this.node);
-        document.removeEventListener('keydown', this.handleKeyboardStrokes);
-        this.eventSubscription.unsubscribe();
-    }
-
-    private getEventObject(data: { eventType: PresentationEventType, newConfig: ComponentConfig<TextConfig>, previousConfig?: ComponentConfig<TextConfig>, trackHistory?: boolean }): TextEvent {
-        const currentAttrs = this.node.getAttrs();
-        const prevConfig = data.previousConfig ? structuredClone(data.previousConfig) : {
-            attrs: structuredClone(currentAttrs),
-            zIndex: this.node.getZIndex(),
+  private boundRespondToClick = (event: MouseEvent) => {
+    if (this.textareaToEditText && event.target != this.textareaToEditText) {
+      if (this.textareaToEditText.value.length != 0) {
+        const updatedConfig = {
+          attrs: {
+            text: this.textareaToEditText.value,
+          },
+          zIndex: this.node.getZIndex(),
         };
-        const event = new TextEvent(
-            {
-                nodeId: this.node._id.toString(),
-                presentationId: this.slide.presentationId,
-                slideId: this.slide.slideId,
-                previousConfig: prevConfig,
-                currentConfig: {
-                    attrs: {
-                        ...currentAttrs,
-                        ...data.newConfig.attrs
-                    },
-                    zIndex: data.newConfig.zIndex
-                },
-                eventType: data.eventType,
-                trackHistory: data.trackHistory == undefined ? true : data.trackHistory
-            }
+        this.eventBus.next(
+          this.getEventObject({
+            eventType: PresentationEventType.UPDATE,
+            newConfig: updatedConfig,
+          }),
         );
-        return event;
+      } else {
+        // remove the node if no text is found
+        this.eventBus.next(
+          this.getEventObject({
+            eventType: PresentationEventType.REMOVE,
+            newConfig: { attrs: {}, zIndex: this.node.getZIndex() },
+          }),
+        );
+      }
+      this.textareaToEditText.remove();
+      document.removeEventListener('mousedown', this.boundRespondToClick);
     }
+  };
 
-    private boundRespondToClick = (event: MouseEvent) => {
-        if (this.textareaToEditText && event.target != this.textareaToEditText) {
-            const updatedConfig = {
-                attrs: {
-                    text: this.textareaToEditText.value,
-                },
-                zIndex: this.node.getZIndex(),
-            };
-            this.eventBus.next(
-                this.getEventObject({ eventType: PresentationEventType.UPDATE_TEXT, newConfig: updatedConfig })
-            );
-            this.textareaToEditText.remove();
-            document.removeEventListener('mousedown', this.boundRespondToClick);
-        }
+  protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
+    if (
+      event.key === 'Delete' &&
+      this.slide.controller.isNodeSelected(this.node)
+    ) {
+      super.handleRemove();
     }
-
-    protected handleNodeClick(): void {
-        this.node.on('click', () => {
-            this.eventBus.next(
-                this.getEventObject(
-                    {
-                        eventType: PresentationEventType.SELECT_NODE,
-                        newConfig: { attrs: {}, zIndex: this.node.zIndex() },
-                    }
-                )
-            )
-        });
-    }
-
-    protected handleTransformEvents() {
-        let widthBeforeTransform: number = this.node.width();
-        let heightBeforeTransform: number = this.node.height();
-
-        this.node.on("transformstart", () => {
-            widthBeforeTransform = this.node.width();
-            heightBeforeTransform = this.node.height();
-        });
-
-        this.node.on("transform", () => {
-            const scaleX = this.node.scaleX();
-            const scaleY = this.node.scaleY();
-            const newWidth = this.node.width() * scaleX;
-            const newHeight = this.node.height() * scaleY;
-            const updatedConfig: ComponentConfig<ShapeConfig> = {
-                attrs: {
-                    width: newWidth,
-                    height: newHeight,
-                    scaleX: 1,
-                    scaleY: 1,
-                },
-                zIndex: this.node.getZIndex()
-            };
-            this.eventBus.next(
-                this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
-                    newConfig: updatedConfig,
-                    trackHistory: false
-                })
-            )
-        });
-
-        this.node.on("transformend", () => {
-            const updatedConfig: ComponentConfig<TextConfig> = {
-                attrs: {
-                    width: this.node.width(),
-                    height: this.node.height(),
-                    scaleX: 1,
-                    scaleY: 1,
-                },
-                zIndex: this.node.getZIndex()
-            };
-            const prevConfig: ComponentConfig<TextConfig> = {
-                attrs: {
-                    width: widthBeforeTransform,
-                    height: heightBeforeTransform,
-                    scaleX: 1,
-                    scaleY: 1,
-                },
-                zIndex: this.node.getZIndex()
-            }
-            this.eventBus.next(
-                this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
-                    newConfig: updatedConfig,
-                    previousConfig: prevConfig
-                })
-            )
-        });
-    }
-
-    protected handleDragEvents() {
-        let XBeforeDrag: number = this.node.x();
-        let YBeforeDrag: number = this.node.y();
-        this.node.on("dragstart", () => {
-            XBeforeDrag = this.node.x();
-            YBeforeDrag = this.node.y();
-        });
-        this.node.on("dragend", () => {
-            this.eventBus.next(
-                this.getEventObject({
-                    eventType: PresentationEventType.UPDATE_TEXT,
-                    newConfig: {
-                        attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
-                        zIndex: this.node.zIndex()
-                    },
-                    previousConfig: {
-                        attrs: {
-                            x: XBeforeDrag,
-                            y: YBeforeDrag
-                        },
-                        zIndex: this.node.zIndex()
-                    }
-                })
-            );
-            XBeforeDrag = this.node.x();
-            YBeforeDrag = this.node.y();
-        });
-    }
-
-    private handleKeyboardStrokes = (event: KeyboardEvent) => {
-        if (event.key === 'Delete' && this.slide.controller.isNodeSelected(this.node)) {
-            this.destroy();
-        }
-    }
+  };
 }

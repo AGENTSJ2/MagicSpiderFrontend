@@ -1,11 +1,12 @@
 import SlideController from "../../controllers/slide.controller";
 import { Shape } from "konva/lib/Shape";
 import { PresentationEventStream } from "../EventModels/presentationEvents.model";
+import { ICanvasComponent } from "./ICanvasComponent";
 
 export class Slide {
     slideId: string;
     presentationId: string;
-    components: Shape[];
+    components: ICanvasComponent[];
     controller: SlideController;
     containerDiv!: HTMLDivElement;
 
