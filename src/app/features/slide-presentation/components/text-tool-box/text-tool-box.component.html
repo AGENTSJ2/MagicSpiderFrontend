@@ -1,81 +1,117 @@
-<div class="toolbox-panel" *ngIf="localConfig">
+<div class="toolbox-panel" *ngIf="form">
+    <form action="" [formGroup]="form">
 
-    <!-- Content -->
-    <div class="toolbox-title">Text properties</div>
+        <div class="toolbox-title">Text properties</div>
 
-    <div class="mb-3">
-        <label class="form-label">Content</label>
-        <textarea class="form-control" rows="3" [value]="localConfig.attrs.text"
-            (input)="updateField('text', $any($event.target).value)">
-    </textarea>
-    </div>
-
-    <!-- Font family + Style -->
-    <div class="row-half mb-3">
-        <div>
-            <label class="form-label">Font family</label>
-            <select class="form-select" [value]="localConfig.attrs.fontFamily"
-                (change)="updateField('fontFamily', $any($event.target).value)">
-                <option>Arial</option>
-                <option>Calibri</option>
-                <option>Times New Roman</option>
-                <option>Verdana</option>
-            </select>
+        <!-- Content -->
+        <div class="mb-3">
+            <label class="form-label">Content</label>
+            <textarea class="form-control" rows="3" formControlName="text"></textarea>
         </div>
-        <div>
-            <label class="form-label">Style</label>
-            <select class="form-select" [value]="localConfig.attrs.fontStyle"
-                (change)="updateField('fontStyle', $any($event.target).value)">
-                <option value="normal">Normal</option>
-                <option value="bold">Bold</option>
-                <option value="italic">Italic</option>
-            </select>
-        </div>
-    </div>
 
-    <!-- Font size + Line height -->
-    <div class="row-half mb-3">
-        <div>
-            <label class="form-label">Font size</label>
-            <input type="number" class="form-control" [value]="localConfig.attrs.fontSize"
-                (input)="updateField('fontSize', +$any($event.target).value)" />
-        </div>
-        <div>
-            <label class="form-label">Line height</label>
-            <input type="number" class="form-control" step="0.1" [value]="localConfig.attrs.lineHeight"
-                (input)="updateField('lineHeight', +$any($event.target).value)" />
-        </div>
-    </div>
-
-    <hr class="section-divider" />
-
-    <!-- Color -->
-    <div class="mb-3">
-        <label class="form-label">Text color</label>
-        <div class="color-row">
-            <div class="color-preview" [style.background]="localConfig.attrs.fill">
-                <input type="color" [value]="localConfig.attrs.fill"
-                    (input)="updateField('fill', $any($event.target).value)" />
+        <!-- Font family + Style -->
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Font family</label>
+                <select class="form-select" formControlName="fontFamily">
+                    <option>Arial</option>
+                    <option>Calibri</option>
+                    <option>Times New Roman</option>
+                    <option>Verdana</option>
+                </select>
             </div>
-            <span class="color-hex">{{ localConfig.attrs.fill }}</span>
+
+            <div>
+                <label class="form-label">Style</label>
+                <select class="form-select" formControlName="fontStyle">
+                    <option value="normal">Normal</option>
+                    <option value="bold">Bold</option>
+                    <option value="italic">Italic</option>
+                </select>
+            </div>
         </div>
-    </div>
 
-    <!-- Alignment -->
-    <div class="mb-3">
-        <label class="form-label">Alignment</label>
-        <div class="align-btn-group d-flex gap-2">
-            <button class="btn" [class.active]="localConfig.attrs.align === 'left'"
-                (click)="updateField('align', 'left')">Left</button>
-            <button class="btn" [class.active]="localConfig.attrs.align === 'center'"
-                (click)="updateField('align', 'center')">Center</button>
-            <button class="btn" [class.active]="localConfig.attrs.align === 'right'"
-                (click)="updateField('align', 'right')">Right</button>
+        <!-- Font size + Line height -->
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Font size</label>
+                <input type="number" class="form-control" formControlName="fontSize" />
+            </div>
+
+            <div>
+                <label class="form-label">Line height</label>
+                <input type="number" step="0.1" class="form-control" formControlName="lineHeight" />
+            </div>
         </div>
-    </div>
 
-    <hr class="section-divider" />
+        <hr class="section-divider" />
 
-    <button class="apply-btn" (click)="applyChanges()">Apply changes</button>
+        <!-- Color -->
+        <div class="mb-3">
+            <label class="form-label">Text color</label>
+            <div class="color-row">
+                <div class="color-preview" [style.background]="form.value.fill">
+                    <input type="color" formControlName="fill" />
+                </div>
+                <span class="color-hex">{{ form.value.fill }}</span>
+            </div>
+        </div>
+
+        <!-- Alignment -->
+        <div class="mb-3">
+            <label class="form-label">Alignment</label>
+            <div class="align-btn-group d-flex gap-2">
+                <button type="button" class="btn" [class.active]="form.value.align === 'left'"
+                    (click)="form.patchValue({ align: 'left' })">
+                    Left
+                </button>
+
+                <button type="button" class="btn" [class.active]="form.value.align === 'center'"
+                    (click)="form.patchValue({ align: 'center' })">
+                    Center
+                </button>
+
+                <button type="button" class="btn" [class.active]="form.value.align === 'right'"
+                    (click)="form.patchValue({ align: 'right' })">
+                    Right
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Stroke color</label>
+            <input type="color" formControlName="stroke" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Stroke width</label>
+            <input type="number" min="0" formControlName="strokeWidth" />
+        </div>
+
+        <div class="mb-3">
+            <label>
+                <input type="checkbox" formControlName="gradientEnabled" />
+                Enable Gradient
+            </label>
+        </div>
+
+        <div *ngIf="form.value.gradientEnabled" class="row-half">
+            <input type="color" formControlName="gradientStart" />
+            <input type="color" formControlName="gradientEnd" />
+            <div class="mb-3">
+                <label>Direction</label>
+                <select class="form-select" formControlName="gradientDirection">
+                    <option value="horizontal">Horizontal →</option>
+                    <option value="vertical">Vertical ↓</option>
+                    <option value="diagonal">Diagonal ↘</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Gradient length</label>
+                <input type="number" formControlName="gradientLength" />
+            </div>
+        </div>
+    </form>
 
 </div>

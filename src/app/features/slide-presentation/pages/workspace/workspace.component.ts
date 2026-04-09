@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { AddTextEvent, SelectTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
+import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
 import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
-import { AddShapeEvent, ShapeEvent } from '../../domain/EventModels/shapeEvent.models';
-import { PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
+import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent } from '../../domain/EventModels/shapeEvent.models';
+import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 
 @Component({
   selector: 'app-workspace',
@@ -24,19 +24,8 @@ export class WorkspaceComponent implements OnInit {
     this.listenPresentationEvents();
   }
 
-  selectedToolBox:ToolBoxType = ToolBoxType.None;
-  event?:PresentationEvent;
-  listenPresentationEvents()
-  {
-    const listener = this.presentation.listenEvent();
-    listener.subscribe((event)=>{
-      if(event instanceof SelectTextEvent)
-      {
-        this.selectedToolBox = ToolBoxType.TextToolBox;
-        this.event = event;
-      }
-    });
-  }
+  selectedToolBox: ToolBoxType = ToolBoxType.None;
+  event?: PresentationEvent;
   handleAddText() {
     const textEvent: TextEvent = new AddTextEvent(
       {
@@ -57,7 +46,7 @@ export class WorkspaceComponent implements OnInit {
       slideId: "",
       nodeId: '',
       trackHistory: true,
-      
+
     });
     this.presentation.publishEvent(
       slideEvent
@@ -88,10 +77,56 @@ export class WorkspaceComponent implements OnInit {
       this.activeSlide = slide;
     })
   }
-  handleUpdate(event:any)
-  {
+  
+  handleUpdate(event: any) {
     this.presentation.publishEvent(event)
   }
+
+  private listenPresentationEvents() {
+    const listener = this.presentation.listenEvent();
+    listener.subscribe((event) => {
+      if (event instanceof ClearSelectionEvent) {
+        this.event = undefined;
+        this.selectedToolBox = ToolBoxType.None;
+        return;
+      }
+      if (event instanceof TextEvent) {
+        this.handleTextSpecificEvents(event);
+        return;
+      }
+      if (event instanceof ShapeEvent) {
+        this.handleShapeSpecificEvents(event);
+        return;
+      }
+
+    });
+  }
+
+  private handleTextSpecificEvents(event: TextEvent) {
+    if (event instanceof SelectTextEvent) {
+      this.selectedToolBox = ToolBoxType.TextToolBox;
+      this.event = event;
+    }
+    if (event instanceof RemoveTextEvent) {
+      if (this.event?.nodeId == event.nodeId) {
+        this.selectedToolBox = ToolBoxType.None;
+      }
+    }
+  }
+
+  private handleShapeSpecificEvents(event: ShapeEvent) {
+    if (event instanceof SelectShapeEvent) {
+      this.selectedToolBox = ToolBoxType.ShapeTooLBox;
+      this.event = event;
+    }
+    if (event instanceof RemoveShapeEvent) {
+      if (this.event?.nodeId == event.nodeId) {
+        this.selectedToolBox = ToolBoxType.None;
+      }
+    }
+  }
+
+
 }
 enum ToolBoxType {
   TextToolBox,

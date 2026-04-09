@@ -18,6 +18,21 @@ export class PresentationEvent {
     }
 }
 
+export class ClearSelectionEvent extends PresentationEvent
+{
+    constructor(init:{slideId:string,presentationId:string})
+    {
+        super({
+            nodeId:'',
+            slideId:init.slideId,
+            presentationId:init.presentationId,
+            currentConfig:undefined,
+            previousConfig:undefined,
+            trackHistory:false,
+        });
+    }
+}
+
 export interface ComponentConfig<T>{
     attrs:T;
     zIndex:number;
@@ -25,25 +40,7 @@ export interface ComponentConfig<T>{
 
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
-export class UndoEvent extends PresentationEvent
-{
-    event:PresentationEvent;
-    constructor(init:PresentationEvent)
-    {
-        super(init);
-        this.event = init;
-    };
-}
 
-export class RedoEvent extends PresentationEvent
-{
-    event:PresentationEvent;
-    constructor(init:PresentationEvent)
-    {
-        super(init);
-        this.event = init;
-    };
-}
 
 export enum PresentationEventType {
     ADD,

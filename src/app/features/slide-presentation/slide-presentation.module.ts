@@ -5,17 +5,19 @@ import { SlidePresentationRoutingModule } from './slide-presentation-routing.mod
 import { SlideComponent } from './components/slide/slide.component';
 import { WorkspaceComponent } from './pages/workspace/workspace.component';
 import { TextToolBoxComponent } from './components/text-tool-box/text-tool-box.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
   declarations: [
     SlideComponent,
     WorkspaceComponent,
-    TextToolBoxComponent
+    TextToolBoxComponent,
   ],
   imports: [
     CommonModule,
-    SlidePresentationRoutingModule
+    SlidePresentationRoutingModule,
+    ReactiveFormsModule
   ]
 })
 export class SlidePresentationModule { }

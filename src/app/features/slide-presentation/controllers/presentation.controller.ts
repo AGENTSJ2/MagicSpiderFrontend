@@ -2,7 +2,6 @@ import { Observable } from 'rxjs';
 import {
   PresentationEvent,
   PresentationEventStream,
-  UndoEvent,
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
@@ -23,6 +22,7 @@ import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import { AddTrashEvents, RemoveFromTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
+import { UndoEvent } from '../domain/EventModels/undoRedo.model';
 
 export class PresentationController {
   private eventBus: PresentationEventStream = new PresentationEventStream();
