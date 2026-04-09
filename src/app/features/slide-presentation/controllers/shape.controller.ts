@@ -39,7 +39,7 @@ export default class ShapeController extends BaseController {
 
     protected listenPresentationEventStream() {
         this.eventBus.subscribe((event) => {
-            if (!(event instanceof ShapeEvent) || event.nodeId != this.node.id()) {
+            if (!(event instanceof ShapeEvent) || event.nodeId != this.node._id.toString()) {
                 return;
             }
             if (event instanceof UpdateShapeEvent) {
@@ -53,7 +53,7 @@ export default class ShapeController extends BaseController {
         })
     }
 
-    protected override  getEventObject(data: {
+    protected override getEventObject(data: {
         eventType: PresentationEventType;
         newConfig: ComponentConfig<ShapeConfig>;
         previousConfig?: ComponentConfig<ShapeConfig>;
@@ -63,7 +63,7 @@ export default class ShapeController extends BaseController {
             presentationId: this.slide.presentationId,
             slideId: this.slide.slideId,
             trackHistory: data.trackHistory == undefined ? true : data.trackHistory,
-            nodeId: this.node.id(),
+            nodeId: this.node._id.toString(),
             shapeType: this.shapeType,
             currentConfig: {
                 attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig },

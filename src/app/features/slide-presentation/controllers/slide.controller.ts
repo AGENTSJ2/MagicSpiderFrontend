@@ -16,16 +16,19 @@ import { Subscription } from 'rxjs';
 import {
   AddTextEvent,
   RemoveTextEvent,
+  RestoreTextEvent,
   SelectTextEvent,
   TextEvent,
 } from '../domain/EventModels/textEvent.model';
 import {
   AddShapeEvent,
   RemoveShapeEvent,
+  RestoreShapeEvent,
   SelectShapeEvent,
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
 import { SlideEvent } from '../domain/EventModels/slideEvent.model';
+import { AddTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -135,7 +138,7 @@ export default class SlideController {
     if (event instanceof SelectTextEvent) {
       const nodeId = event.nodeId;
       let targetNode = this.slide.components.find(
-        (nd) => nd.node.id() == nodeId,
+        (nd) => nd.node._id.toString() == nodeId,
       );
       this.selectComponent(targetNode!.node);
       return;
@@ -148,13 +151,17 @@ export default class SlideController {
       this.handleRemoveNode(event);
       return;
     }
+    if (event instanceof RestoreTextEvent) {
+      this.handleRestoreNode(event.nodeToRestore);
+      return;
+    }
   }
 
   protected handleShapeEvents(event: ShapeEvent) {
     if (event instanceof SelectShapeEvent) {
       const nodeId = event.nodeId;
       let targetNode = this.slide.components.find(
-        (nd) => nd.node.id() == nodeId,
+        (nd) => nd.node._id.toString() == nodeId,
       );
       this.selectComponent(targetNode!.node);
       return;
@@ -167,9 +174,13 @@ export default class SlideController {
       this.handleRemoveNode(event);
       return;
     }
+    if (event instanceof RestoreShapeEvent) {
+      this.handleRestoreNode(event.nodeToRestore);
+      return;
+    }
   }
 
-  protected handleSlideEvents(event: SlideEvent) {}
+  protected handleSlideEvents(event: SlideEvent) { }
 
   triggerResize(options: {
     divElm: HTMLDivElement;
@@ -217,7 +228,6 @@ export default class SlideController {
 
   private handleAddNode(event: PresentationEvent) {
     let node: ICanvasComponent | undefined;
-    const isRejuvenation = event.nodeId.length != 0; // previously this node exists hence there was an node id ,  brought back with undo or such operations
     if (event instanceof AddTextEvent) {
       node = new TextComponent({
         config: event.currentConfig,
@@ -228,18 +238,13 @@ export default class SlideController {
     if (event instanceof ShapeEvent) {
       node = new ShapeComponent({
         slide: this.slide,
-        config:event.currentConfig,
+        config: event.currentConfig,
         shapeType: event.shapeType,
         eventBus: this.eventBus,
       });
     }
-    if (isRejuvenation) {
-      node?.node.id(event.nodeId);
-    } else {
-      node?.node.id(node.node._id.toString());
-    }
     this.addComponent(node!);
-    event.nodeId = node!.node!.id();
+    event.nodeId = node!.node!._id.toString();
     event.currentConfig = structuredClone({
       attrs: node!.node!.getAttrs(),
       zIndex: node!.node!.getZIndex(),
@@ -247,13 +252,26 @@ export default class SlideController {
     event.previousConfig = structuredClone(event.previousConfig);
   }
 
-  private handleRemoveNode(event: PresentationEvent)
-  {
-    const index = this.slide.components.findIndex(x => x.node.id() === event.nodeId);
+  private handleRemoveNode(event: PresentationEvent) {
+    const index = this.slide.components.findIndex(x => x.node._id.toString() === event.nodeId);
     if (index == -1) {
       return;
     }
     const removed = this.slide.components.splice(index, 1)[0];
-    removed.destroy();
-  } 
+    removed.node.remove();
+    this.removeSelectionOfComponent(removed.node);
+    const trashEvent = new AddTrashEvents({
+      nodeId: removed.node._id.toString(),
+      presentationId: this.slide.presentationId,
+      slideId: this.slide.slideId,
+      trackHistory: false,
+      node: removed
+    });
+    this.eventBus.next(trashEvent);
+  }
+  private handleRestoreNode(nodeComponent: ICanvasComponent) {
+    this.slide.components.push(nodeComponent);
+    this.layer.add(nodeComponent.node);
+    this.layer.batchDraw();
+  }
 }

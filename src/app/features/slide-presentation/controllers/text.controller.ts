@@ -66,7 +66,7 @@ export default class TextController extends BaseController {
     this.eventSubscription = this.eventBus.subscribe((event) => {
       if (
         !(event instanceof TextEvent) ||
-        event.nodeId != this.node.id()
+        event.nodeId != this.node._id.toString()
       ) {
         return;
       }
@@ -87,7 +87,6 @@ export default class TextController extends BaseController {
 
   override destroy() {
     this.node.remove();
-    this.slide.controller.removeSelectionOfComponent(this.node);
     document.removeEventListener('keydown', this.handleKeyboardStrokes);
     this.eventSubscription.unsubscribe();
   }
@@ -99,7 +98,7 @@ export default class TextController extends BaseController {
     trackHistory?: boolean;
   }): TextEvent {
     const defaultEvent: TextEvent = {
-      nodeId: this.node.id(),
+      nodeId: this.node._id.toString(),
       presentationId: this.slide.presentationId,
       slideId: this.slide.slideId,
       previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),
@@ -139,6 +138,11 @@ export default class TextController extends BaseController {
         break;
       case PresentationEventType.SELECT:
         event = new SelectTextEvent({
+          ...defaultEvent
+        });
+        break;
+      case PresentationEventType.RESTORE:
+        event = new RemoveTextEvent({
           ...defaultEvent
         });
         break;
