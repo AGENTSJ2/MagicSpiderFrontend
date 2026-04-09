@@ -1,0 +1,144 @@
+.toolbox-panel {
+    background: #fff;
+    border: 0.5px solid rgba(0, 0, 0, 0.12);
+    // box-shadow: var(--box-shadow-1);
+      border-radius: 12px;
+    padding: 1.25rem;
+    max-width: 380px;
+}
+
+.toolbox-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.form-control,
+.form-select {
+    font-size: 13px;
+    height: 34px;
+    padding: 6px 10px;
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    background: #f8f8f7;
+    color: #1a1a1a;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:focus {
+        border-color: rgba(0, 0, 0, 0.3);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(100, 100, 255, 0.08);
+        outline: none;
+    }
+}
+
+textarea.form-control {
+    height: auto;
+    resize: vertical;
+}
+
+.row-half {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.section-divider {
+    border: none;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+}
+
+// Color picker
+.color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.color-preview {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+
+    input[type='color'] {
+        opacity: 0;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+    }
+}
+
+.color-hex {
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #666;
+}
+
+// Alignment buttons
+.align-btn-group {
+    .btn {
+        font-size: 13px;
+        padding: 5px 14px;
+        border: 0.5px solid rgba(0, 0, 0, 0.15);
+        background: #f8f8f7;
+        color: #333;
+        border-radius: 8px !important;
+        transition: background 0.12s, color 0.12s;
+
+        &:hover {
+            background: #efefef;
+        }
+
+        &.active {
+            background: #eef2ff;
+            color: #3b4fcf;
+            border-color: #c5cdfb;
+            font-weight: 500;
+        }
+    }
+}
+
+// Apply button
+.apply-btn {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    width: 100%;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}

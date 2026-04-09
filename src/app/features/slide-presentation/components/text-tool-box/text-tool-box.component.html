@@ -1,0 +1,81 @@
+<div class="toolbox-panel" *ngIf="localConfig">
+
+    <!-- Content -->
+    <div class="toolbox-title">Text properties</div>
+
+    <div class="mb-3">
+        <label class="form-label">Content</label>
+        <textarea class="form-control" rows="3" [value]="localConfig.attrs.text"
+            (input)="updateField('text', $any($event.target).value)">
+    </textarea>
+    </div>
+
+    <!-- Font family + Style -->
+    <div class="row-half mb-3">
+        <div>
+            <label class="form-label">Font family</label>
+            <select class="form-select" [value]="localConfig.attrs.fontFamily"
+                (change)="updateField('fontFamily', $any($event.target).value)">
+                <option>Arial</option>
+                <option>Calibri</option>
+                <option>Times New Roman</option>
+                <option>Verdana</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">Style</label>
+            <select class="form-select" [value]="localConfig.attrs.fontStyle"
+                (change)="updateField('fontStyle', $any($event.target).value)">
+                <option value="normal">Normal</option>
+                <option value="bold">Bold</option>
+                <option value="italic">Italic</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Font size + Line height -->
+    <div class="row-half mb-3">
+        <div>
+            <label class="form-label">Font size</label>
+            <input type="number" class="form-control" [value]="localConfig.attrs.fontSize"
+                (input)="updateField('fontSize', +$any($event.target).value)" />
+        </div>
+        <div>
+            <label class="form-label">Line height</label>
+            <input type="number" class="form-control" step="0.1" [value]="localConfig.attrs.lineHeight"
+                (input)="updateField('lineHeight', +$any($event.target).value)" />
+        </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- Color -->
+    <div class="mb-3">
+        <label class="form-label">Text color</label>
+        <div class="color-row">
+            <div class="color-preview" [style.background]="localConfig.attrs.fill">
+                <input type="color" [value]="localConfig.attrs.fill"
+                    (input)="updateField('fill', $any($event.target).value)" />
+            </div>
+            <span class="color-hex">{{ localConfig.attrs.fill }}</span>
+        </div>
+    </div>
+
+    <!-- Alignment -->
+    <div class="mb-3">
+        <label class="form-label">Alignment</label>
+        <div class="align-btn-group d-flex gap-2">
+            <button class="btn" [class.active]="localConfig.attrs.align === 'left'"
+                (click)="updateField('align', 'left')">Left</button>
+            <button class="btn" [class.active]="localConfig.attrs.align === 'center'"
+                (click)="updateField('align', 'center')">Center</button>
+            <button class="btn" [class.active]="localConfig.attrs.align === 'right'"
+                (click)="updateField('align', 'right')">Right</button>
+        </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <button class="apply-btn" (click)="applyChanges()">Apply changes</button>
+
+</div>

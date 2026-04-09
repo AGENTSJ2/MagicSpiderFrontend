@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { AddTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
+import { AddTextEvent, SelectTextEvent, TextEvent } from '../../domain/EventModels/textEvent.model';
 import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
 import { AddShapeEvent, ShapeEvent } from '../../domain/EventModels/shapeEvent.models';
+import { PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 
 @Component({
   selector: 'app-workspace',
@@ -14,14 +15,28 @@ import { AddShapeEvent, ShapeEvent } from '../../domain/EventModels/shapeEvent.m
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
   activeSlide?: Slide;
-
+  TooBoxType = ToolBoxType;
   constructor() { }
 
   ngOnInit(): void {
     this.presentation = new Presentation();
     this.addSlide(); // TODO REMOVE
+    this.listenPresentationEvents();
   }
 
+  selectedToolBox:ToolBoxType = ToolBoxType.None;
+  event?:PresentationEvent;
+  listenPresentationEvents()
+  {
+    const listener = this.presentation.listenEvent();
+    listener.subscribe((event)=>{
+      if(event instanceof SelectTextEvent)
+      {
+        this.selectedToolBox = ToolBoxType.TextToolBox;
+        this.event = event;
+      }
+    });
+  }
   handleAddText() {
     const textEvent: TextEvent = new AddTextEvent(
       {
@@ -33,7 +48,7 @@ export class WorkspaceComponent implements OnInit {
         trackHistory: true
       }
     )
-    this.presentation.controller.publishEvent(textEvent)
+    this.presentation.publishEvent(textEvent)
   }
 
   addSlide() {
@@ -44,7 +59,7 @@ export class WorkspaceComponent implements OnInit {
       trackHistory: true,
       
     });
-    this.presentation.controller.publishEvent(
+    this.presentation.publishEvent(
       slideEvent
     )
     if (this.presentation.slides.length == 1) {
@@ -64,7 +79,7 @@ export class WorkspaceComponent implements OnInit {
         trackHistory: true
       }
     );
-    this.presentation.controller.publishEvent(shapeEvent);
+    this.presentation.publishEvent(shapeEvent);
   }
 
   selectSlide(slide: Slide) {
@@ -73,5 +88,14 @@ export class WorkspaceComponent implements OnInit {
       this.activeSlide = slide;
     })
   }
-
+  handleUpdate(event:any)
+  {
+    this.presentation.publishEvent(event)
+  }
+}
+enum ToolBoxType {
+  TextToolBox,
+  ImageToolBox,
+  ShapeTooLBox,
+  None
 }

@@ -50,3 +50,18 @@
     cursor: pointer;
   }
 }
+.side-wrap
+{
+  position: relative;
+  .tool-display
+  {
+    position: absolute;
+    width: 300px;
+    z-index: 10000;
+    max-height: 90%;
+    top: 10px;
+    left: 110%;
+    border-radius: 5px;
+    overflow: auto;
+  }
+}

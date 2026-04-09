@@ -14,19 +14,31 @@
     </div>
   </div>
   <div class="d-flex flex-1">
-    <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
-      <div class="menu-item d-flex gap-1 flex-column " (click)="handleAddText()">
-        <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center" >Text</p>
+    <div class="side-wrap">
+      <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
+        <div class="menu-item d-flex gap-1 flex-column " (click)="handleAddText()">
+          <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center" >Text</p>
+        </div>
+        <div class="menu-item d-flex gap-1 flex-column" (click)="addShape()">
+          <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Shape</p>
+        </div>
+        <div class="menu-item d-flex gap-1 flex-column">
+          <i class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Upload</p>
+        </div>
       </div>
-      <div class="menu-item d-flex gap-1 flex-column" (click)="addShape()">
-        <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center">Shape</p>
-      </div>
-      <div class="menu-item d-flex gap-1 flex-column">
-        <i class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center">Upload</p>
-      </div>
+      @if(selectedToolBox!=TooBoxType.None)
+      {
+        <div class="tool-display">
+            @switch (selectedToolBox) {
+              @case (TooBoxType.TextToolBox) {
+                <app-text-tool-box [event]="event!" (update)="handleUpdate($event)"></app-text-tool-box>
+              }
+            }
+        </div>
+      }
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">

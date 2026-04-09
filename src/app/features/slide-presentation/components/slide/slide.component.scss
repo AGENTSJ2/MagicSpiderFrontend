@@ -1,8 +1,13 @@
-.slide
-{
+.slide {
     width: 90%;
 }
-.slide-wrapper
-{
+
+.slide-wrapper {
     position: relative;
+}
+.slide
+{
+    box-shadow:
+        0 0 0 0px rgba(0, 0, 0, 0.1),
+        0 8px 20px rgba(0, 0, 0, 0.2);
 }

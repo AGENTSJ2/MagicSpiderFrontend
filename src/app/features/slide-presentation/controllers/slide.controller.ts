@@ -28,7 +28,7 @@ import {
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
 import { SlideEvent } from '../domain/EventModels/slideEvent.model';
-import { AddTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
+import { AddTrashEvents } from '../domain/EventModels/trashEvents.model';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -36,6 +36,7 @@ export default class SlideController {
   mainCover!: Rect;
   stage!: Stage;
   private slide: Slide;
+  private readonly DESIRED_SLIDE_HEIGHT = 750;
   private eventBus: PresentationEventStream;
   private eventBusSubscription!: Subscription;
   private readonly Anchors = [
@@ -71,7 +72,7 @@ export default class SlideController {
       height: this.stage.height(),
       fill: 'white',
       stroke: 'black',
-      strokeWidth: 1,
+      strokeWidth: 0,
     });
     this.transformer = new Transformer({
       rotateEnabled: true,
@@ -181,23 +182,32 @@ export default class SlideController {
   }
 
   protected handleSlideEvents(event: SlideEvent) { }
-
   triggerResize(options: {
     divElm: HTMLDivElement;
     config: DocumentConfiguration;
   }) {
     this.slide.containerDiv = options.divElm;
+    const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
+    const desiredWidth = desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+
     const containerWidth = options.divElm.offsetWidth;
     const containerHeight =
-      options.divElm.offsetWidth *
+      containerWidth *
       (options.config.ratio.den / options.config.ratio.num);
+    const xScaleFactor = containerWidth / desiredWidth;
+    const yScaleFactor = containerHeight / desiredHeight;
+
     this.stage.container(options.divElm);
     this.stage.height(containerHeight);
     this.stage.width(containerWidth);
-    this.mainCover.height(containerHeight);
-    this.mainCover.width(containerWidth);
+    this.mainCover.height(desiredHeight);
+    this.mainCover.width(desiredWidth);
+
+    this.stage.scale({
+      x: xScaleFactor,
+      y: yScaleFactor
+    });
     this.layer.batchDraw();
-    this.stage.draw();
   }
 
   isNodeSelected(node: Shape): boolean {
