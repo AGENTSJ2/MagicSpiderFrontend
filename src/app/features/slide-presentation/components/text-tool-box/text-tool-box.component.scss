@@ -1,8 +1,7 @@
 .toolbox-panel {
     background: #fff;
     border: 0.5px solid rgba(0, 0, 0, 0.12);
-    // box-shadow: var(--box-shadow-1);
-      border-radius: 12px;
+    border-radius: 12px;
     padding: 1.25rem;
     max-width: 380px;
 }
@@ -25,30 +24,6 @@
     margin-bottom: 4px;
 }
 
-// .form-control,
-// .form-select {
-//     font-size: 13px;
-//     height: 34px;
-//     padding: 6px 10px;
-//     border: 0.5px solid rgba(0, 0, 0, 0.15);
-//     border-radius: 8px;
-//     background: #f8f8f7;
-//     color: #1a1a1a;
-//     transition: border-color 0.15s, background 0.15s;
-
-//     &:focus {
-//         border-color: rgba(0, 0, 0, 0.3);
-//         background: #fff;
-//         box-shadow: 0 0 0 3px rgba(100, 100, 255, 0.08);
-//         outline: none;
-//     }
-// }
-
-// textarea.form-control {
-//     height: auto;
-//     resize: vertical;
-// }
-
 .row-half {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -64,8 +39,8 @@
 // Color picker
 .color-row {
     display: flex;
-    align-items: center;
     gap: 10px;
+    flex-direction: column;
 }
 
 .color-preview {
@@ -117,28 +92,5 @@
             border-color: #c5cdfb;
             font-weight: 500;
         }
-    }
-}
-
-// Apply button
-.apply-btn {
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    width: 100%;
-    border-radius: 8px;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    margin-top: 4px;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-
-    &:hover {
-        opacity: 0.85;
-    }
-
-    &:active {
-        transform: scale(0.98);
     }
 }

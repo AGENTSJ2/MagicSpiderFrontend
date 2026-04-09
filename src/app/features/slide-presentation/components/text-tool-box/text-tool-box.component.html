@@ -43,73 +43,76 @@
                 <input type="number" step="0.1" class="form-control" formControlName="lineHeight" />
             </div>
         </div>
-
+        <!-- Stroke width and color  -->
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Stroke color</label>
+                <div class="color-row">
+                    <div class="color-preview" [style.background]="form.value.stroke">
+                        <input type="color" formControlName="stroke" />
+                    </div>
+                    <span class="color-hex">{{ form.value.stroke }}</span>
+                </div>
+            </div>
+            <div>
+                <label class="form-label">Stroke width</label>
+                <input class="form-control" type="number" min="0" formControlName="strokeWidth" />
+            </div>
+        </div>
         <hr class="section-divider" />
 
         <!-- Color -->
-        <div class="mb-3">
-            <label class="form-label">Text color</label>
-            <div class="color-row">
-                <div class="color-preview" [style.background]="form.value.fill">
-                    <input type="color" formControlName="fill" />
+        <div class="mb-3 row-half">
+            <div>
+                <label class="form-label">Text color</label>
+                <div class="color-row">
+                    <div class="color-preview" [style.background]="form.value.fill">
+                        <input type="color" formControlName="fill" />
+                    </div>
+                    <span class="color-hex">{{ form.value.fill }}</span>
                 </div>
-                <span class="color-hex">{{ form.value.fill }}</span>
+            </div>
+            <div>
+                <label class="form-label">Alignment</label>
+                <select class="form-select" formControlName="align">
+                    <option value="left">Left</option>
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                </select>
             </div>
         </div>
 
-        <!-- Alignment -->
-        <div class="mb-3">
-            <label class="form-label">Alignment</label>
-            <div class="align-btn-group d-flex gap-2">
-                <button type="button" class="btn" [class.active]="form.value.align === 'left'"
-                    (click)="form.patchValue({ align: 'left' })">
-                    Left
-                </button>
-
-                <button type="button" class="btn" [class.active]="form.value.align === 'center'"
-                    (click)="form.patchValue({ align: 'center' })">
-                    Center
-                </button>
-
-                <button type="button" class="btn" [class.active]="form.value.align === 'right'"
-                    (click)="form.patchValue({ align: 'right' })">
-                    Right
-                </button>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Stroke color</label>
-            <input type="color" formControlName="stroke" />
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Stroke width</label>
-            <input type="number" min="0" formControlName="strokeWidth" />
-        </div>
 
         <div class="mb-3">
             <label>
-                <input type="checkbox" formControlName="gradientEnabled" />
-                Enable Gradient
+                Gradient Color
             </label>
+            <input class="ms-3 form-check-input" type="checkbox" formControlName="gradientEnabled" />
         </div>
 
-        <div *ngIf="form.value.gradientEnabled" class="row-half">
-            <input type="color" formControlName="gradientStart" />
-            <input type="color" formControlName="gradientEnd" />
-            <div class="mb-3">
-                <label>Direction</label>
-                <select class="form-select" formControlName="gradientDirection">
-                    <option value="horizontal">Horizontal →</option>
-                    <option value="vertical">Vertical ↓</option>
-                    <option value="diagonal">Diagonal ↘</option>
-                </select>
+        <div *ngIf="form.value.gradientEnabled" class="row-half mb-3">
+            <div class="color-row align-items-center">
+                <div class="color-preview" [style.background]="form.value.gradientStart">
+                    <input type="color" formControlName="gradientStart" />
+                </div>
+                <span class="color-hex">{{ form.value.gradientStart }}</span>
             </div>
+            <div class="color-row align-items-center">
+                <div class="color-preview" [style.background]="form.value.gradientEnd">
+                    <input type="color" formControlName="gradientEnd" />
+                </div>
+                <span class="color-hex">{{ form.value.gradientEnd }}</span>
+            </div>
+        </div>
+        <div *ngIf="form.value.gradientEnabled" class="mb-3">
+            <label class="form-label">Gradient Position</label>
 
-            <div class="mb-3">
-                <label>Gradient length</label>
-                <input type="number" formControlName="gradientLength" />
+            <input type="range" min="0" max="1" step="0.01" formControlName="gradientOffset" class="form-range" />
+
+            <div class="d-flex justify-content-between">
+                <span>0</span>
+                <span>{{ form.value.gradientOffset }}</span>
+                <span>1</span>
             </div>
         </div>
     </form>

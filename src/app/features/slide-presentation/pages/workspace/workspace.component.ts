@@ -77,7 +77,7 @@ export class WorkspaceComponent implements OnInit {
       this.activeSlide = slide;
     })
   }
-  
+
   handleUpdate(event: any) {
     this.presentation.publishEvent(event)
   }
@@ -98,7 +98,6 @@ export class WorkspaceComponent implements OnInit {
         this.handleShapeSpecificEvents(event);
         return;
       }
-
     });
   }
 
@@ -112,8 +111,7 @@ export class WorkspaceComponent implements OnInit {
         this.selectedToolBox = ToolBoxType.None;
       }
     }
-    if(event instanceof UpdateTextEvent && (this.activeEvent?.nodeId == event.nodeId))
-    {
+    if (event instanceof UpdateTextEvent && (this.activeEvent?.nodeId == event.nodeId)) {
       this.activeEvent = event;
     }
   }

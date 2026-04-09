@@ -34,7 +34,7 @@
         <div class="tool-display">
             @switch (selectedToolBox) {
               @case (TooBoxType.TextToolBox) {
-                <app-text-tool-box [event]="activeEvent!" (update)="handleUpdate($event)"></app-text-tool-box>
+                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
               }
             }
         </div>

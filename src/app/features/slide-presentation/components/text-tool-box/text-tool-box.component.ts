@@ -13,6 +13,9 @@ import {
   UpdateTextEvent
 } from '../../domain/EventModels/textEvent.model';
 import { ComponentConfig } from '../../domain/EventModels/presentationEvents.model';
+import { Subscription } from 'rxjs';
+import { Presentation } from '../../domain/canvasModels/presenatation.model';
+import { TextConfig } from 'konva/lib/shapes/Text';
 
 @Component({
   selector: 'app-text-tool-box',
@@ -22,11 +25,12 @@ import { ComponentConfig } from '../../domain/EventModels/presentationEvents.mod
 export class TextToolBoxComponent implements OnChanges {
 
   @Input() event!: SelectTextEvent;
-  @Output() update = new EventEmitter<UpdateTextEvent>();
+  @Input() presentation!:Presentation;
 
   form!: FormGroup;
-  localConfig!: ComponentConfig<any>;
-
+  localConfig!: ComponentConfig<TextConfig>;
+  private sub?: Subscription;
+  private updateTimeOut:any;
   constructor(private fb: FormBuilder) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -39,8 +43,11 @@ export class TextToolBoxComponent implements OnChanges {
 
   initForm() {
     const attrs = this.localConfig.attrs;
-    if(!this.form)
-    {
+    const stops = this.localConfig.attrs.fillLinearGradientColorStops;
+    let gradientOffset = stops?.at(1);
+    gradientOffset ??= 0.5;
+    this.sub?.unsubscribe();
+    if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.text],
         fontFamily: [attrs.fontFamily],
@@ -54,23 +61,25 @@ export class TextToolBoxComponent implements OnChanges {
         gradientEnabled: [false],
         gradientStart: ['#000000'],
         gradientEnd: ['#ff0000'],
-  
+        gradientOffset:[gradientOffset]
       });
     }
-    else
-    {
+    else {
       this.form.patchValue({
         ...this.localConfig.attrs
-      },{
-        emitEvent:false
+      }, {
+        emitEvent: false
       })
-    }
+    } 
   }
 
   listenToChanges() {
-    this.form.valueChanges.subscribe(values => {
+    this.sub = this.form.valueChanges.subscribe(values => {
       Object.assign(this.localConfig.attrs, values);
-      this.applyChanges()
+      clearTimeout(this.updateTimeOut);
+      this.updateTimeOut = setTimeout(()=>{
+        this.applyChanges()
+      },200)
     });
   }
 
@@ -78,11 +87,10 @@ export class TextToolBoxComponent implements OnChanges {
     if (this.form.value.gradientEnabled) {
       this.localConfig.attrs.fillLinearGradientStartPoint = { x: 0, y: 0 };
       this.localConfig.attrs.fillLinearGradientEndPoint = { x: 200, y: 0 };
-
       this.localConfig.attrs.fillLinearGradientColorStops = [
         0,
         this.form.value.gradientStart,
-        1,
+        this.form.value.gradientOffset,
         this.form.value.gradientEnd
       ];
 
@@ -93,9 +101,9 @@ export class TextToolBoxComponent implements OnChanges {
     const updateEvent = new UpdateTextEvent({
       ...this.event,
       previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig
+      currentConfig: this.localConfig,
+      trackHistory: true
     });
-
-    this.update.emit(updateEvent);
+    this.presentation.publishEvent(updateEvent);
   }
 }
