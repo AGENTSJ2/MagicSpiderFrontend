@@ -1,5 +1,3 @@
-import { TextConfig } from "konva/lib/shapes/Text";
-import { ShapeType } from "../canvasModels/shapeComponent.model";
 import { Subject } from "rxjs";
 import { ShapeConfig } from "konva/lib/Shape";
 
@@ -19,13 +17,25 @@ export class PresentationEvent {
         this.trackHistory = init.trackHistory;
     }
 }
+
 export interface ComponentConfig<T>{
     attrs:T;
     zIndex:number;
 }
+
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
 export class UndoEvent extends PresentationEvent
+{
+    event:PresentationEvent;
+    constructor(init:PresentationEvent)
+    {
+        super(init);
+        this.event = init;
+    };
+}
+
+export class RedoEvent extends PresentationEvent
 {
     event:PresentationEvent;
     constructor(init:PresentationEvent)
@@ -39,5 +49,7 @@ export enum PresentationEventType {
     ADD,
     UPDATE,
     REMOVE,
-    SELECT
+    SELECT,
+    RESTORE
 }
+

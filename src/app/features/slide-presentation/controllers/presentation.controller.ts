@@ -9,6 +9,7 @@ import { Presentation } from '../domain/canvasModels/presenatation.model';
 import {
   AddTextEvent,
   RemoveTextEvent,
+  RestoreTextEvent,
   SelectTextEvent,
   TextEvent,
   UpdateTextEvent,
@@ -17,13 +18,18 @@ import {
   AddSlideEvent,
   SlideEvent,
 } from '../domain/EventModels/slideEvent.model';
-import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
+import { AddShapeEvent, RemoveShapeEvent, RestoreShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
+import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
+import { AddTrashEvents, RemoveFromTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
+import { TextComponent } from '../domain/canvasModels/textComponent.model';
+import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 
 export class PresentationController {
   private eventBus: PresentationEventStream = new PresentationEventStream();
   private eventHistory: PresentationEvent[] = [];
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
+  private trash:ICanvasComponent[] = [];
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
@@ -45,7 +51,6 @@ export class PresentationController {
         }
         const lastEvent = this.eventHistory[this.eventIdx];
         let undoEvent: UndoEvent | undefined;
-
         const EventClass = lastEvent.constructor as new (
           init: TextEvent,
         ) => TextEvent; // all wrong from here
@@ -68,7 +73,7 @@ export class PresentationController {
 
   private listenPresentationEvents() {
     this.eventBus.subscribe((event) => {
-
+      // track or not
       if (event.trackHistory) {
         if (this.eventIdx != this.eventHistory.length - 1) {
           // some operation is performed after undo / redo hence reset
@@ -80,6 +85,7 @@ export class PresentationController {
         this.eventHistory.push(event);
         this.eventIdx = this.eventHistory.length - 1;
       }
+      // slide events
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
           const slide: Partial<Slide> = {
@@ -96,7 +102,7 @@ export class PresentationController {
         }
         return;
       }
-
+      // Undo events
       if (event instanceof UndoEvent) {
         if (event.event instanceof TextEvent) {
           this.handleUndoTextEvent(event.event);
@@ -105,6 +111,19 @@ export class PresentationController {
         if (event.event instanceof ShapeEvent) {
           this.handleUndoShapeEvent(event.event);
           return;
+        }
+      }
+      // Trash events
+      if(event instanceof TrashEvent)
+      {
+        if(event instanceof AddTrashEvents)
+        {
+          this.trash.push(event.node);
+        }
+        if(event instanceof RemoveFromTrashEvents)
+        {
+          const idx = this.trash.findIndex((node)=>node.node == event.node.node);
+          this.trash.splice(idx, 1)[0];
         }
       }
     });
@@ -120,12 +139,18 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveTextEvent) {
-      const addEvent = new AddTextEvent({
-        ...event,
-        currentConfig: event.previousConfig,
-        trackHistory: false,
+      const nodeToRestoreIdx = this.trash.findIndex((node)=>node.node._id.toString() == event.nodeId);
+      const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+      const restoreEvent = new RestoreTextEvent({
+        ...event,  
+        nodeToRestore:(nodeToRestore as TextComponent),
       });
-      this.publishEvent(addEvent);
+      const unTrashEvent = new RemoveFromTrashEvents({
+        ...event,
+        node:nodeToRestore 
+      })
+      this.publishEvent(restoreEvent);
+      this.publishEvent(unTrashEvent);
       return;
     }
     if (event instanceof UpdateTextEvent) {
@@ -156,12 +181,18 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveShapeEvent) {
-      const addEvent = new AddShapeEvent({
-        ...event,
-        currentConfig: event.previousConfig,
-        trackHistory: false,
+      const nodeToRestoreIdx = this.trash.findIndex((node)=>node.node._id.toString() == event.nodeId);
+      const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+      const restoreEvent = new RestoreShapeEvent({
+        ...event,  
+        nodeToRestore:(nodeToRestore as ShapeComponent),
       });
-      this.publishEvent(addEvent);
+      const unTrashEvent = new RemoveFromTrashEvents({
+        ...event,
+        node:nodeToRestore 
+      })
+      this.publishEvent(restoreEvent);
+      this.publishEvent(unTrashEvent);
       return;
     }
     if (event instanceof UpdateShapeEvent) {
