@@ -39,22 +39,32 @@ export class TextToolBoxComponent implements OnChanges {
 
   initForm() {
     const attrs = this.localConfig.attrs;
-
-    this.form = this.fb.group({
-      text: [attrs.text],
-      fontFamily: [attrs.fontFamily],
-      fontStyle: [attrs.fontStyle],
-      fontSize: [attrs.fontSize],
-      lineHeight: [attrs.lineHeight],
-      fill: [attrs.fill],
-      align: [attrs.align],
-      stroke: [attrs.stroke || '#000000'],
-      strokeWidth: [attrs.strokeWidth || 0],
-      gradientEnabled: [false],
-      gradientStart: ['#000000'],
-      gradientEnd: ['#ff0000'],
-
-    });
+    if(!this.form)
+    {
+      this.form = this.fb.group({
+        text: [attrs.text],
+        fontFamily: [attrs.fontFamily],
+        fontStyle: [attrs.fontStyle],
+        fontSize: [attrs.fontSize],
+        lineHeight: [attrs.lineHeight],
+        fill: [attrs.fill],
+        align: [attrs.align],
+        stroke: [attrs.stroke || '#000000'],
+        strokeWidth: [attrs.strokeWidth || 0],
+        gradientEnabled: [false],
+        gradientStart: ['#000000'],
+        gradientEnd: ['#ff0000'],
+  
+      });
+    }
+    else
+    {
+      this.form.patchValue({
+        ...this.localConfig.attrs
+      },{
+        emitEvent:false
+      })
+    }
   }
 
   listenToChanges() {
