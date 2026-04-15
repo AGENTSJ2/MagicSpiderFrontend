@@ -45,7 +45,7 @@ export class TextToolBoxComponent implements OnChanges {
     const attrs = this.localConfig.attrs;
     const stops = this.localConfig.attrs.fillLinearGradientColorStops;
     let gradientOffset = stops?.at(1);
-    gradientOffset ??= 0.5;
+    gradientOffset = 1;
     this.sub?.unsubscribe();
     if (!this.form) {
       this.form = this.fb.group({
@@ -61,7 +61,8 @@ export class TextToolBoxComponent implements OnChanges {
         gradientEnabled: [false],
         gradientStart: ['#000000'],
         gradientEnd: ['#ff0000'],
-        gradientOffset:[gradientOffset]
+        gradientOffset:[gradientOffset],
+        gradientWidth :200,
       });
     }
     else {
@@ -86,7 +87,7 @@ export class TextToolBoxComponent implements OnChanges {
   applyChanges() {
     if (this.form.value.gradientEnabled) {
       this.localConfig.attrs.fillLinearGradientStartPoint = { x: 0, y: 0 };
-      this.localConfig.attrs.fillLinearGradientEndPoint = { x: 200, y: 0 };
+      this.localConfig.attrs.fillLinearGradientEndPoint = { x: this.form.value.gradientWidth || 200 , y: 0 };
       this.localConfig.attrs.fillLinearGradientColorStops = [
         0,
         this.form.value.gradientStart,

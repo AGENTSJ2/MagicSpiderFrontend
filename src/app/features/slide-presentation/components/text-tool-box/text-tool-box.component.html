@@ -115,6 +115,9 @@
                 <span>1</span>
             </div>
         </div>
+        <div *ngIf="form.value.gradientEnabled" class="mb-3">
+            <label class="form-label">Gradient Position</label>
+            <input type="number" min="0" formControlName="gradientWidth" class="form-control" />
+        </div>
     </form>
-
 </div>
