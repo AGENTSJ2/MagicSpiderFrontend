@@ -29,7 +29,7 @@ import {
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
 import { SlideEvent } from '../domain/EventModels/slideEvent.model';
-import { AddTrashEvents } from '../domain/EventModels/trashEvents.model';
+import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -112,8 +112,8 @@ export default class SlideController {
         this.transformer?.nodes([]); // clears selection
         this.layer?.batchDraw();
         const clearSelection = new ClearSelectionEvent({
-          slideId:this.slide.slideId,
-          presentationId:this.slide.presentationId
+          slideId: this.slide.slideId,
+          presentationId: this.slide.presentationId
         });
         this.eventBus.next(clearSelection)
         return;
@@ -159,7 +159,7 @@ export default class SlideController {
       return;
     }
     if (event instanceof RestoreTextEvent) {
-      this.handleRestoreNode(event.nodeToRestore);
+      this.handleRestoreNode(event);
       return;
     }
   }
@@ -182,7 +182,7 @@ export default class SlideController {
       return;
     }
     if (event instanceof RestoreShapeEvent) {
-      this.handleRestoreNode(event.nodeToRestore);
+      this.handleRestoreNode(event);
       return;
     }
   }
@@ -285,9 +285,14 @@ export default class SlideController {
     });
     this.eventBus.next(trashEvent);
   }
-  private handleRestoreNode(nodeComponent: ICanvasComponent) {
-    this.slide.components.push(nodeComponent);
-    this.layer.add(nodeComponent.node);
+  private handleRestoreNode(event: PresentationEvent & { nodeToRestore: ICanvasComponent }) {
+    this.slide.components.push(event.nodeToRestore);
+    this.layer.add(event.nodeToRestore.node);
     this.layer.batchDraw();
+    const unTrashEvent = new RemoveFromTrashEvents({
+      ...event,
+      node: event.nodeToRestore
+    });
+    this.eventBus.next(unTrashEvent);
   }
 }

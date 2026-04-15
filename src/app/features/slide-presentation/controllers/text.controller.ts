@@ -141,11 +141,6 @@ export default class TextController extends BaseController {
           ...defaultEvent
         });
         break;
-      case PresentationEventType.RESTORE:
-        event = new RemoveTextEvent({
-          ...defaultEvent
-        });
-        break;
     }
     return event!;
   }

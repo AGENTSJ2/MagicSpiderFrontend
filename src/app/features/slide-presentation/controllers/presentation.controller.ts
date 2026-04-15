@@ -53,7 +53,7 @@ export class PresentationController {
         let undoEvent: UndoEvent | undefined;
         const EventClass = lastEvent.constructor as new (
           init: PresentationEvent,
-        ) => PresentationEvent; // all wrong from here
+        ) => PresentationEvent;
         const newEvent = new EventClass({
           ...lastEvent,
           currentConfig: lastEvent.previousConfig,
@@ -66,19 +66,18 @@ export class PresentationController {
 
       if (event.ctrlKey && event.key.toLowerCase() === 'y') {
         const nextIdx = this.eventIdx + 1;
-        console.log(nextIdx, this.eventHistory.length - 1);
         if (nextIdx >= this.eventHistory.length) {
           return;
         }
         this.eventIdx = nextIdx;
         const nextEvent = this.eventHistory[this.eventIdx];
-        let redoEvent: RedoEvent | undefined;
         const EventClass = nextEvent.constructor as new (
           init: PresentationEvent,
-        ) => PresentationEvent; // all wrong from here
+        ) => PresentationEvent;
+        const newCopy = structuredClone(nextEvent);
+        let redoEvent: RedoEvent | undefined;
         const newEvent = new EventClass({
-          ...nextEvent,
-          currentConfig: nextEvent.previousConfig,
+          ...newCopy,
           trackHistory: false,
         });
         redoEvent = new RedoEvent(newEvent);
@@ -119,7 +118,7 @@ export class PresentationController {
         return;
       }
       // Undo events
-      if (event instanceof UndoEvent) {        
+      if (event instanceof UndoEvent) {
         if (event.event instanceof TextEvent) {
           this.handleUndoTextEvent(event.event);
           return;
@@ -136,9 +135,25 @@ export class PresentationController {
         const inst = new NewInstance({
           ...event.event
         })
-        console.log(inst);
-        this.publishEvent(inst)
-        console.warn(`REDO this type of event is not registered type : ${event.event.constructor.name}`);
+        if (inst instanceof AddTextEvent) {
+          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+          this.publishEvent(new RestoreTextEvent({
+            ...inst,
+            nodeToRestore: nodeToRestore as TextComponent
+          }))
+        }
+        else if (inst instanceof AddShapeEvent) {
+          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+          this.publishEvent(new RestoreShapeEvent({
+            ...inst,
+            nodeToRestore: nodeToRestore as ShapeComponent
+          }))
+        }
+        else {
+          this.publishEvent(inst)
+        }
       }
       // Trash events
       if (event instanceof TrashEvent) {
@@ -167,14 +182,9 @@ export class PresentationController {
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreTextEvent({
         ...event,
-        nodeToRestore: (nodeToRestore as TextComponent),
+        nodeToRestore: nodeToRestore as TextComponent,
       });
-      const unTrashEvent = new RemoveFromTrashEvents({
-        ...event,
-        node: nodeToRestore
-      })
       this.publishEvent(restoreEvent);
-      this.publishEvent(unTrashEvent);
       return;
     }
     if (event instanceof UpdateTextEvent) {
@@ -211,12 +221,7 @@ export class PresentationController {
         ...event,
         nodeToRestore: (nodeToRestore as ShapeComponent),
       });
-      const unTrashEvent = new RemoveFromTrashEvents({
-        ...event,
-        node: nodeToRestore
-      })
       this.publishEvent(restoreEvent);
-      this.publishEvent(unTrashEvent);
       return;
     }
     if (event instanceof UpdateShapeEvent) {

@@ -46,10 +46,6 @@ export default class ShapeController extends BaseController {
                 this.applyConfigurations(event.currentConfig!);
                 return;
             }
-            if (event instanceof RemoveShapeEvent) {
-                this.destroy();
-                return;
-            }
         })
     }
 
