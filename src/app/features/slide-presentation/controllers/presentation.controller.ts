@@ -22,14 +22,14 @@ import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import { AddTrashEvents, RemoveFromTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
-import { UndoEvent } from '../domain/EventModels/undoRedo.model';
+import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
 
 export class PresentationController {
   private eventBus: PresentationEventStream = new PresentationEventStream();
   private eventHistory: PresentationEvent[] = [];
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
-  private trash:ICanvasComponent[] = [];
+  private trash: ICanvasComponent[] = [];
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
@@ -52,21 +52,37 @@ export class PresentationController {
         const lastEvent = this.eventHistory[this.eventIdx];
         let undoEvent: UndoEvent | undefined;
         const EventClass = lastEvent.constructor as new (
-          init: TextEvent,
-        ) => TextEvent; // all wrong from here
+          init: PresentationEvent,
+        ) => PresentationEvent; // all wrong from here
         const newEvent = new EventClass({
           ...lastEvent,
           currentConfig: lastEvent.previousConfig,
           trackHistory: false,
         });
-
         undoEvent = new UndoEvent(newEvent);
         this.publishEvent(undoEvent!);
         this.eventIdx--;
       }
 
       if (event.ctrlKey && event.key.toLowerCase() === 'y') {
-        console.log('Redo');
+        const nextIdx = this.eventIdx + 1;
+        console.log(nextIdx, this.eventHistory.length - 1);
+        if (nextIdx >= this.eventHistory.length) {
+          return;
+        }
+        this.eventIdx = nextIdx;
+        const nextEvent = this.eventHistory[this.eventIdx];
+        let redoEvent: RedoEvent | undefined;
+        const EventClass = nextEvent.constructor as new (
+          init: PresentationEvent,
+        ) => PresentationEvent; // all wrong from here
+        const newEvent = new EventClass({
+          ...nextEvent,
+          currentConfig: nextEvent.previousConfig,
+          trackHistory: false,
+        });
+        redoEvent = new RedoEvent(newEvent);
+        this.publishEvent(redoEvent!);
       }
     });
   }
@@ -103,7 +119,7 @@ export class PresentationController {
         return;
       }
       // Undo events
-      if (event instanceof UndoEvent) {
+      if (event instanceof UndoEvent) {        
         if (event.event instanceof TextEvent) {
           this.handleUndoTextEvent(event.event);
           return;
@@ -112,23 +128,31 @@ export class PresentationController {
           this.handleUndoShapeEvent(event.event);
           return;
         }
+        console.warn(`UNDO this type of event is not registered type : ${event.event.constructor.name}`);
+      }
+      // Redo events
+      if (event instanceof RedoEvent) {
+        const NewInstance = event.event.constructor as { new(init: PresentationEvent): PresentationEvent };
+        const inst = new NewInstance({
+          ...event.event
+        })
+        console.log(inst);
+        this.publishEvent(inst)
+        console.warn(`REDO this type of event is not registered type : ${event.event.constructor.name}`);
       }
       // Trash events
-      if(event instanceof TrashEvent)
-      {
-        if(event instanceof AddTrashEvents)
-        {
+      if (event instanceof TrashEvent) {
+        if (event instanceof AddTrashEvents) {
           this.trash.push(event.node);
         }
-        if(event instanceof RemoveFromTrashEvents)
-        {
-          const idx = this.trash.findIndex((node)=>node.node == event.node.node);
+        if (event instanceof RemoveFromTrashEvents) {
+          const idx = this.trash.findIndex((node) => node.node == event.node.node);
           this.trash.splice(idx, 1)[0];
         }
       }
     });
   }
-
+  // UNDO handlers
   private handleUndoTextEvent(event: TextEvent) {
     if (event instanceof AddTextEvent) {
       const removeEvent = new RemoveTextEvent({
@@ -139,15 +163,15 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveTextEvent) {
-      const nodeToRestoreIdx = this.trash.findIndex((node)=>node.node._id.toString() == event.nodeId);
+      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreTextEvent({
-        ...event,  
-        nodeToRestore:(nodeToRestore as TextComponent),
+        ...event,
+        nodeToRestore: (nodeToRestore as TextComponent),
       });
       const unTrashEvent = new RemoveFromTrashEvents({
         ...event,
-        node:nodeToRestore 
+        node: nodeToRestore
       })
       this.publishEvent(restoreEvent);
       this.publishEvent(unTrashEvent);
@@ -181,15 +205,15 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveShapeEvent) {
-      const nodeToRestoreIdx = this.trash.findIndex((node)=>node.node._id.toString() == event.nodeId);
+      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreShapeEvent({
-        ...event,  
-        nodeToRestore:(nodeToRestore as ShapeComponent),
+        ...event,
+        nodeToRestore: (nodeToRestore as ShapeComponent),
       });
       const unTrashEvent = new RemoveFromTrashEvents({
         ...event,
-        node:nodeToRestore 
+        node: nodeToRestore
       })
       this.publishEvent(restoreEvent);
       this.publishEvent(unTrashEvent);
