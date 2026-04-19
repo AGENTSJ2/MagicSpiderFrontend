@@ -5,3 +5,33 @@
 {
     flex: 1 !important;
 }
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+  display: none;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* track */
+::-webkit-scrollbar-track {
+  background: #1e1e1e00;
+}
+
+/* thumb */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+* {
+  scrollbar-width: thin; /* auto | thin | none */
+  scrollbar-color: #888 transparent; /* thumb track */
+}

@@ -1,5 +1,5 @@
 import { TextConfig } from "konva/lib/shapes/Text";
-import { ComponentConfig, PresentationEvent } from "./presentationEvents.model";
+import { ComponentConfig, PresentationEvent, ZIndexActions } from "./presentationEvents.model";
 import { TextComponent } from "../canvasModels/textComponent.model";
 
 export class TextEvent extends PresentationEvent {
@@ -19,8 +19,10 @@ export class AddTextEvent extends TextEvent {
 
 }
 export class UpdateTextEvent extends TextEvent {
-    constructor(init: TextEvent) {
+   zIndexActions?:ZIndexActions;
+    constructor(init: UpdateTextEvent) {
         super(init);
+        this.zIndexActions = init.zIndexActions;
     }
 }
 

@@ -1,8 +1,6 @@
 import {
   Component,
-  EventEmitter,
   Input,
-  Output,
   OnChanges,
   SimpleChanges
 } from '@angular/core';
@@ -12,7 +10,7 @@ import {
   SelectTextEvent,
   UpdateTextEvent
 } from '../../domain/EventModels/textEvent.model';
-import { ComponentConfig } from '../../domain/EventModels/presentationEvents.model';
+import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
@@ -25,12 +23,12 @@ import { TextConfig } from 'konva/lib/shapes/Text';
 export class TextToolBoxComponent implements OnChanges {
 
   @Input() event!: SelectTextEvent;
-  @Input() presentation!:Presentation;
+  @Input() presentation!: Presentation;
 
   form!: FormGroup;
   localConfig!: ComponentConfig<TextConfig>;
   private sub?: Subscription;
-  private updateTimeOut:any;
+  private updateTimeOut: any;
   constructor(private fb: FormBuilder) { }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -43,9 +41,7 @@ export class TextToolBoxComponent implements OnChanges {
 
   initForm() {
     const attrs = this.localConfig.attrs;
-    const stops = this.localConfig.attrs.fillLinearGradientColorStops;
-    let gradientOffset = stops?.at(1);
-    gradientOffset = 1;
+    const isGradientEnabled = attrs.fill == undefined;   
     this.sub?.unsubscribe();
     if (!this.form) {
       this.form = this.fb.group({
@@ -58,11 +54,11 @@ export class TextToolBoxComponent implements OnChanges {
         align: [attrs.align],
         stroke: [attrs.stroke || '#000000'],
         strokeWidth: [attrs.strokeWidth || 0],
-        gradientEnabled: [false],
-        gradientStart: ['#000000'],
-        gradientEnd: ['#ff0000'],
-        gradientOffset:[gradientOffset],
-        gradientWidth :200,
+        gradientEnabled: [isGradientEnabled],
+        gradientStart: [attrs.fillLinearGradientColorStops?.at(1) ?? '#000000'],
+        gradientEnd: [attrs.fillLinearGradientColorStops?.at(3) ?? '#ff0000'],
+        gradientOffset: [attrs.fillLinearGradientColorStops?.at(2) ?? 1],
+        gradientWidth: attrs.fillLinearGradientEndPointX,
       });
     }
     else {
@@ -71,23 +67,37 @@ export class TextToolBoxComponent implements OnChanges {
       }, {
         emitEvent: false
       })
-    } 
+    }
   }
 
   listenToChanges() {
     this.sub = this.form.valueChanges.subscribe(values => {
       Object.assign(this.localConfig.attrs, values);
       clearTimeout(this.updateTimeOut);
-      this.updateTimeOut = setTimeout(()=>{
+      this.updateTimeOut = setTimeout(() => {
         this.applyChanges()
-      },200)
+      }, 200)
     });
+  }
+  ZIndexActions = ZIndexActions;
+  move(action:ZIndexActions)
+  {
+    console.log(action);
+    
+    const updateEvent = new UpdateTextEvent({
+      ...this.event,
+      previousConfig: this.event.currentConfig,
+      currentConfig: this.localConfig,
+      trackHistory: true,
+      zIndexActions:action
+    });
+    this.presentation.publishEvent(updateEvent);
   }
 
   applyChanges() {
     if (this.form.value.gradientEnabled) {
       this.localConfig.attrs.fillLinearGradientStartPoint = { x: 0, y: 0 };
-      this.localConfig.attrs.fillLinearGradientEndPoint = { x: this.form.value.gradientWidth || 200 , y: 0 };
+      this.localConfig.attrs.fillLinearGradientEndPoint = { x: this.form.value.gradientWidth || 200, y: 0 };
       this.localConfig.attrs.fillLinearGradientColorStops = [
         0,
         this.form.value.gradientStart,

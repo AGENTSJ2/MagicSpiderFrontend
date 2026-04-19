@@ -81,7 +81,15 @@
                 </select>
             </div>
         </div>
-
+        <div class="mb-3">
+            <label class="form-label">Position</label>
+        </div>
+        <div class="row-half mb-3">
+            <button class="btn z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
+            <button class="btn z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
+            <button class="btn z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
+            <button class="btn z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
+        </div>
 
         <div class="mb-3">
             <label>
@@ -91,19 +99,20 @@
         </div>
 
         <div *ngIf="form.value.gradientEnabled" class="row-half mb-3">
-            <div class="color-row align-items-center">
+            <div class="color-row">
                 <div class="color-preview" [style.background]="form.value.gradientStart">
                     <input type="color" formControlName="gradientStart" />
                 </div>
                 <span class="color-hex">{{ form.value.gradientStart }}</span>
             </div>
-            <div class="color-row align-items-center">
+            <div class="color-row">
                 <div class="color-preview" [style.background]="form.value.gradientEnd">
                     <input type="color" formControlName="gradientEnd" />
                 </div>
                 <span class="color-hex">{{ form.value.gradientEnd }}</span>
             </div>
         </div>
+
         <div *ngIf="form.value.gradientEnabled" class="mb-3">
             <label class="form-label">Gradient Position</label>
 
@@ -115,9 +124,11 @@
                 <span>1</span>
             </div>
         </div>
+
         <div *ngIf="form.value.gradientEnabled" class="mb-3">
             <label class="form-label">Gradient Width</label>
             <input type="number" min="0" formControlName="gradientWidth" class="form-control" />
         </div>
+
     </form>
 </div>
