@@ -1,0 +1,85 @@
+<div class="toolbox-panel" *ngIf="form">
+    <form action="" [formGroup]="form">
+
+        <div class="toolbox-title">Image properties</div>
+
+        <div class="mb-3">
+            <label class="form-label">Image</label>
+            <label class="upload-row">
+                <span>Replace image</span>
+                <input type="file" accept="image/*" (change)="replaceImage($event)" />
+            </label>
+        </div>
+
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">X</label>
+                <input type="number" class="form-control" formControlName="x" />
+            </div>
+
+            <div>
+                <label class="form-label">Y</label>
+                <input type="number" class="form-control" formControlName="y" />
+            </div>
+        </div>
+
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Width</label>
+                <input type="number" min="1" class="form-control" formControlName="width" />
+            </div>
+
+            <div>
+                <label class="form-label">Height</label>
+                <input type="number" min="1" class="form-control" formControlName="height" />
+            </div>
+        </div>
+
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Rotation</label>
+                <input type="number" class="form-control" formControlName="rotation" />
+            </div>
+
+            <div>
+                <label class="form-label">Opacity</label>
+                <input type="number" min="0" max="1" step="0.1" class="form-control" formControlName="opacity" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Corner radius</label>
+            <input type="number" min="0" class="form-control" formControlName="cornerRadius" />
+        </div>
+
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">Stroke color</label>
+                <div class="color-row">
+                    <div class="color-preview" [style.background]="form.value.stroke">
+                        <input type="color" formControlName="stroke" />
+                    </div>
+                    <span class="color-hex">{{ form.value.stroke }}</span>
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label">Stroke width</label>
+                <input class="form-control" type="number" min="0" formControlName="strokeWidth" />
+            </div>
+        </div>
+
+        <hr class="section-divider" />
+
+        <div class="mb-3">
+            <label class="form-label">Position</label>
+        </div>
+        <div class="row-half mb-3">
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
+        </div>
+
+    </form>
+</div>

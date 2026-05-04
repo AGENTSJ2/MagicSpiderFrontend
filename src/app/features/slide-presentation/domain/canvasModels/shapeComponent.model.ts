@@ -6,22 +6,21 @@ import { Rect } from "konva/lib/shapes/Rect";
 import ShapeController from "../../controllers/shape.controller";
 import { Slide } from "./slide.model";
 import { ComponentConfig, PresentationEventStream } from "../EventModels/presentationEvents.model";
-
 export default class ShapeComponent implements ICanvasComponent {
     shapeType: ShapeType;
-    config:ComponentConfig<ShapeConfig>;
+    config: ComponentConfig<ShapeConfig>;
     node: Shape;
     controller!: ShapeController;
     slide: Slide;
 
-    constructor(init: Partial<ShapeComponent> & {eventBus:PresentationEventStream}) {
+    constructor(init: Partial<ShapeComponent> & { eventBus: PresentationEventStream }) {
         this.slide = init.slide!;
         this.shapeType = init.shapeType!;
         this.node = init.node!;
         this.config = init.config!;
         // ✅ Proper config object
         const config = {
-            ...this.config.attrs,
+            ...(this.config?.attrs ? this.config.attrs : {}),
             x: init.config?.attrs.x ?? 10,
             y: init.config?.attrs.y ?? 10,
             width: init.config?.attrs.width ?? 100,
@@ -49,8 +48,8 @@ export default class ShapeComponent implements ICanvasComponent {
             {
                 shape: this.node,
                 slide: this.slide,
-                eventBus:init.eventBus ,
-                shapeType:init.shapeType!
+                eventBus: init.eventBus,
+                shapeType: init.shapeType!
             }
         );
     }

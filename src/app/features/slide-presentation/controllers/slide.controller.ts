@@ -6,11 +6,13 @@ import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
+  ClearSelectionEvent,
   PresentationEvent,
   PresentationEventStream,
 } from '../domain/EventModels/presentationEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
+import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { Subscription } from 'rxjs';
 import {
@@ -27,8 +29,15 @@ import {
   SelectShapeEvent,
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
+import {
+  AddImageEvent,
+  ImageEvent,
+  RemoveImageEvent,
+  RestoreImageEvent,
+  SelectImageEvent,
+} from '../domain/EventModels/imageEvent.model';
 import { SlideEvent } from '../domain/EventModels/slideEvent.model';
-import { AddTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
+import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -36,6 +45,7 @@ export default class SlideController {
   mainCover!: Rect;
   stage!: Stage;
   private slide: Slide;
+  private readonly DESIRED_SLIDE_HEIGHT = 750;
   private eventBus: PresentationEventStream;
   private eventBusSubscription!: Subscription;
   private readonly Anchors = [
@@ -71,7 +81,7 @@ export default class SlideController {
       height: this.stage.height(),
       fill: 'white',
       stroke: 'black',
-      strokeWidth: 1,
+      strokeWidth: 0,
     });
     this.transformer = new Transformer({
       rotateEnabled: true,
@@ -109,6 +119,11 @@ export default class SlideController {
       if (e.target === this.mainCover) {
         this.transformer?.nodes([]); // clears selection
         this.layer?.batchDraw();
+        const clearSelection = new ClearSelectionEvent({
+          slideId: this.slide.slideId,
+          presentationId: this.slide.presentationId
+        });
+        this.eventBus.next(clearSelection)
         return;
       }
     });
@@ -126,6 +141,9 @@ export default class SlideController {
         }
         if (event instanceof ShapeEvent) {
           this.handleShapeEvents(event);
+        }
+        if (event instanceof ImageEvent) {
+          this.handleImageEvents(event);
         }
         if (event instanceof SlideEvent) {
           this.handleSlideEvents(event);
@@ -152,7 +170,7 @@ export default class SlideController {
       return;
     }
     if (event instanceof RestoreTextEvent) {
-      this.handleRestoreNode(event.nodeToRestore);
+      this.handleRestoreNode(event);
       return;
     }
   }
@@ -175,29 +193,61 @@ export default class SlideController {
       return;
     }
     if (event instanceof RestoreShapeEvent) {
-      this.handleRestoreNode(event.nodeToRestore);
+      this.handleRestoreNode(event);
+      return;
+    }
+  }
+
+  protected handleImageEvents(event: ImageEvent) {
+    if (event instanceof SelectImageEvent) {
+      const nodeId = event.nodeId;
+      let targetNode = this.slide.components.find(
+        (nd) => nd.node._id.toString() == nodeId,
+      );
+      this.selectComponent(targetNode!.node);
+      return;
+    }
+    if (event instanceof AddImageEvent) {
+      this.handleAddNode(event);
+      return;
+    }
+    if (event instanceof RemoveImageEvent) {
+      this.handleRemoveNode(event);
+      return;
+    }
+    if (event instanceof RestoreImageEvent) {
+      this.handleRestoreNode(event);
       return;
     }
   }
 
   protected handleSlideEvents(event: SlideEvent) { }
-
   triggerResize(options: {
     divElm: HTMLDivElement;
     config: DocumentConfiguration;
   }) {
     this.slide.containerDiv = options.divElm;
+    const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
+    const desiredWidth = desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+
     const containerWidth = options.divElm.offsetWidth;
     const containerHeight =
-      options.divElm.offsetWidth *
+      containerWidth *
       (options.config.ratio.den / options.config.ratio.num);
+    const xScaleFactor = containerWidth / desiredWidth;
+    const yScaleFactor = containerHeight / desiredHeight;
+
     this.stage.container(options.divElm);
     this.stage.height(containerHeight);
     this.stage.width(containerWidth);
-    this.mainCover.height(containerHeight);
-    this.mainCover.width(containerWidth);
+    this.mainCover.height(desiredHeight);
+    this.mainCover.width(desiredWidth);
+
+    this.stage.scale({
+      x: xScaleFactor,
+      y: yScaleFactor
+    });
     this.layer.batchDraw();
-    this.stage.draw();
   }
 
   isNodeSelected(node: Shape): boolean {
@@ -243,12 +293,21 @@ export default class SlideController {
         eventBus: this.eventBus,
       });
     }
+    if (event instanceof ImageEvent) {
+      node = new ImageComponent({
+        slide: this.slide,
+        config: event.currentConfig,
+        eventBus: this.eventBus,
+      });
+    }
     this.addComponent(node!);
     event.nodeId = node!.node!._id.toString();
-    event.currentConfig = structuredClone({
-      attrs: node!.node!.getAttrs(),
-      zIndex: node!.node!.getZIndex(),
-    });
+    event.currentConfig = event instanceof ImageEvent
+      ? structuredClone((node as ImageComponent).getSerializableConfig())
+      : structuredClone({
+        attrs: node!.node!.getAttrs(),
+        zIndex: node!.node!.getZIndex(),
+      });
     event.previousConfig = structuredClone(event.previousConfig);
   }
 
@@ -269,9 +328,14 @@ export default class SlideController {
     });
     this.eventBus.next(trashEvent);
   }
-  private handleRestoreNode(nodeComponent: ICanvasComponent) {
-    this.slide.components.push(nodeComponent);
-    this.layer.add(nodeComponent.node);
+  private handleRestoreNode(event: PresentationEvent & { nodeToRestore: ICanvasComponent }) {
+    this.slide.components.push(event.nodeToRestore);
+    this.layer.add(event.nodeToRestore.node);
     this.layer.batchDraw();
+    const unTrashEvent = new RemoveFromTrashEvents({
+      ...event,
+      node: event.nodeToRestore
+    });
+    this.eventBus.next(unTrashEvent);
   }
 }

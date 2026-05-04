@@ -14,19 +14,48 @@
     </div>
   </div>
   <div class="d-flex flex-1">
-    <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
-      <div class="menu-item d-flex gap-1 flex-column " (click)="handleAddText()">
-        <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center" >Text</p>
+    <div class="side-wrap">
+      <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
+        <div class="menu-item d-flex gap-1 flex-column " (click)="handleAddText()">
+          <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center" >Text</p>
+        </div>
+        <div class="menu-item d-flex gap-1 flex-column">
+          <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Shape</p>
+          <div class="shape-types">
+            <div class="shape-type d-flex flex-column align-items-center gap-1" (click)="addShape(ShapeType.RECT)">
+              <i class="fi fi-rr-square"></i>
+              <p class="mb-0">Square</p>
+            </div>
+            <div class="shape-type d-flex flex-column align-items-center gap-1" (click)="addShape(ShapeType.CIRCLE)">
+              <i class="fi fi-rr-circle"></i>
+              <p class="mb-0">Circle</p>
+            </div>
+          </div>
+        </div>
+        <label class="menu-item d-flex gap-1 flex-column">
+          <i class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Upload</p>
+          <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
+        </label>
       </div>
-      <div class="menu-item d-flex gap-1 flex-column" (click)="addShape()">
-        <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center">Shape</p>
-      </div>
-      <div class="menu-item d-flex gap-1 flex-column">
-        <i class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"></i>
-        <p class="mb-0 text-center">Upload</p>
-      </div>
+      <!-- @if(selectedToolBox!=TooBoxType.None)
+      {
+        <div class="tool-display">
+            @switch (selectedToolBox) {
+              @case (TooBoxType.TextToolBox) {
+                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
+              }
+              @case (TooBoxType.ShapeTooLBox) {
+                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
+              }
+              @case (TooBoxType.ImageToolBox) {
+                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
+              }
+            }
+        </div>
+      } -->
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">
@@ -43,6 +72,22 @@
           }
         </div>
       </div>
+      @if(selectedToolBox!=TooBoxType.None)
+      {
+        <div class="tool-display">
+            @switch (selectedToolBox) {
+              @case (TooBoxType.TextToolBox) {
+                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
+              }
+              @case (TooBoxType.ShapeTooLBox) {
+                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
+              }
+              @case (TooBoxType.ImageToolBox) {
+                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
+              }
+            }
+        </div>
+      }
       <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
         @for (item of presentation.slides; track $index) {
 

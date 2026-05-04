@@ -71,13 +71,16 @@ export default abstract class BaseController {
     protected handleTransformEvents() {
         let widthBeforeTransform: number = this.node.width();
         let heightBeforeTransform: number = this.node.height();
+        let rotationBeforeTransform: number = this.node.rotation();
 
         this.node.on('transformstart', () => {
             widthBeforeTransform = this.node.width();
             heightBeforeTransform = this.node.height();
+            rotationBeforeTransform = this.node.rotation();
         });
 
-        this.node.on('transform', () => {            
+        this.node.on('transform', () => { 
+                       
             const scaleX = this.node.scaleX();
             const scaleY = this.node.scaleY();
             const newWidth = this.node.width() * scaleX;
@@ -88,6 +91,7 @@ export default abstract class BaseController {
                     height: newHeight,
                     scaleX: 1,
                     scaleY: 1,
+                    rotation: this.node.rotation(),
                 },
                 zIndex: this.node.getZIndex(),
             };
@@ -107,6 +111,7 @@ export default abstract class BaseController {
                     height: this.node.height(),
                     scaleX: 1,
                     scaleY: 1,
+                    rotation: this.node.rotation(),
                 },
                 zIndex: this.node.getZIndex(),
             };
@@ -116,6 +121,7 @@ export default abstract class BaseController {
                     height: heightBeforeTransform,
                     scaleX: 1,
                     scaleY: 1,
+                    rotation: rotationBeforeTransform,
                 },
                 zIndex: this.node.getZIndex(),
             };
@@ -130,6 +136,9 @@ export default abstract class BaseController {
         });
     }
 
+    protected handleRotationEvents() {
+
+    }
     protected handleRemove() {
         this.eventBus.next(
             this.getEventObject({

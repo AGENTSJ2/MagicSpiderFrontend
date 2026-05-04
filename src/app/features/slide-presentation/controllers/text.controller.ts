@@ -5,6 +5,7 @@ import {
   ComponentConfig,
   PresentationEventStream,
   PresentationEventType,
+  ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
@@ -17,7 +18,7 @@ import {
 } from '../domain/EventModels/textEvent.model';
 
 export default class TextController extends BaseController {
-  private textareaToEditText: HTMLTextAreaElement | undefined;
+  // private textareaToEditText: HTMLTextAreaElement | undefined;
   private readonly positionSlack = 5;
   private slide: Slide;
   private containerDiv: HTMLDivElement;
@@ -42,24 +43,6 @@ export default class TextController extends BaseController {
     this.handleTransformEvents();
     this.handleDragEvents();
     document.addEventListener('keydown', this.handleKeyboardStrokes);
-    this.node.on('dblclick', () => {
-      this.slide.controller.removeSelectionOfComponent(this.node);
-      const { x, y } = this.node.getAbsolutePosition();
-      // creating textarea
-      this.textareaToEditText = document.createElement('textarea');
-      this.textareaToEditText.value = this.node.text();
-      this.textareaToEditText.style.position = 'absolute';
-      this.textareaToEditText.style.left = x + 'px';
-      this.textareaToEditText.style.top = y - this.positionSlack + 'px';
-      this.textareaToEditText.style.width = 'auto';
-      this.textareaToEditText.style.height = 'auto';
-      this.textareaToEditText.style.fontSize = this.node.fontSize() + 'px';
-      this.textareaToEditText.style.fontFamily = this.node.fontFamily();
-      this.containerDiv.appendChild(this.textareaToEditText);
-      this.textareaToEditText.focus();
-      // click event seems to run as it was set inside dblClick hence mousedown is used
-      document.addEventListener('mousedown', this.boundRespondToClick);
-    });
   }
 
   protected listenPresentationEventStream() {
@@ -71,18 +54,36 @@ export default class TextController extends BaseController {
         return;
       }
       if (event instanceof UpdateTextEvent) {
-        this.applyConfigurations(event.currentConfig);
+        this.applyConfigurations(event);
         return;
       }
     });
   }
 
-  private applyConfigurations(config?: ComponentConfig<TextConfig>) {
+  private applyConfigurations(event: UpdateTextEvent) {
+    const config = event.currentConfig;
     if (!config) {
       return;
     }
     this.node.setAttrs(config.attrs);
-    this.node.zIndex(config.zIndex);
+    if(event?.zIndexActions != undefined)
+    {
+      switch(event.zIndexActions)
+      {
+        case ZIndexActions.moveToFront:
+          this.node.moveToTop();
+          break
+        case ZIndexActions.moveToBack:
+          this.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          this.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          this.node.moveUp();
+          break;
+      }
+    }
   }
 
   override destroy() {
@@ -141,43 +142,9 @@ export default class TextController extends BaseController {
           ...defaultEvent
         });
         break;
-      case PresentationEventType.RESTORE:
-        event = new RemoveTextEvent({
-          ...defaultEvent
-        });
-        break;
     }
     return event!;
   }
-
-  private boundRespondToClick = (event: MouseEvent) => {
-    if (this.textareaToEditText && event.target != this.textareaToEditText) {
-      if (this.textareaToEditText.value.length != 0) {
-        const updatedConfig = {
-          attrs: {
-            text: this.textareaToEditText.value,
-          },
-          zIndex: this.node.getZIndex(),
-        };
-        this.eventBus.next(
-          this.getEventObject({
-            eventType: PresentationEventType.UPDATE,
-            newConfig: updatedConfig,
-          }),
-        );
-      } else {
-        // remove the node if no text is found
-        this.eventBus.next(
-          this.getEventObject({
-            eventType: PresentationEventType.REMOVE,
-            newConfig: { attrs: {}, zIndex: this.node.getZIndex() },
-          }),
-        );
-      }
-      this.textareaToEditText.remove();
-      document.removeEventListener('mousedown', this.boundRespondToClick);
-    }
-  };
 
   protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
     if (

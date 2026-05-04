@@ -1,13 +1,16 @@
-import { Shape } from "konva/lib/Shape";
 import ShapeComponent, { ShapeType } from "../canvasModels/shapeComponent.model";
-import { PresentationEvent } from "./presentationEvents.model";
-import { ICanvasComponent } from "../canvasModels/ICanvasComponent";
+import { ComponentConfig, PresentationEvent, ZIndexActions } from "./presentationEvents.model";
+import { ShapeConfig } from "konva/lib/Shape";
 
 export class ShapeEvent extends PresentationEvent {
     shapeType!: ShapeType;
+    override currentConfig?: ComponentConfig<ShapeConfig>;
+    override previousConfig?: ComponentConfig<ShapeConfig>;
     constructor(init: ShapeEvent) {
         super(init);
         this.shapeType = init.shapeType;
+        this.currentConfig = init.currentConfig;
+        this.previousConfig = init.previousConfig;
     }
 }
 
@@ -23,8 +26,10 @@ export class SelectShapeEvent extends ShapeEvent {
 }
 
 export class UpdateShapeEvent extends ShapeEvent {
-    constructor(init: ShapeEvent) {
+    zIndexActions?: ZIndexActions;
+    constructor(init: UpdateShapeEvent) {
         super(init);
+        this.zIndexActions = init.zIndexActions;
     }
 }
 
