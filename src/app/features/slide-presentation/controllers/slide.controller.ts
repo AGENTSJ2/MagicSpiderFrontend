@@ -12,6 +12,7 @@ import {
 } from '../domain/EventModels/presentationEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
+import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { Subscription } from 'rxjs';
 import {
@@ -28,6 +29,13 @@ import {
   SelectShapeEvent,
   ShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
+import {
+  AddImageEvent,
+  ImageEvent,
+  RemoveImageEvent,
+  RestoreImageEvent,
+  SelectImageEvent,
+} from '../domain/EventModels/imageEvent.model';
 import { SlideEvent } from '../domain/EventModels/slideEvent.model';
 import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
 
@@ -134,6 +142,9 @@ export default class SlideController {
         if (event instanceof ShapeEvent) {
           this.handleShapeEvents(event);
         }
+        if (event instanceof ImageEvent) {
+          this.handleImageEvents(event);
+        }
         if (event instanceof SlideEvent) {
           this.handleSlideEvents(event);
         }
@@ -182,6 +193,29 @@ export default class SlideController {
       return;
     }
     if (event instanceof RestoreShapeEvent) {
+      this.handleRestoreNode(event);
+      return;
+    }
+  }
+
+  protected handleImageEvents(event: ImageEvent) {
+    if (event instanceof SelectImageEvent) {
+      const nodeId = event.nodeId;
+      let targetNode = this.slide.components.find(
+        (nd) => nd.node._id.toString() == nodeId,
+      );
+      this.selectComponent(targetNode!.node);
+      return;
+    }
+    if (event instanceof AddImageEvent) {
+      this.handleAddNode(event);
+      return;
+    }
+    if (event instanceof RemoveImageEvent) {
+      this.handleRemoveNode(event);
+      return;
+    }
+    if (event instanceof RestoreImageEvent) {
       this.handleRestoreNode(event);
       return;
     }
@@ -259,12 +293,21 @@ export default class SlideController {
         eventBus: this.eventBus,
       });
     }
+    if (event instanceof ImageEvent) {
+      node = new ImageComponent({
+        slide: this.slide,
+        config: event.currentConfig,
+        eventBus: this.eventBus,
+      });
+    }
     this.addComponent(node!);
     event.nodeId = node!.node!._id.toString();
-    event.currentConfig = structuredClone({
-      attrs: node!.node!.getAttrs(),
-      zIndex: node!.node!.getZIndex(),
-    });
+    event.currentConfig = event instanceof ImageEvent
+      ? structuredClone((node as ImageComponent).getSerializableConfig())
+      : structuredClone({
+        attrs: node!.node!.getAttrs(),
+        zIndex: node!.node!.getZIndex(),
+      });
     event.previousConfig = structuredClone(event.previousConfig);
   }
 

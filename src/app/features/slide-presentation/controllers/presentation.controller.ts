@@ -18,10 +18,12 @@ import {
   SlideEvent,
 } from '../domain/EventModels/slideEvent.model';
 import { AddShapeEvent, RemoveShapeEvent, RestoreShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
+import { AddImageEvent, ImageEvent, RemoveImageEvent, RestoreImageEvent, SelectImageEvent, UpdateImageEvent } from '../domain/EventModels/imageEvent.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import { AddTrashEvents, RemoveFromTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
+import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
 
 export class PresentationController {
@@ -127,6 +129,10 @@ export class PresentationController {
           this.handleUndoShapeEvent(event.event);
           return;
         }
+        if (event.event instanceof ImageEvent) {
+          this.handleUndoImageEvent(event.event);
+          return;
+        }
         console.warn(`UNDO this type of event is not registered type : ${event.event.constructor.name}`);
       }
       // Redo events
@@ -149,6 +155,14 @@ export class PresentationController {
           this.publishEvent(new RestoreShapeEvent({
             ...inst,
             nodeToRestore: nodeToRestore as ShapeComponent
+          }))
+        }
+        else if (inst instanceof AddImageEvent) {
+          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+          this.publishEvent(new RestoreImageEvent({
+            ...inst,
+            nodeToRestore: nodeToRestore as ImageComponent
           }))
         }
         else {
@@ -234,6 +248,43 @@ export class PresentationController {
     }
     if (event instanceof SelectShapeEvent) {
       const newEvent = new SelectShapeEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
+    }
+  }
+
+  private handleUndoImageEvent(event: ImageEvent) {
+    if (event instanceof AddImageEvent) {
+      const removeEvent = new RemoveImageEvent({
+        ...event,
+        trackHistory: false,
+      });
+      this.publishEvent(removeEvent);
+      return;
+    }
+    if (event instanceof RemoveImageEvent) {
+      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+      const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
+      const restoreEvent = new RestoreImageEvent({
+        ...event,
+        nodeToRestore: nodeToRestore as ImageComponent,
+      });
+      this.publishEvent(restoreEvent);
+      return;
+    }
+    if (event instanceof UpdateImageEvent) {
+      const newEvent = new UpdateImageEvent({
+        ...event,
+      });
+      newEvent.trackHistory = false;
+      this.publishEvent(newEvent);
+      return;
+    }
+    if (event instanceof SelectImageEvent) {
+      const newEvent = new SelectImageEvent({
         ...event,
       });
       newEvent.trackHistory = false;

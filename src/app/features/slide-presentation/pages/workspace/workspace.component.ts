@@ -5,6 +5,7 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from '../../domain/EventModels/textEvent.model';
 import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
 import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../../domain/EventModels/shapeEvent.models';
+import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
 import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 
 @Component({
@@ -72,6 +73,34 @@ export class WorkspaceComponent implements OnInit {
     this.presentation.publishEvent(shapeEvent);
   }
 
+  handleImageUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.activeSlide) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageEvent: ImageEvent = new AddImageEvent({
+        nodeId: '',
+        presentationId: this.presentation.id,
+        slideId: this.activeSlide!.slideId,
+        currentConfig: {
+          attrs: {
+            imageSrc: reader.result as string,
+          },
+          zIndex: 0,
+        },
+        previousConfig: undefined,
+        trackHistory: true
+      });
+      this.presentation.publishEvent(imageEvent);
+      input.value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
   selectSlide(slide: Slide) {
     this.activeSlide = undefined;
     setTimeout(() => {
@@ -97,6 +126,10 @@ export class WorkspaceComponent implements OnInit {
       }
       if (event instanceof ShapeEvent) {
         this.handleShapeSpecificEvents(event);
+        return;
+      }
+      if (event instanceof ImageEvent) {
+        this.handleImageSpecificEvents(event);
         return;
       }
     });
@@ -128,6 +161,21 @@ export class WorkspaceComponent implements OnInit {
       }
     }
     if (event instanceof UpdateShapeEvent && (this.activeEvent?.nodeId == event.nodeId)) {
+      this.activeEvent = event;
+    }
+  }
+
+  private handleImageSpecificEvents(event: ImageEvent) {
+    if (event instanceof SelectImageEvent) {
+      this.selectedToolBox = ToolBoxType.None;
+      this.activeEvent = event;
+    }
+    if (event instanceof RemoveImageEvent) {
+      if (this.activeEvent?.nodeId == event.nodeId) {
+        this.selectedToolBox = ToolBoxType.None;
+      }
+    }
+    if (event instanceof UpdateImageEvent && (this.activeEvent?.nodeId == event.nodeId)) {
       this.activeEvent = event;
     }
   }
