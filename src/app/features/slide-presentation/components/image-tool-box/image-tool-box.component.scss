@@ -54,6 +54,40 @@
     }
 }
 
+.color-row {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.color-preview {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+
+    input[type='color'] {
+        opacity: 0;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+    }
+}
+
+.color-hex {
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #666;
+}
+
 .z-btn {
     background-color: oklch(15.3% 0.006 107.1);
     color: oklch(88% 0.011 106.6);

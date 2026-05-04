@@ -48,6 +48,8 @@ export class ImageToolBoxComponent implements OnChanges {
         height: [attrs.height ?? 180],
         rotation: [attrs.rotation ?? 0],
         opacity: [attrs.opacity ?? 1],
+        stroke: [attrs.stroke || '#000000'],
+        strokeWidth: [attrs.strokeWidth || 0],
         cornerRadius: [attrs.cornerRadius || 0],
       });
     }
@@ -59,6 +61,8 @@ export class ImageToolBoxComponent implements OnChanges {
         height: attrs.height ?? 180,
         rotation: attrs.rotation ?? 0,
         opacity: attrs.opacity ?? 1,
+        stroke: attrs.stroke || '#000000',
+        strokeWidth: attrs.strokeWidth || 0,
         cornerRadius: attrs.cornerRadius || 0,
       }, {
         emitEvent: false
