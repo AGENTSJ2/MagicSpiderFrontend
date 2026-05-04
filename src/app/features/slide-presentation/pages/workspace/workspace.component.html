@@ -40,7 +40,7 @@
           <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
         </label>
       </div>
-      @if(selectedToolBox!=TooBoxType.None)
+      <!-- @if(selectedToolBox!=TooBoxType.None)
       {
         <div class="tool-display">
             @switch (selectedToolBox) {
@@ -55,7 +55,7 @@
               }
             }
         </div>
-      }
+      } -->
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">
@@ -72,6 +72,22 @@
           }
         </div>
       </div>
+      @if(selectedToolBox!=TooBoxType.None)
+      {
+        <div class="tool-display">
+            @switch (selectedToolBox) {
+              @case (TooBoxType.TextToolBox) {
+                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
+              }
+              @case (TooBoxType.ShapeTooLBox) {
+                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
+              }
+              @case (TooBoxType.ImageToolBox) {
+                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
+              }
+            }
+        </div>
+      }
       <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
         @for (item of presentation.slides; track $index) {
 
