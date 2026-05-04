@@ -127,6 +127,9 @@ export class WorkspaceComponent implements OnInit {
         this.selectedToolBox = ToolBoxType.None;
       }
     }
+    if (event instanceof UpdateShapeEvent && (this.activeEvent?.nodeId == event.nodeId)) {
+      this.activeEvent = event;
+    }
   }
 
 

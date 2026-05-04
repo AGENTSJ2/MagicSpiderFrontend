@@ -46,6 +46,9 @@
               @case (TooBoxType.TextToolBox) {
                 <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
               }
+              @case (TooBoxType.ShapeTooLBox) {
+                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
+              }
             }
         </div>
       }

@@ -1,7 +1,7 @@
 import { Shape, ShapeConfig } from "konva/lib/Shape";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
-import { ComponentConfig, PresentationEventStream, PresentationEventType } from "../domain/EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream, PresentationEventType, ZIndexActions } from "../domain/EventModels/presentationEvents.model";
 import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from "../domain/EventModels/shapeEvent.models";
 import { ShapeType } from "../domain/canvasModels/shapeComponent.model";
 
@@ -43,7 +43,7 @@ export default class ShapeController extends BaseController {
                 return;
             }
             if (event instanceof UpdateShapeEvent) {
-                this.applyConfigurations(event.currentConfig!);
+                this.applyConfigurations(event);
                 return;
             }
         })
@@ -92,8 +92,29 @@ export default class ShapeController extends BaseController {
         }
     }
 
-    protected applyConfigurations(config: ComponentConfig<ShapeConfig>) {
-        this.node.setAttrs(config);
+    protected applyConfigurations(event: UpdateShapeEvent) {
+        const config = event.currentConfig;
+        if (!config) {
+            return;
+        }
+        this.node.setAttrs(config.attrs);
+        if (event?.zIndexActions != undefined) {
+            switch (event.zIndexActions) {
+                case ZIndexActions.moveToFront:
+                    this.node.moveToTop();
+                    break;
+                case ZIndexActions.moveToBack:
+                    this.node.moveToBottom();
+                    break;
+                case ZIndexActions.moveDown:
+                    this.node.moveDown();
+                    break;
+                case ZIndexActions.moveUp:
+                    this.node.moveUp();
+                    break;
+            }
+            return;
+        }
         this.node.zIndex(config.zIndex);
     }
 
