@@ -61,7 +61,7 @@
       border: 1px solid #cbd5e1;
       border-radius: 5px;
       top: -10%;
-      right: -100%;
+      right: -130%;
       .shape-type
       {
         border-bottom: 1px solid #cbd5e1;
@@ -74,7 +74,7 @@
     }
 
     &:hover .shape-types {
-      opacity: 1;// 👈 show on hover
+      opacity: 1;
     }
   }
 }

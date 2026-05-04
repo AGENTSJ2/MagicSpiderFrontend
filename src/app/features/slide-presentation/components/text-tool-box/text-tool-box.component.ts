@@ -82,8 +82,6 @@ export class TextToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
   move(action:ZIndexActions)
   {
-    console.log(action);
-    
     const updateEvent = new UpdateTextEvent({
       ...this.event,
       previousConfig: this.event.currentConfig,

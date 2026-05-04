@@ -6,6 +6,7 @@ import { SlideComponent } from './components/slide/slide.component';
 import { WorkspaceComponent } from './pages/workspace/workspace.component';
 import { TextToolBoxComponent } from './components/text-tool-box/text-tool-box.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ShapeToolBoxComponent } from './components/shape-tool-box/shape-tool-box.component';
 
 
 @NgModule({
@@ -13,6 +14,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     SlideComponent,
     WorkspaceComponent,
     TextToolBoxComponent,
+    ShapeToolBoxComponent,
   ],
   imports: [
     CommonModule,
