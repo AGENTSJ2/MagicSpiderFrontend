@@ -7,10 +7,10 @@ import { TextConfig } from "konva/lib/shapes/Text";
 
 export class TextComponent  implements ICanvasComponent {
     node: Konva.Text;
-    config:ComponentConfig<TextConfig>;
+    config:ComponentConfig<TextToolboxConfig>;
     slide: Slide;
     controller: TextController;
-
+    
     constructor(init: Partial<TextComponent> & {eventBus:PresentationEventStream}) {        
         this.config = init.config!;
         this.slide = init.slide!;
@@ -33,3 +33,12 @@ export class TextComponent  implements ICanvasComponent {
         this.node.destroy();
     }
 }
+export type ListType = 'none' | 'bullet' | 'number';
+export type BulletStyle = 'disc' | 'circle' | 'square' | 'dash' | 'check';
+export type NumberStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman';
+export interface TextToolboxConfig extends TextConfig  {
+  rawText?: string;
+  listType?: ListType;
+  bulletStyle?: BulletStyle;
+  numberStyle?: NumberStyle;
+};

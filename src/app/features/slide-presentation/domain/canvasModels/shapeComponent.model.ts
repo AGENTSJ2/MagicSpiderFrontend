@@ -6,9 +6,6 @@ import { Rect } from "konva/lib/shapes/Rect";
 import ShapeController from "../../controllers/shape.controller";
 import { Slide } from "./slide.model";
 import { ComponentConfig, PresentationEventStream } from "../EventModels/presentationEvents.model";
-import { Ellipse } from "konva/lib/shapes/Ellipse";
-import { Star } from "konva/lib/shapes/Star";
-
 export default class ShapeComponent implements ICanvasComponent {
     shapeType: ShapeType;
     config: ComponentConfig<ShapeConfig>;

@@ -13,17 +13,9 @@ import {
 import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { TextConfig } from 'konva/lib/shapes/Text';
+import { BulletStyle, ListType, NumberStyle, TextToolboxConfig } from '../../domain/canvasModels/textComponent.model';
 
-type ListType = 'none' | 'bullet' | 'number';
-type BulletStyle = 'disc' | 'circle' | 'square' | 'dash' | 'check';
-type NumberStyle = 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman';
-type TextToolboxConfig = TextConfig & {
-  rawText?: string;
-  listType?: ListType;
-  bulletStyle?: BulletStyle;
-  numberStyle?: NumberStyle;
-};
+
 
 @Component({
   selector: 'app-text-tool-box',
