@@ -9,6 +9,39 @@
             <textarea class="form-control" rows="3" formControlName="text"></textarea>
         </div>
 
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">List type</label>
+                <select class="form-select" formControlName="listType">
+                    <option value="none">None</option>
+                    <option value="bullet">Bullet</option>
+                    <option value="number">Numbered</option>
+                </select>
+            </div>
+
+            <div *ngIf="form.value.listType === 'bullet'">
+                <label class="form-label">Bullet point</label>
+                <select class="form-select" formControlName="bulletStyle">
+                    <option value="disc">Disc</option>
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                    <option value="dash">Dash</option>
+                    <option value="check">Check</option>
+                </select>
+            </div>
+
+            <div *ngIf="form.value.listType === 'number'">
+                <label class="form-label">Number style</label>
+                <select class="form-select" formControlName="numberStyle">
+                    <option value="decimal">1, 2, 3</option>
+                    <option value="lower-alpha">a, b, c</option>
+                    <option value="upper-alpha">A, B, C</option>
+                    <option value="lower-roman">i, ii, iii</option>
+                    <option value="upper-roman">I, II, III</option>
+                </select>
+            </div>
+        </div>
+
         <!-- Font family + Style -->
         <div class="row-half mb-3">
             <div>
@@ -42,6 +75,10 @@
                 <label class="form-label">Line height</label>
                 <input type="number" step="0.1" class="form-control" formControlName="lineHeight" />
             </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Rotation</label>
+            <input type="number" class="form-control" formControlName="rotation" />
         </div>
         <!-- Stroke width and color  -->
         <div class="row-half mb-3">
@@ -85,10 +122,10 @@
             <label class="form-label">Position</label>
         </div>
         <div class="row-half mb-3">
-            <button class="btn z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
-            <button class="btn z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
-            <button class="btn z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
-            <button class="btn z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
+            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
         </div>
 
         <div class="mb-3">
