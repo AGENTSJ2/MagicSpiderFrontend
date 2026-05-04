@@ -50,6 +50,9 @@
               @case (TooBoxType.ShapeTooLBox) {
                 <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
               }
+              @case (TooBoxType.ImageToolBox) {
+                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
+              }
             }
         </div>
       }

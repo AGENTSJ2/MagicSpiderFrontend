@@ -167,7 +167,7 @@ export class WorkspaceComponent implements OnInit {
 
   private handleImageSpecificEvents(event: ImageEvent) {
     if (event instanceof SelectImageEvent) {
-      this.selectedToolBox = ToolBoxType.None;
+      this.selectedToolBox = ToolBoxType.ImageToolBox;
       this.activeEvent = event;
     }
     if (event instanceof RemoveImageEvent) {

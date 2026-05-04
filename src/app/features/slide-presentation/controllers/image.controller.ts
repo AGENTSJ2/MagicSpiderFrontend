@@ -88,6 +88,15 @@ export default class ImageController extends BaseController {
         }
         const { imageSrc, ...attrs } = config.attrs;
         this.node.setAttrs(attrs as ImageConfig);
+        if (imageSrc && imageSrc !== this.node.getAttr('imageSrc')) {
+            const imageElement = new Image();
+            imageElement.onload = () => {
+                this.node.image(imageElement);
+                this.node.setAttr('imageSrc', imageSrc);
+                this.node.getLayer()?.batchDraw();
+            };
+            imageElement.src = imageSrc;
+        }
         if (event?.zIndexActions != undefined) {
             switch (event.zIndexActions) {
                 case ZIndexActions.moveToFront:
