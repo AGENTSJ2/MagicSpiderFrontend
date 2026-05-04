@@ -20,9 +20,19 @@
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center" >Text</p>
         </div>
-        <div class="menu-item d-flex gap-1 flex-column" (click)="addShape()">
+        <div class="menu-item d-flex gap-1 flex-column">
           <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center">Shape</p>
+          <div class="shape-types">
+            <div class="shape-type d-flex flex-column align-items-center gap-1" (click)="addShape(ShapeType.RECT)">
+              <i class="fi fi-rr-square"></i>
+              <p class="mb-0">Square</p>
+            </div>
+            <div class="shape-type d-flex flex-column align-items-center gap-1" (click)="addShape(ShapeType.CIRCLE)">
+              <i class="fi fi-rr-circle"></i>
+              <p class="mb-0">Circle</p>
+            </div>
+          </div>
         </div>
         <div class="menu-item d-flex gap-1 flex-column">
           <i class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"></i>

@@ -16,6 +16,7 @@ export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
+  ShapeType = ShapeType;
   constructor() { }
 
   ngOnInit(): void {
@@ -56,13 +57,13 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-  addShape() {
+  addShape(shapeType: ShapeType) {
     const shapeEvent: ShapeEvent = new AddShapeEvent(
       {
         nodeId: '',
         presentationId: this.presentation.id,
         slideId: this.presentation.slides[0].slideId,
-        shapeType: ShapeType.RECT,
+        shapeType: shapeType,
         currentConfig: { attrs: {}, zIndex: 0 },
         previousConfig: undefined,
         trackHistory: true

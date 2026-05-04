@@ -9,19 +9,20 @@
     color: white;
     flex-shrink: 0;
   }
+
   .content-wrapper {
     background-color: var(--background-secondary);
 
     .ppt-list {
       width: 100%;
-      height: 20vh; 
+      height: 20vh;
       flex-shrink: 0;
       background-color: var(--background-secondary);
       border-right: 1px solid #cbd5e1;
       overflow-y: auto;
       padding: 12px;
-      .slide-preview-wrapper
-      {
+
+      .slide-preview-wrapper {
         height: 100px;
         width: 150px;
         border: 1px solid black;
@@ -31,30 +32,57 @@
         border-radius: 0.5rem;
       }
     }
-    .slide-view
-    {
-    }
+
+    .slide-view {}
   }
 }
-.parent-slide-wrapper
-{
+
+.parent-slide-wrapper {
   width: 60%;
 }
-.side-bar
-{
+
+.side-bar {
   width: 100px;
   height: 100%;
   background-color: white;
-  .menu-item
-  {
+
+  .menu-item {
+    position: relative;
     cursor: pointer;
+
+    .shape-types {
+      position: absolute;
+      display: flex;
+      opacity: 0;
+      flex-direction: column;
+      gap: 5px;
+      padding: 5px;
+      background-color: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      top: -10%;
+      right: -100%;
+      .shape-type
+      {
+        border-bottom: 1px solid #cbd5e1;
+        padding: 5px;
+        &:last-child
+        {
+          border-bottom: none;
+        }
+      }
+    }
+
+    &:hover .shape-types {
+      opacity: 1;// 👈 show on hover
+    }
   }
 }
-.side-wrap
-{
+
+.side-wrap {
   position: relative;
-  .tool-display
-  {
+
+  .tool-display {
     position: absolute;
     width: 300px;
     z-index: 10000;
