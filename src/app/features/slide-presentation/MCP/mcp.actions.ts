@@ -272,9 +272,7 @@ export class McpActions {
 
   }
 
-  getSlide()
-  {
-    
-  }
+  addSlide() {}
 
+  removeSlide() {}
 }
