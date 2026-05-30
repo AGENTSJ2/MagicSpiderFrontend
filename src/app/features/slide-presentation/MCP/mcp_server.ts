@@ -1,7 +1,4 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import z from 'zod/v3';
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
-
 import { Presentation } from '../domain/canvasModels/presenatation.model';
 import { McpActions } from './mcp.actions';
 import { InternalMcpError } from './mcp.erros';
@@ -97,7 +94,7 @@ export class MCP {
     ],
   ]);
 
-  listTools() {
+  listTools() : Tool[] {
     const toolHandlers = [...this.handlers.values()];
     const tools = toolHandlers.map((val) => val.toolDesc);
     return tools;
