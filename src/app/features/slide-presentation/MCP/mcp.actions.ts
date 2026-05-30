@@ -27,7 +27,7 @@ import {
 } from '../domain/EventModels/imageEvent.model';
 import { ImageConfig } from '@angular/common';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
-import { AddSlideEvent } from '../domain/EventModels/slideEvent.model';
+import { AddSlideEvent, RemoveSlideEvent } from '../domain/EventModels/slideEvent.model';
 
 export class McpActions {
   constructor(private presentation: Presentation) {}
@@ -281,5 +281,13 @@ export class McpActions {
     this.presentation.publishEvent(slideEvent);
   }
 
-  removeSlide() {}
+  removeSlide(args:{slideId:string}) {
+    const removeSlideEvent = new RemoveSlideEvent({
+      presentationId: this.presentation.id,
+      slideId: args.slideId,
+      nodeId: '',
+      trackHistory: true,
+    });
+    this.presentation.publishEvent(removeSlideEvent);
+  }
 }
