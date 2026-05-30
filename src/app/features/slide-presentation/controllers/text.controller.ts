@@ -18,7 +18,6 @@ import {
 } from '../domain/EventModels/textEvent.model';
 
 export default class TextController extends BaseController {
-  // private textareaToEditText: HTMLTextAreaElement | undefined;
   private readonly positionSlack = 5;
   private slide: Slide;
   private containerDiv: HTMLDivElement;
