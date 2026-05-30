@@ -16,4 +16,9 @@ export class Slide {
         this.components = init.components ?? [];
         this.controller = new SlideController({ eventBus: init.eventBus, slide: this });
     }
+
+    destroy()
+    {
+        this.controller.destroy();
+    }
 }

@@ -159,7 +159,7 @@ export default abstract class BaseController {
   } {
     const configs = {
       currentConfig: {
-        attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig },
+        attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig.attrs },
         zIndex: data.newConfig.zIndex,
       },
       previousConfig: structuredClone(

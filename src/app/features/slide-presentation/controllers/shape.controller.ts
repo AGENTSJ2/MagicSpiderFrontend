@@ -62,7 +62,7 @@ export default class ShapeController extends BaseController {
             nodeId: this.node._id.toString(),
             shapeType: this.shapeType,
             currentConfig: {
-                attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig },
+                attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig.attrs },
                 zIndex: data.newConfig.zIndex
             },
             previousConfig: structuredClone(!data.previousConfig ? { attrs: this.node.getAttrs(), zIndex: this.node.zIndex() } : data.previousConfig),

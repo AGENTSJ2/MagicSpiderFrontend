@@ -92,7 +92,8 @@
         @for (item of presentation.slides; track $index) {
 
           <div class="slide-preview-wrapper" (click)="selectSlide(item)">
-            slide {{$index}}
+            slide {{$index+1}}
+            <button (click)="handleRemoveSlide(item)">delete</button>
           </div>
         }
         <button class="add-slide" (click)="addSlide()">

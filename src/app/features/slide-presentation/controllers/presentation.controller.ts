@@ -15,6 +15,7 @@ import {
 } from '../domain/EventModels/textEvent.model';
 import {
   AddSlideEvent,
+  RemoveSlideEvent,
   SlideEvent,
 } from '../domain/EventModels/slideEvent.model';
 import { AddShapeEvent, RemoveShapeEvent, RestoreShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
@@ -115,6 +116,17 @@ export class PresentationController {
             eventBus: this.eventBus,
           });
           this.presentation.slides.push(ConfiguredSlide);
+          return;
+        }
+        if (event instanceof RemoveSlideEvent) {
+          const slideIdx = this.presentation.slides.findIndex((sl)=>sl.slideId == event.slideId);
+          if(slideIdx < 0)
+          {
+            throw new Error("No Slide of this id is found");
+          }
+          const slide = this.presentation.slides.at(slideIdx);
+          this.presentation.slides.splice(slideIdx,1);
+          slide?.destroy();
           return;
         }
         return;

@@ -3,7 +3,7 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from '../../domain/EventModels/textEvent.model';
-import { AddSlideEvent } from '../../domain/EventModels/slideEvent.model';
+import { AddSlideEvent, RemoveSlideEvent } from '../../domain/EventModels/slideEvent.model';
 import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../../domain/EventModels/shapeEvent.models';
 import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
 import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
@@ -180,7 +180,17 @@ export class WorkspaceComponent implements OnInit {
     }
   }
 
-
+  handleRemoveSlide(item:Slide)
+  {
+    this.presentation.publishEvent(
+      new RemoveSlideEvent({
+        slideId:item.slideId,
+        nodeId:item.slideId,
+        presentationId:this.presentation.id,
+        trackHistory:false
+      })
+    )
+  }
 }
 enum ToolBoxType {
   TextToolBox,

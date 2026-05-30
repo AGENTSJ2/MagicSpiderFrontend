@@ -18,3 +18,9 @@ export class AddSlideEvent extends SlideEvent{
         super(init);
     }
 }
+export class RemoveSlideEvent extends SlideEvent{
+    constructor(init:RemoveSlideEvent)
+    {
+        super(init);
+    }
+}

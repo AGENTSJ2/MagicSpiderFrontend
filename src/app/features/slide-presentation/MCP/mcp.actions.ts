@@ -27,7 +27,7 @@ import {
 } from '../domain/EventModels/imageEvent.model';
 import { ImageConfig } from '@angular/common';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
-import { z } from 'zod';
+import { AddSlideEvent } from '../domain/EventModels/slideEvent.model';
 
 export class McpActions {
   constructor(private presentation: Presentation) {}
@@ -267,12 +267,19 @@ export class McpActions {
     );
   }
 
-  getSlides()
-  {
+  getSlides() {}
 
+  getSlide() {}
+
+  addSlide() {
+    const slideEvent = new AddSlideEvent({
+      presentationId: this.presentation.id,
+      slideId: '',
+      nodeId: '',
+      trackHistory: true,
+    });
+    this.presentation.publishEvent(slideEvent);
   }
-
-  addSlide() {}
 
   removeSlide() {}
 }

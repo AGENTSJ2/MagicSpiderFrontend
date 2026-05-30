@@ -36,7 +36,7 @@ import {
   RestoreImageEvent,
   SelectImageEvent,
 } from '../domain/EventModels/imageEvent.model';
-import { SlideEvent } from '../domain/EventModels/slideEvent.model';
+import { RemoveSlideEvent, SlideEvent } from '../domain/EventModels/slideEvent.model';
 import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
 
 export default class SlideController {
@@ -145,9 +145,6 @@ export default class SlideController {
         if (event instanceof ImageEvent) {
           this.handleImageEvents(event);
         }
-        if (event instanceof SlideEvent) {
-          this.handleSlideEvents(event);
-        }
       },
     );
   }
@@ -221,7 +218,6 @@ export default class SlideController {
     }
   }
 
-  protected handleSlideEvents(event: SlideEvent) { }
   triggerResize(options: {
     divElm: HTMLDivElement;
     config: DocumentConfiguration;
@@ -274,6 +270,7 @@ export default class SlideController {
 
   destroy() {
     this.eventBusSubscription.unsubscribe();
+    this.transformer.destroy();
   }
 
   private handleAddNode(event: PresentationEvent) {
