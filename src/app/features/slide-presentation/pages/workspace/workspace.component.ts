@@ -7,6 +7,7 @@ import { AddSlideEvent, RemoveSlideEvent } from '../../domain/EventModels/slideE
 import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../../domain/EventModels/shapeEvent.models';
 import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
 import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
+import { LLM_Agents } from '../../../../services/agents';
 
 @Component({
   selector: 'app-workspace',
@@ -18,7 +19,7 @@ export class WorkspaceComponent implements OnInit {
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
-  constructor() { }
+  constructor(private agentsService : LLM_Agents) { }
 
   ngOnInit(): void {
     this.presentation = new Presentation();
@@ -190,6 +191,10 @@ export class WorkspaceComponent implements OnInit {
         trackHistory:false
       })
     )
+  }
+
+  handleTest() {
+    
   }
 }
 enum ToolBoxType {

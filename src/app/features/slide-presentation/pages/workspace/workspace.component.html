@@ -39,6 +39,10 @@
           <p class="mb-0 text-center">Upload</p>
           <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
         </label>
+        <div class="menu-item d-flex gap-1 flex-column " (click)="handleTest()">
+          <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center" >Test</p>
+        </div>
       </div>
       <!-- @if(selectedToolBox!=TooBoxType.None)
       {
