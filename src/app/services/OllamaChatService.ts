@@ -11,28 +11,15 @@ export class OllamaChatService {
   });
   async streamChat(request: Partial<ChatRequest>) {
     const stream = await this.ollama.chat({
-      ...request,
       model: this.AvilableModel,
       messages: [{
         role:'user',
         content:"write an poem about model context protocol"
       }],
+      keep_alive:"1h",
+      ...request,
       stream: true,
-      keep_alive:"1h"
     });
     return stream;
-    // let thought = '';
-    // let resp = '';
-    // for await (const chunk of stream) {
-    //   if (chunk.message.thinking) {
-    //     thought += chunk.message.thinking;
-    //     console.log("[THINKING] : ",thought)
-    //   }
-    //   if (chunk.message.content) {
-    //     resp += chunk.message.content;
-    //     console.log("[THINKING] : ",thought)
-    //     console.log("[Content] : ",resp)
-    //   }
-    // }
   }
 }

@@ -107,8 +107,5 @@
     </div>
   </div>
 </div>
-<nz-modal [(nzVisible)]="isVisible" nzTitle="User Details" (nzOnCancel)="isVisible = false">
-  <ng-container *nzModalContent>
-    <p>Your form goes here</p>
-  </ng-container>
-</nz-modal>
+
+<app-aislide-description [isVisible]="isVisible"></app-aislide-description>
