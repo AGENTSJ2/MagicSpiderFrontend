@@ -8,7 +8,7 @@ import { TextToolBoxComponent } from './components/text-tool-box/text-tool-box.c
 import { ReactiveFormsModule } from '@angular/forms';
 import { ShapeToolBoxComponent } from './components/shape-tool-box/shape-tool-box.component';
 import { ImageToolBoxComponent } from './components/image-tool-box/image-tool-box.component';
-
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @NgModule({
   declarations: [
@@ -21,7 +21,8 @@ import { ImageToolBoxComponent } from './components/image-tool-box/image-tool-bo
   imports: [
     CommonModule,
     SlidePresentationRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NzModalModule
   ]
 })
 export class SlidePresentationModule { }

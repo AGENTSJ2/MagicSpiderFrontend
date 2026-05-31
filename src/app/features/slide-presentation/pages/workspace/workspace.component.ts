@@ -192,9 +192,9 @@ export class WorkspaceComponent implements OnInit {
       })
     )
   }
-
+  isVisible:boolean = false;
   handleTest() {
-    
+    this.isVisible = true;
   }
 }
 enum ToolBoxType {
