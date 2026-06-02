@@ -44,8 +44,7 @@ import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
-import { SlideService } from '../../../services/konva.services/slide.service';
-import { inject } from '@angular/core';
+import { slideService } from '../../../services/konva.services/slide.service';
 
 export class PresentationController {
   readonly eventBus: PresentationEventStream = new PresentationEventStream();
@@ -53,11 +52,9 @@ export class PresentationController {
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
   private trash: ICanvasComponent[] = [];
-  private slideService :SlideService ;
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
-    this.slideService = inject(SlideService);
   }
 
   publishEvent(event: PresentationEvent) {
@@ -128,11 +125,11 @@ export class PresentationController {
       // slide events
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
-          this.slideService.addSlide({ presentation: this.presentation });
+          slideService.addSlide({ presentation: this.presentation });
           return;
         }
         if (event instanceof RemoveSlideEvent) {
-          this.slideService.removeSlide({
+          slideService.removeSlide({
             presentation: this.presentation,
             slideId: event.slideId,
           });

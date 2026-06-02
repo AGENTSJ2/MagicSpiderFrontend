@@ -3,13 +3,11 @@ import { ComponentConfig, PresentationEventStream, PresentationEventType, } from
 import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, SerializableImageConfig, UpdateImageEvent } from "../domain/EventModels/imageEvent.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
-import { ImageNodeService } from "../../../services/konva.services/image.service";
-import { inject } from "@angular/core";
+import { imageNodeService } from "../../../services/konva.services/image.service";
 
 export default class ImageController extends BaseController {
     override node: KonvaImage;
     private slide: Slide;
-    private imageNodeService :ImageNodeService;
     constructor(init: {
         slide: Slide,
         imageNode: KonvaImage,
@@ -20,7 +18,6 @@ export default class ImageController extends BaseController {
         this.node = init.imageNode;
         this.registerEvents();
         this.listenPresentationEventStream();
-        this.imageNodeService =  inject(ImageNodeService);
     }
 
     protected registerEvents(): void {
@@ -89,7 +86,7 @@ export default class ImageController extends BaseController {
         if (!config) {
             return;
         }
-        this.imageNodeService.updateImageNode({
+        imageNodeService.updateImageNode({
             currentConfig:config,
             node:this.node,
             zIndexActions:event.zIndexActions

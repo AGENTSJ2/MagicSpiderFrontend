@@ -38,3 +38,5 @@ export class SlideService {
     return slide;
   }
 }
+
+export const slideService = new SlideService();

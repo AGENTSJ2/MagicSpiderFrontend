@@ -57,3 +57,5 @@ export class ShapeNodeService {
     return params.node;
   }
 }
+
+export const shapeNodeService = new ShapeNodeService();

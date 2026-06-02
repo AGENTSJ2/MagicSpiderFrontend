@@ -40,10 +40,9 @@ import {
   AddTrashEvents,
   RemoveFromTrashEvents,
 } from '../domain/EventModels/trashEvents.model';
-import { inject } from '@angular/core';
-import { ImageNodeService } from '../../../services/konva.services/image.service';
-import { ShapeNodeService } from '../../../services/konva.services/shapeNode.service';
-import { TextNodeService } from '../../../services/konva.services/textNode.service';
+import { imageNodeService } from '../../../services/konva.services/image.service';
+import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
+import { textNodeService } from '../../../services/konva.services/textNode.service';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -54,9 +53,6 @@ export default class SlideController {
   private readonly DESIRED_SLIDE_HEIGHT = 750;
   private eventBus: PresentationEventStream;
   private eventBusSubscription!: Subscription;
-  private imageNodeService :ImageNodeService;
-  private shapeNodeService :ShapeNodeService;
-  private textNodeService :TextNodeService;
   private readonly Anchors = [
     'top-left',
     'top-center',
@@ -74,9 +70,6 @@ export default class SlideController {
     this.setUp();
     this.registerEvents();
     this.ListenPresentationEvents();
-    this.imageNodeService = inject(ImageNodeService);
-    this.shapeNodeService = inject(ShapeNodeService);
-    this.textNodeService = inject(TextNodeService);
   }
 
   private setUp() {
@@ -289,14 +282,14 @@ export default class SlideController {
   private handleAddNode(event: PresentationEvent) {
     let node: ICanvasComponent | undefined;
     if (event instanceof AddTextEvent) {
-      node = this.textNodeService.addTextNode({
+      node = textNodeService.addTextNode({
         eventBus: this.eventBus,
         slide: this.slide,
         config: event.currentConfig!,
       });
     }
     if (event instanceof ShapeEvent) {
-      node = this.shapeNodeService.addShapeNode({
+      node = shapeNodeService.addShapeNode({
         eventBus: this.eventBus,
         slide: this.slide,
         config: event.currentConfig!,
@@ -304,7 +297,7 @@ export default class SlideController {
       });
     }
     if (event instanceof ImageEvent) {
-      node = this.imageNodeService.addImageNode({
+      node = imageNodeService.addImageNode({
         eventBus: this.eventBus,
         slide: this.slide,
         config: event.currentConfig!,

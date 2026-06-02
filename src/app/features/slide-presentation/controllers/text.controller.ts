@@ -16,8 +16,7 @@ import {
   TextEvent,
   UpdateTextEvent,
 } from '../domain/EventModels/textEvent.model';
-import { TextNodeService } from '../../../services/konva.services/textNode.service';
-import { inject } from '@angular/core';
+import { textNodeService } from '../../../services/konva.services/textNode.service';
 
 export default class TextController extends BaseController {
   private readonly positionSlack = 5;
@@ -25,7 +24,6 @@ export default class TextController extends BaseController {
   private containerDiv: HTMLDivElement;
   private eventSubscription!: Subscription;
   override node: Konva.Text;
-  private textNodeService :TextNodeService;
   constructor(init: {
     slide: Slide;
     textNode: Konva.Text;
@@ -37,7 +35,6 @@ export default class TextController extends BaseController {
     this.node = init.textNode;
     this.registerEvents();
     this.listenPresentationEventStream();
-    this.textNodeService = inject(TextNodeService);
   }
 
   protected registerEvents() {
@@ -67,7 +64,7 @@ export default class TextController extends BaseController {
     if (!config) {
       return;
     }
-    this.textNodeService.updateTextNode({
+    textNodeService.updateTextNode({
       node:this.node,
       config:config,
       zIndexActions:event.zIndexActions

@@ -14,14 +14,12 @@ import {
   UpdateShapeEvent,
 } from '../domain/EventModels/shapeEvent.models';
 import { ShapeType } from '../domain/canvasModels/shapeComponent.model';
-import { inject } from '@angular/core';
-import { ShapeNodeService } from '../../../services/konva.services/shapeNode.service';
+import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
 
 export default class ShapeController extends BaseController {
   override node: Shape;
   slide: Slide;
   shapeType: ShapeType;
-  private shapeService :ShapeNodeService;
   constructor(init: {
     shape: Shape;
     slide: Slide;
@@ -34,7 +32,6 @@ export default class ShapeController extends BaseController {
     this.registerEvents();
     this.listenPresentationEventStream();
     this.shapeType = init.shapeType;
-    this.shapeService = inject(ShapeNodeService);
   }
 
   override destroy() {
@@ -114,7 +111,7 @@ export default class ShapeController extends BaseController {
     if (!config) {
       return;
     }
-    this.shapeService.updateShapeNode({
+    shapeNodeService.updateShapeNode({
       node: this.node,
       zIndexActions: event.zIndexActions,
       config: config,

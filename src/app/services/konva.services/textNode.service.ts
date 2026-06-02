@@ -52,3 +52,5 @@ export class TextNodeService {
     return params.node;
   }
 }
+
+export const textNodeService = new TextNodeService();

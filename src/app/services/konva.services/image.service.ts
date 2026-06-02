@@ -67,3 +67,5 @@ export class ImageNodeService {
     return params.node;
   }
 }
+
+export const imageNodeService = new ImageNodeService();

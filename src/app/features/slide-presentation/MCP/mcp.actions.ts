@@ -12,28 +12,18 @@ import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import { SerializableImageConfig } from '../domain/EventModels/imageEvent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
-import { inject } from '@angular/core';
-import { ImageNodeService } from '../../../services/konva.services/image.service';
-import { TextNodeService } from '../../../services/konva.services/textNode.service';
-import { ShapeNodeService } from '../../../services/konva.services/shapeNode.service';
-import { SlideService } from '../../../services/konva.services/slide.service';
+import { imageNodeService } from '../../../services/konva.services/image.service';
+import { textNodeService } from '../../../services/konva.services/textNode.service';
+import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
+import { slideService } from '../../../services/konva.services/slide.service';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export class McpActions {
-  private imageNodeService: ImageNodeService;
-  private textNodeService: TextNodeService;
-  private shapeNodeService: ShapeNodeService;
-  private slideService: SlideService;
-  constructor(private presentation: Presentation) {
-    this.imageNodeService = inject(ImageNodeService);
-    this.textNodeService = inject(TextNodeService);
-    this.shapeNodeService = inject(ShapeNodeService);
-    this.slideService = inject(SlideService);
-  }
+  constructor(private presentation: Presentation) {}
 
   private getSlideOrThrow(slideId: string): Slide {
-    const slide = this.slideService.getSlideById({
+    const slide = slideService.getSlideById({
       slideId,
       presentation: this.presentation,
     });
@@ -66,8 +56,7 @@ export class McpActions {
     if (index < 0) {
       throw new InternalMcpError('Node not found');
     }
-    const component = slide.components.at(index)!;
-    component.node.remove();
+    const component = slide.components.splice(index, 1)[0];
     slide.controller.removeSelectionOfComponent(component.node);
     component.destroy();
     slide.controller.layer.batchDraw();
@@ -75,7 +64,7 @@ export class McpActions {
 
   addShape(args: { slideId: string; shapeType: ShapeType }) {
     const slide = this.getSlideOrThrow(args.slideId);
-    this.shapeNodeService.addShapeNode({
+    shapeNodeService.addShapeNode({
       eventBus: this.presentation.eventBus,
       slide: slide,
       shapeType: args.shapeType,
@@ -97,7 +86,7 @@ export class McpActions {
       },
     });
 
-    this.shapeNodeService.updateShapeNode({
+    shapeNodeService.updateShapeNode({
       node: node.node,
       config: configs.currentConfig,
       zIndexActions: args.zIndexActions,
@@ -111,7 +100,7 @@ export class McpActions {
 
   addText(args: { slideId: string }) {
     const slide = this.getSlideOrThrow(args.slideId);
-    this.textNodeService.addTextNode({
+    textNodeService.addTextNode({
       eventBus: this.presentation.eventBus,
       slide,
       config: { attrs: {}, zIndex: 0 },
@@ -133,7 +122,7 @@ export class McpActions {
       },
     });
 
-    this.textNodeService.updateTextNode({
+    textNodeService.updateTextNode({
       node: node.node,
       config: configs.currentConfig,
       zIndexActions: args.zIndexActions,
@@ -148,7 +137,7 @@ export class McpActions {
 
   addImage(args: { slideId: string }) {
     const slide = this.getSlideOrThrow(args.slideId);
-    this.imageNodeService.addImageNode({
+    imageNodeService.addImageNode({
       eventBus: this.presentation.eventBus,
       slide,
       config: { attrs: {}, zIndex: 0 },
@@ -170,7 +159,7 @@ export class McpActions {
       },
     });
 
-    this.imageNodeService.updateImageNode({
+    imageNodeService.updateImageNode({
       node: node.node,
       currentConfig: configs.currentConfig,
       zIndexActions: args.zIndexActions,
@@ -188,11 +177,11 @@ export class McpActions {
   getSlide() {}
 
   addSlide() {
-    this.slideService.addSlide({ presentation: this.presentation });
+    slideService.addSlide({ presentation: this.presentation });
   }
 
   removeSlide(args: { slideId: string }) {
-    this.slideService.removeSlide({
+    slideService.removeSlide({
       presentation: this.presentation,
       slideId: args.slideId,
     });
