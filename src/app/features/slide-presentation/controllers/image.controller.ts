@@ -9,7 +9,7 @@ import { inject } from "@angular/core";
 export default class ImageController extends BaseController {
     override node: KonvaImage;
     private slide: Slide;
-    private imageNodeService = inject(ImageNodeService);
+    private imageNodeService :ImageNodeService;
     constructor(init: {
         slide: Slide,
         imageNode: KonvaImage,
@@ -20,6 +20,7 @@ export default class ImageController extends BaseController {
         this.node = init.imageNode;
         this.registerEvents();
         this.listenPresentationEventStream();
+        this.imageNodeService =  inject(ImageNodeService);
     }
 
     protected registerEvents(): void {

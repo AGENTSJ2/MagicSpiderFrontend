@@ -53,10 +53,11 @@ export class PresentationController {
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
   private trash: ICanvasComponent[] = [];
-  private slideService = inject(SlideService);
+  private slideService :SlideService ;
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
+    this.slideService = inject(SlideService);
   }
 
   publishEvent(event: PresentationEvent) {

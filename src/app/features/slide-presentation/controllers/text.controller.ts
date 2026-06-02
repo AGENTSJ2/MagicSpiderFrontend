@@ -25,7 +25,7 @@ export default class TextController extends BaseController {
   private containerDiv: HTMLDivElement;
   private eventSubscription!: Subscription;
   override node: Konva.Text;
-  private textNodeService = inject(TextNodeService);
+  private textNodeService :TextNodeService;
   constructor(init: {
     slide: Slide;
     textNode: Konva.Text;
@@ -37,6 +37,7 @@ export default class TextController extends BaseController {
     this.node = init.textNode;
     this.registerEvents();
     this.listenPresentationEventStream();
+    this.textNodeService = inject(TextNodeService);
   }
 
   protected registerEvents() {

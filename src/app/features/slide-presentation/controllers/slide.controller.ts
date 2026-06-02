@@ -54,9 +54,9 @@ export default class SlideController {
   private readonly DESIRED_SLIDE_HEIGHT = 750;
   private eventBus: PresentationEventStream;
   private eventBusSubscription!: Subscription;
-  private imageNodeService = inject(ImageNodeService);
-  private shapeNodeService = inject(ShapeNodeService);
-  private textNodeService = inject(TextNodeService);
+  private imageNodeService :ImageNodeService;
+  private shapeNodeService :ShapeNodeService;
+  private textNodeService :TextNodeService;
   private readonly Anchors = [
     'top-left',
     'top-center',
@@ -74,6 +74,9 @@ export default class SlideController {
     this.setUp();
     this.registerEvents();
     this.ListenPresentationEvents();
+    this.imageNodeService = inject(ImageNodeService);
+    this.shapeNodeService = inject(ShapeNodeService);
+    this.textNodeService = inject(TextNodeService);
   }
 
   private setUp() {
@@ -275,6 +278,7 @@ export default class SlideController {
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
     this.slide.components.push(node);
+    console.log(JSON.stringify(this.slide));
   }
 
   destroy() {

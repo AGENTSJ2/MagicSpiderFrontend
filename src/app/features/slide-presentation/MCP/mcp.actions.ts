@@ -21,11 +21,16 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export class McpActions {
-  private imageNodeService = inject(ImageNodeService);
-  private textNodeService = inject(TextNodeService);
-  private shapeNodeService = inject(ShapeNodeService);
-  private slideService = inject(SlideService);
-  constructor(private presentation: Presentation) {}
+  private imageNodeService: ImageNodeService;
+  private textNodeService: TextNodeService;
+  private shapeNodeService: ShapeNodeService;
+  private slideService: SlideService;
+  constructor(private presentation: Presentation) {
+    this.imageNodeService = inject(ImageNodeService);
+    this.textNodeService = inject(TextNodeService);
+    this.shapeNodeService = inject(ShapeNodeService);
+    this.slideService = inject(SlideService);
+  }
 
   private getSlideOrThrow(slideId: string): Slide {
     const slide = this.slideService.getSlideById({
@@ -61,8 +66,8 @@ export class McpActions {
     if (index < 0) {
       throw new InternalMcpError('Node not found');
     }
-
     const component = slide.components.at(index)!;
+    component.node.remove();
     slide.controller.removeSelectionOfComponent(component.node);
     component.destroy();
     slide.controller.layer.batchDraw();
@@ -176,7 +181,9 @@ export class McpActions {
     this.removeComponent(args);
   }
 
-  getSlides() {}
+  getSlides() {
+    return this.presentation.slides.map((slide) => JSON.stringify(slide));
+  }
 
   getSlide() {}
 

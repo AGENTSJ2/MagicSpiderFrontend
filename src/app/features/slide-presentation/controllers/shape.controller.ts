@@ -5,7 +5,6 @@ import {
   ComponentConfig,
   PresentationEventStream,
   PresentationEventType,
-  ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import {
   AddShapeEvent,
@@ -22,7 +21,7 @@ export default class ShapeController extends BaseController {
   override node: Shape;
   slide: Slide;
   shapeType: ShapeType;
-  private shapeService = inject(ShapeNodeService);
+  private shapeService :ShapeNodeService;
   constructor(init: {
     shape: Shape;
     slide: Slide;
@@ -35,6 +34,7 @@ export default class ShapeController extends BaseController {
     this.registerEvents();
     this.listenPresentationEventStream();
     this.shapeType = init.shapeType;
+    this.shapeService = inject(ShapeNodeService);
   }
 
   override destroy() {
