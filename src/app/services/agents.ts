@@ -63,12 +63,19 @@ export class LLM_Agents {
       },
       {
         role: 'user',
-        content: params.slideContent,
+        content:`Slide Description ${params.slideContent}` ,
       },
     ];
     for (let i = 0; i < 10; i++) {
+      const slideJson = JSON.stringify((params.presentation.slides.map((sl)=>sl.toJson())))
       const response: ChatResponse = await this.chatService.chat({
-        messages: messages,
+        messages: [
+          ...messages,
+          {
+            role:'user',
+            content : `Latest Slide JSON ${slideJson}`
+          }
+        ],
         tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
       });
       console.log(response.message.tool_calls);

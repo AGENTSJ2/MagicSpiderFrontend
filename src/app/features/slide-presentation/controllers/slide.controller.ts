@@ -271,7 +271,6 @@ export default class SlideController {
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
     this.slide.components.push(node);
-    console.log(JSON.stringify(this.slide));
   }
 
   destroy() {

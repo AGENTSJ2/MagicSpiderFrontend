@@ -171,7 +171,7 @@ export class McpActions {
   }
 
   getSlides() {
-    return this.presentation.slides.map((slide) => JSON.stringify(slide));
+    return this.presentation.slides.map((slide) => slide.toJson());
   }
 
   getSlide() {}
