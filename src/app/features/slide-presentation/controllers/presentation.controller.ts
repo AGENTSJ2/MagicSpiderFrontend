@@ -26,13 +26,16 @@ import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
+import { SlideService } from '../../../services/slide.service';
+import { inject } from '@angular/core';
 
 export class PresentationController {
-  private eventBus: PresentationEventStream = new PresentationEventStream();
+  readonly eventBus: PresentationEventStream = new PresentationEventStream();
   private eventHistory: PresentationEvent[] = [];
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
   private trash: ICanvasComponent[] = [];
+  private slideService  = inject(SlideService);
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
@@ -106,16 +109,7 @@ export class PresentationController {
       // slide events
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
-          const slide: Partial<Slide> = {
-            presentationId: this.presentation.id,
-            slideId: crypto.randomUUID().toString(),
-            components: [],
-          };
-          const ConfiguredSlide = new Slide({
-            ...slide,
-            eventBus: this.eventBus,
-          });
-          this.presentation.slides.push(ConfiguredSlide);
+          
           return;
         }
         if (event instanceof RemoveSlideEvent) {
