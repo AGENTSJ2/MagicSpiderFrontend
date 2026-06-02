@@ -5,7 +5,6 @@ import {
   PresentationEventStream,
   ZIndexActions,
 } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
-import { SerializableImageConfig } from '../../features/slide-presentation/domain/EventModels/imageEvent.model';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
 import { Text, TextConfig } from 'konva/lib/shapes/Text';
 
@@ -16,7 +15,7 @@ export class TextNodeService {
   addTextNode(params: {
     eventBus: PresentationEventStream;
     slide: Slide;
-    config: ComponentConfig<SerializableImageConfig>;
+    config: ComponentConfig<TextConfig>;
   }) {
     const component = new TextComponent({
       slide: params.slide,

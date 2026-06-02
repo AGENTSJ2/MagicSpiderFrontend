@@ -8,7 +8,6 @@ import {
   PresentationEventStream,
   ZIndexActions,
 } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
-import { SerializableImageConfig } from '../../features/slide-presentation/domain/EventModels/imageEvent.model';
 import { Shape, ShapeConfig } from 'konva/lib/Shape';
 
 @Injectable({
@@ -18,7 +17,7 @@ export class ShapeNodeService {
   addShapeNode(params: {
     eventBus: PresentationEventStream;
     slide: Slide;
-    config: ComponentConfig<SerializableImageConfig>;
+    config: ComponentConfig<ShapeConfig>;
     shapeType: ShapeType;
   }) {
     const component = new ShapeComponent({

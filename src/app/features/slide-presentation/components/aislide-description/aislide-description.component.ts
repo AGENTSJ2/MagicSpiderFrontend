@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
@@ -19,6 +19,7 @@ enum StreamPhase {
 export class AISlideDescriptionComponent {
   @Input() isVisible = false;
   @Input() presentation!:Presentation;
+  @Output() close:EventEmitter<boolean> = new EventEmitter();
   problemStatement = '';
   thinkingText = '';
   contentText = '';
@@ -57,7 +58,7 @@ export class AISlideDescriptionComponent {
 
   handleCancel(): void {
     if (this.phase === StreamPhase.thinking || this.phase === StreamPhase.content) return;
-    this.isVisible = false;
+    this.close.emit();
     this.reset();
   }
 
@@ -140,7 +141,7 @@ export class AISlideDescriptionComponent {
       slideContent:content,
       presentation:this.presentation
     })
-    this.isVisible = false;
+    this.close.emit(true);
   }
 }
 

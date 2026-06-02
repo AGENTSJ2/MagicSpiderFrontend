@@ -103,7 +103,7 @@ export class MCP {
   async callTool(params: { toolName: string; args: any }) {
     const tool = this.handlers.get(params.toolName);
     if (!tool) {
-      throw new InternalMcpError('Invalid Tool Call');
+      throw new InternalMcpError(`No tool of name ${params.toolName} is available`);
     }
     const toolResponse = await tool.execute(params.args!);
     return toolResponse;
@@ -113,7 +113,7 @@ export class MCP {
 const addShapeTool: Tool = {
   name: 'addShape',
   description:
-    'Add a new shape component to a slide. Creates a shape of the specified type and inserts it onto the target slide using default configuration.',
+    'Add a new shape component to a slide. Creates a shape of the specified type and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -126,6 +126,23 @@ const addShapeTool: Tool = {
         type: 'string',
         description:
           'The type of shape to create (rectangle, circle, star, arrow, etc.).',
+      },
+      initialConfig: {
+        type: 'object',
+        description:
+          'Optional initial configuration for the new shape. Use this to set position, size, color, rotation, opacity, or layer order at creation time.',
+        properties: {
+          attrs: {
+            type: 'object',
+            description:
+              'Initial Konva Shape attributes. Examples include x, y, width, height, fill, stroke, strokeWidth, rotation, opacity, scaleX, and scaleY.',
+          },
+          zIndex: {
+            type: 'number',
+            description:
+              'Initial Konva z index of the shape. Defaults to 0 when omitted.',
+          },
+        },
       },
     },
     required: ['slideId', 'shapeType'],
@@ -191,13 +208,31 @@ const deleteShapeTool: Tool = {
 };
 const addTextTool: Tool = {
   name: 'addText',
-  description: 'Add a new text component to a slide.',
+  description:
+    'Add a new text component to a slide. Optionally accepts initial Konva text attributes and z index.',
   inputSchema: {
     type: 'object',
     properties: {
       slideId: {
         type: 'string',
         description: 'The slide where the text component should be created.',
+      },
+      initialConfig: {
+        type: 'object',
+        description:
+          'Optional initial configuration for the new text component. Use this to set content, font, position, dimensions, styling, rotation, opacity, or layer order at creation time.',
+        properties: {
+          attrs: {
+            type: 'object',
+            description:
+              'Initial Konva Text attributes. Examples include text, x, y, width, height, fontSize, fontFamily, fill, align, rotation, opacity, scaleX, and scaleY.',
+          },
+          zIndex: {
+            type: 'number',
+            description:
+              'Initial Konva z index of the text component. Defaults to 0 when omitted.',
+          },
+        },
       },
     },
     required: ['slideId'],

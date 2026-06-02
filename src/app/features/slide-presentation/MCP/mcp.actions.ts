@@ -28,7 +28,7 @@ export class McpActions {
       presentation: this.presentation,
     });
     if (!slide) {
-      throw new InternalMcpError('Slide not found');
+      throw new InternalMcpError(`No slide of ${slideId} is found`);
     }
     return slide;
   }
@@ -43,7 +43,7 @@ export class McpActions {
     ) as T | undefined;
 
     if (!component) {
-      throw new InternalMcpError('Node not found');
+      throw new InternalMcpError(`No node of ${args.nodeId} is Found`);
     }
     return component;
   }
@@ -54,7 +54,7 @@ export class McpActions {
       (component) => component.node._id.toString() === args.nodeId,
     );
     if (index < 0) {
-      throw new InternalMcpError('Node not found');
+      throw new InternalMcpError('Node of ');
     }
     const component = slide.components.splice(index, 1)[0];
     slide.controller.removeSelectionOfComponent(component.node);
@@ -62,13 +62,27 @@ export class McpActions {
     slide.controller.layer.batchDraw();
   }
 
-  addShape(args: { slideId: string; shapeType: ShapeType }) {
+  private normalizeInitialConfig<T>(config?: {
+    attrs?: T;
+    zIndex?: number;
+  }): ComponentConfig<T> {
+    return {
+      attrs: config?.attrs ?? ({} as T),
+      zIndex: config?.zIndex ?? 0,
+    };
+  }
+
+  addShape(args: {
+    slideId: string;
+    shapeType: ShapeType;
+    initialConfig?: { attrs?: ShapeConfig; zIndex?: number };
+  }) {
     const slide = this.getSlideOrThrow(args.slideId);
     shapeNodeService.addShapeNode({
       eventBus: this.presentation.eventBus,
       slide: slide,
       shapeType: args.shapeType,
-      config: { attrs: {}, zIndex: 0 },
+      config: this.normalizeInitialConfig(args.initialConfig),
     });
   }
 
@@ -98,12 +112,15 @@ export class McpActions {
   }
   // Text
 
-  addText(args: { slideId: string }) {
+  addText(args: {
+    slideId: string;
+    initialConfig?: { attrs?: TextConfig; zIndex?: number };
+  }) {
     const slide = this.getSlideOrThrow(args.slideId);
     textNodeService.addTextNode({
       eventBus: this.presentation.eventBus,
       slide,
-      config: { attrs: {}, zIndex: 0 },
+      config: this.normalizeInitialConfig(args.initialConfig),
     });
   }
 

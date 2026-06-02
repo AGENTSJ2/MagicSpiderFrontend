@@ -7,10 +7,12 @@ export const createAddSchema = (isShape: boolean) => {
     return z.object({
       slideId: z.string(),
       shapeType: z.enum(ShapeType),
+      initialConfig: InitialComponentConfigSchema.optional(),
     });
   }
   return z.object({
     slideId: z.string(),
+    initialConfig: InitialComponentConfigSchema.optional(),
   });
 };
 
@@ -36,5 +38,10 @@ export const KonvaAttrsSchema = z.record(
 export const ComponentConfigSchema = z.object({
   attrs: KonvaAttrsSchema,
   zIndex: z.number(),
+});
+
+export const InitialComponentConfigSchema = z.object({
+  attrs: KonvaAttrsSchema.optional(),
+  zIndex: z.number().optional(),
 });
 
