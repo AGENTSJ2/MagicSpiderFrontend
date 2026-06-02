@@ -1,0 +1,34 @@
+import { Injectable } from '@angular/core';
+import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
+import { Presentation } from '../../features/slide-presentation/domain/canvasModels/presenatation.model';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class SlideService {
+  addSlide(params: { presentation: Presentation }): Slide {
+    const slide: Partial<Slide> = {
+      presentationId: params.presentation.id,
+      slideId: crypto.randomUUID().toString(),
+      components: [],
+    };
+    const ConfiguredSlide = new Slide({
+      ...slide,
+      eventBus: params.presentation.eventBus,
+    });
+    params.presentation.slides.push(ConfiguredSlide);
+    return ConfiguredSlide;
+  }
+  removeSlide(params: { presentation: Presentation ,slideId:string}): Slide {
+    const slideIdx = params.presentation.slides.findIndex(
+      (sl) => sl.slideId == params.slideId,
+    );
+    if (slideIdx < 0) {
+      throw new Error('No Slide of this id is found');
+    }
+    const slide = params.presentation.slides.at(slideIdx)!;
+    params.presentation.slides.splice(slideIdx, 1);
+    slide?.destroy();
+    return slide;
+  }
+}

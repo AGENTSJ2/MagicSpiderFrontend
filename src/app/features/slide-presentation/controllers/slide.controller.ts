@@ -36,8 +36,14 @@ import {
   RestoreImageEvent,
   SelectImageEvent,
 } from '../domain/EventModels/imageEvent.model';
-import { RemoveSlideEvent, SlideEvent } from '../domain/EventModels/slideEvent.model';
-import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
+import {
+  AddTrashEvents,
+  RemoveFromTrashEvents,
+} from '../domain/EventModels/trashEvents.model';
+import { inject } from '@angular/core';
+import { ImageNodeService } from '../../../services/konva.services/image.service';
+import { ShapeNodeService } from '../../../services/konva.services/shapeNode.service';
+import { TextNodeService } from '../../../services/konva.services/textNode.service';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -48,6 +54,9 @@ export default class SlideController {
   private readonly DESIRED_SLIDE_HEIGHT = 750;
   private eventBus: PresentationEventStream;
   private eventBusSubscription!: Subscription;
+  private imageNodeService = inject(ImageNodeService);
+  private shapeNodeService = inject(ShapeNodeService);
+  private textNodeService = inject(TextNodeService);
   private readonly Anchors = [
     'top-left',
     'top-center',
@@ -121,9 +130,9 @@ export default class SlideController {
         this.layer?.batchDraw();
         const clearSelection = new ClearSelectionEvent({
           slideId: this.slide.slideId,
-          presentationId: this.slide.presentationId
+          presentationId: this.slide.presentationId,
         });
-        this.eventBus.next(clearSelection)
+        this.eventBus.next(clearSelection);
         return;
       }
     });
@@ -224,12 +233,12 @@ export default class SlideController {
   }) {
     this.slide.containerDiv = options.divElm;
     const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
-    const desiredWidth = desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+    const desiredWidth =
+      desiredHeight * (options.config.ratio.num / options.config.ratio.den);
 
     const containerWidth = options.divElm.offsetWidth;
     const containerHeight =
-      containerWidth *
-      (options.config.ratio.den / options.config.ratio.num);
+      containerWidth * (options.config.ratio.den / options.config.ratio.num);
     const xScaleFactor = containerWidth / desiredWidth;
     const yScaleFactor = containerHeight / desiredHeight;
 
@@ -241,7 +250,7 @@ export default class SlideController {
 
     this.stage.scale({
       x: xScaleFactor,
-      y: yScaleFactor
+      y: yScaleFactor,
     });
     this.layer.batchDraw();
   }
@@ -276,40 +285,42 @@ export default class SlideController {
   private handleAddNode(event: PresentationEvent) {
     let node: ICanvasComponent | undefined;
     if (event instanceof AddTextEvent) {
-      node = new TextComponent({
-        config: event.currentConfig,
-        slide: this.slide,
+      node = this.textNodeService.addTextNode({
         eventBus: this.eventBus,
+        slide: this.slide,
+        config: event.currentConfig!,
       });
     }
     if (event instanceof ShapeEvent) {
-      node = new ShapeComponent({
-        slide: this.slide,
-        config: event.currentConfig,
-        shapeType: event.shapeType,
+      node = this.shapeNodeService.addShapeNode({
         eventBus: this.eventBus,
+        slide: this.slide,
+        config: event.currentConfig!,
+        shapeType: event.shapeType,
       });
     }
     if (event instanceof ImageEvent) {
-      node = new ImageComponent({
-        slide: this.slide,
-        config: event.currentConfig,
+      node = this.imageNodeService.addImageNode({
         eventBus: this.eventBus,
+        slide: this.slide,
+        config: event.currentConfig!,
       });
     }
-    this.addComponent(node!);
     event.nodeId = node!.node!._id.toString();
-    event.currentConfig = event instanceof ImageEvent
-      ? structuredClone((node as ImageComponent).getSerializableConfig())
-      : structuredClone({
-        attrs: node!.node!.getAttrs(),
-        zIndex: node!.node!.getZIndex(),
-      });
+    event.currentConfig =
+      event instanceof ImageEvent
+        ? structuredClone((node as ImageComponent).getSerializableConfig())
+        : structuredClone({
+            attrs: node!.node!.getAttrs(),
+            zIndex: node!.node!.getZIndex(),
+          });
     event.previousConfig = structuredClone(event.previousConfig);
   }
 
   private handleRemoveNode(event: PresentationEvent) {
-    const index = this.slide.components.findIndex(x => x.node._id.toString() === event.nodeId);
+    const index = this.slide.components.findIndex(
+      (x) => x.node._id.toString() === event.nodeId,
+    );
     if (index == -1) {
       return;
     }
@@ -321,17 +332,19 @@ export default class SlideController {
       presentationId: this.slide.presentationId,
       slideId: this.slide.slideId,
       trackHistory: false,
-      node: removed
+      node: removed,
     });
     this.eventBus.next(trashEvent);
   }
-  private handleRestoreNode(event: PresentationEvent & { nodeToRestore: ICanvasComponent }) {
+  private handleRestoreNode(
+    event: PresentationEvent & { nodeToRestore: ICanvasComponent },
+  ) {
     this.slide.components.push(event.nodeToRestore);
     this.layer.add(event.nodeToRestore.node);
     this.layer.batchDraw();
     const unTrashEvent = new RemoveFromTrashEvents({
       ...event,
-      node: event.nodeToRestore
+      node: event.nodeToRestore,
     });
     this.eventBus.next(unTrashEvent);
   }

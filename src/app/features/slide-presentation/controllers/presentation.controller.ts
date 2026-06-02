@@ -18,15 +18,33 @@ import {
   RemoveSlideEvent,
   SlideEvent,
 } from '../domain/EventModels/slideEvent.model';
-import { AddShapeEvent, RemoveShapeEvent, RestoreShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../domain/EventModels/shapeEvent.models';
-import { AddImageEvent, ImageEvent, RemoveImageEvent, RestoreImageEvent, SelectImageEvent, UpdateImageEvent } from '../domain/EventModels/imageEvent.model';
+import {
+  AddShapeEvent,
+  RemoveShapeEvent,
+  RestoreShapeEvent,
+  SelectShapeEvent,
+  ShapeEvent,
+  UpdateShapeEvent,
+} from '../domain/EventModels/shapeEvent.models';
+import {
+  AddImageEvent,
+  ImageEvent,
+  RemoveImageEvent,
+  RestoreImageEvent,
+  SelectImageEvent,
+  UpdateImageEvent,
+} from '../domain/EventModels/imageEvent.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
-import { AddTrashEvents, RemoveFromTrashEvents, TrashEvent } from '../domain/EventModels/trashEvents.model';
+import {
+  AddTrashEvents,
+  RemoveFromTrashEvents,
+  TrashEvent,
+} from '../domain/EventModels/trashEvents.model';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
-import { SlideService } from '../../../services/slide.service';
+import { SlideService } from '../../../services/konva.services/slide.service';
 import { inject } from '@angular/core';
 
 export class PresentationController {
@@ -35,7 +53,7 @@ export class PresentationController {
   private eventIdx: number = -1;
   private readonly MAX_HISTORY_LENGTH = 100;
   private trash: ICanvasComponent[] = [];
-  private slideService  = inject(SlideService);
+  private slideService = inject(SlideService);
   constructor(private presentation: Presentation) {
     this.registerEvent();
     this.listenPresentationEvents();
@@ -109,18 +127,14 @@ export class PresentationController {
       // slide events
       if (event instanceof SlideEvent) {
         if (event instanceof AddSlideEvent) {
-          
+          this.slideService.addSlide({ presentation: this.presentation });
           return;
         }
         if (event instanceof RemoveSlideEvent) {
-          const slideIdx = this.presentation.slides.findIndex((sl)=>sl.slideId == event.slideId);
-          if(slideIdx < 0)
-          {
-            throw new Error("No Slide of this id is found");
-          }
-          const slide = this.presentation.slides.at(slideIdx);
-          this.presentation.slides.splice(slideIdx,1);
-          slide?.destroy();
+          this.slideService.removeSlide({
+            presentation: this.presentation,
+            slideId: event.slideId,
+          });
           return;
         }
         return;
@@ -139,40 +153,53 @@ export class PresentationController {
           this.handleUndoImageEvent(event.event);
           return;
         }
-        console.warn(`UNDO this type of event is not registered type : ${event.event.constructor.name}`);
+        console.warn(
+          `UNDO this type of event is not registered type : ${event.event.constructor.name}`,
+        );
       }
       // Redo events
       if (event instanceof RedoEvent) {
-        const NewInstance = event.event.constructor as { new(init: PresentationEvent): PresentationEvent };
+        const NewInstance = event.event.constructor as {
+          new (init: PresentationEvent): PresentationEvent;
+        };
         const inst = new NewInstance({
-          ...event.event
-        })
+          ...event.event,
+        });
         if (inst instanceof AddTextEvent) {
-          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          const nodeToRestoreIdx = this.trash.findIndex(
+            (node) => node.node._id.toString() == event.nodeId,
+          );
           const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
-          this.publishEvent(new RestoreTextEvent({
-            ...inst,
-            nodeToRestore: nodeToRestore as TextComponent
-          }))
-        }
-        else if (inst instanceof AddShapeEvent) {
-          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          this.publishEvent(
+            new RestoreTextEvent({
+              ...inst,
+              nodeToRestore: nodeToRestore as TextComponent,
+            }),
+          );
+        } else if (inst instanceof AddShapeEvent) {
+          const nodeToRestoreIdx = this.trash.findIndex(
+            (node) => node.node._id.toString() == event.nodeId,
+          );
           const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
-          this.publishEvent(new RestoreShapeEvent({
-            ...inst,
-            nodeToRestore: nodeToRestore as ShapeComponent
-          }))
-        }
-        else if (inst instanceof AddImageEvent) {
-          const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+          this.publishEvent(
+            new RestoreShapeEvent({
+              ...inst,
+              nodeToRestore: nodeToRestore as ShapeComponent,
+            }),
+          );
+        } else if (inst instanceof AddImageEvent) {
+          const nodeToRestoreIdx = this.trash.findIndex(
+            (node) => node.node._id.toString() == event.nodeId,
+          );
           const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
-          this.publishEvent(new RestoreImageEvent({
-            ...inst,
-            nodeToRestore: nodeToRestore as ImageComponent
-          }))
-        }
-        else {
-          this.publishEvent(inst)
+          this.publishEvent(
+            new RestoreImageEvent({
+              ...inst,
+              nodeToRestore: nodeToRestore as ImageComponent,
+            }),
+          );
+        } else {
+          this.publishEvent(inst);
         }
       }
       // Trash events
@@ -181,7 +208,9 @@ export class PresentationController {
           this.trash.push(event.node);
         }
         if (event instanceof RemoveFromTrashEvents) {
-          const idx = this.trash.findIndex((node) => node.node == event.node.node);
+          const idx = this.trash.findIndex(
+            (node) => node.node == event.node.node,
+          );
           this.trash.splice(idx, 1)[0];
         }
       }
@@ -198,7 +227,9 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveTextEvent) {
-      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+      const nodeToRestoreIdx = this.trash.findIndex(
+        (node) => node.node._id.toString() == event.nodeId,
+      );
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreTextEvent({
         ...event,
@@ -235,11 +266,13 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveShapeEvent) {
-      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+      const nodeToRestoreIdx = this.trash.findIndex(
+        (node) => node.node._id.toString() == event.nodeId,
+      );
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreShapeEvent({
         ...event,
-        nodeToRestore: (nodeToRestore as ShapeComponent),
+        nodeToRestore: nodeToRestore as ShapeComponent,
       });
       this.publishEvent(restoreEvent);
       return;
@@ -272,7 +305,9 @@ export class PresentationController {
       return;
     }
     if (event instanceof RemoveImageEvent) {
-      const nodeToRestoreIdx = this.trash.findIndex((node) => node.node._id.toString() == event.nodeId);
+      const nodeToRestoreIdx = this.trash.findIndex(
+        (node) => node.node._id.toString() == event.nodeId,
+      );
       const nodeToRestore = this.trash.at(nodeToRestoreIdx)!;
       const restoreEvent = new RestoreImageEvent({
         ...event,

@@ -7,7 +7,7 @@ export class Slide {
     slideId: string;
     presentationId: string;
     components: ICanvasComponent[];
-    controller: SlideController;
+    readonly controller: SlideController;
     containerDiv!: HTMLDivElement;
 
     constructor(init: Partial<Slide> & { eventBus: PresentationEventStream }) {
