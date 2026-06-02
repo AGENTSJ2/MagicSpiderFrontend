@@ -94,7 +94,7 @@ export class MCP {
     ],
   ]);
 
-  listTools() : Tool[] {
+  listTools(): Tool[] {
     const toolHandlers = [...this.handlers.values()];
     const tools = toolHandlers.map((val) => val.toolDesc);
     return tools;
@@ -102,9 +102,8 @@ export class MCP {
 
   async callTool(params: { toolName: string; args: any }) {
     const tool = this.handlers.get(params.toolName);
-    if(!tool)
-    {
-      throw new InternalMcpError("Invalid Tool Call");
+    if (!tool) {
+      throw new InternalMcpError('Invalid Tool Call');
     }
     const toolResponse = await tool.execute(params.args!);
     return toolResponse;
@@ -132,6 +131,7 @@ const addShapeTool: Tool = {
     required: ['slideId', 'shapeType'],
   },
 };
+
 const updateShapeTool: Tool = {
   name: 'updateShape',
   description:
@@ -149,8 +149,18 @@ const updateShapeTool: Tool = {
       },
       newConfig: {
         type: 'object',
-        description:
-          'Partial configuration containing only the Konva Shape attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+        properties: {
+          attrs: {
+            type: 'object',
+            description:
+              'Partial configuration containing only the Konva Shape attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+          },
+          zIndex: {
+            type: 'number',
+            description: 'Konva z index of the component',
+          },
+        },
+        required: ['attrs', 'zIndex'],
       },
       zIndexActions: {
         type: 'string',
@@ -208,8 +218,18 @@ const updateTextTool: Tool = {
       },
       newConfig: {
         type: 'object',
-        description:
-          'Partial configuration containing only the Konva Text attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+        properties: {
+          attrs: {
+            type: 'object',
+            description:
+              'Partial configuration containing only the Konva Text attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+          },
+          zIndex: {
+            type: 'number',
+            description: 'Konva z index of the component',
+          },
+        },
+        required: ['attrs', 'zIndex'],
       },
       zIndexActions: {
         type: 'string',
@@ -263,8 +283,18 @@ const updateImageTool: Tool = {
       },
       newConfig: {
         type: 'object',
-        description:
-          'Partial configuration containing only the Konva Image attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+        properties: {
+          attrs: {
+            type: 'object',
+            description:
+              'Partial configuration containing only the Konva Image attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
+          },
+          zIndex: {
+            type: 'number',
+            description: 'Konva z index of the component',
+          },
+        },
+        required: ['attrs', 'zIndex'],
       },
       zIndexActions: {
         type: 'string',

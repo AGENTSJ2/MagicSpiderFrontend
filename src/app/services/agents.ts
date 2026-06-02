@@ -3,7 +3,6 @@ import { OllamaChatService } from './OllamaChatService';
 import { Subject } from 'rxjs';
 import { AbortableAsyncIterator, ChatResponse, Tool } from 'ollama';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
-import { MCP } from '../features/slide-presentation/MCP/mcp_server';
 import { McpService } from './mcp.service';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
 

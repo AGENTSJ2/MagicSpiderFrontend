@@ -29,6 +29,7 @@ export class Slide {
       slideId: this.slideId,
       presentationId: this.presentationId,
       components: this.components.map((cm) => {
+        cm.node.id(cm.node._id.toString())
         return {
           node: cm.node.toJSON(),
         };
