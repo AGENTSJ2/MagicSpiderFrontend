@@ -3,9 +3,11 @@ import { TextComponent } from '../../features/slide-presentation/domain/canvasMo
 import {
   ComponentConfig,
   PresentationEventStream,
+  ZIndexActions,
 } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
 import { SerializableImageConfig } from '../../features/slide-presentation/domain/EventModels/imageEvent.model';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
+import { Text, TextConfig } from 'konva/lib/shapes/Text';
 
 @Injectable({
   providedIn: 'root',
@@ -23,5 +25,30 @@ export class TextNodeService {
     });
     params.slide.controller.addComponent(component);
     return component;
+  }
+  updateTextNode(params: {
+    node: Text;
+    zIndexActions?: ZIndexActions;
+    config: ComponentConfig<TextConfig>;
+  }) :Text | undefined {
+    params.node.setAttrs(params.config.attrs);
+    if (params?.zIndexActions != undefined) {
+      switch (params.zIndexActions) {
+        case ZIndexActions.moveToFront:
+          params.node.moveToTop();
+          break;
+        case ZIndexActions.moveToBack:
+          params.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          params.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          params.node.moveUp();
+          break;
+      }
+    }
+    params.node.zIndex(params.config.zIndex);
+    return params.node;
   }
 }

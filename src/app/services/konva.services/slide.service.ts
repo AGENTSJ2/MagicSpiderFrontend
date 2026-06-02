@@ -19,7 +19,7 @@ export class SlideService {
     params.presentation.slides.push(ConfiguredSlide);
     return ConfiguredSlide;
   }
-  removeSlide(params: { presentation: Presentation ,slideId:string}): Slide {
+  removeSlide(params: { presentation: Presentation; slideId: string }): Slide {
     const slideIdx = params.presentation.slides.findIndex(
       (sl) => sl.slideId == params.slideId,
     );
@@ -29,6 +29,12 @@ export class SlideService {
     const slide = params.presentation.slides.at(slideIdx)!;
     params.presentation.slides.splice(slideIdx, 1);
     slide?.destroy();
+    return slide;
+  }
+  getSlideById(params: { slideId: string; presentation: Presentation }) {
+    const slide = params.presentation.slides.find(
+      (sl) => sl.slideId == params.slideId,
+    );
     return slide;
   }
 }

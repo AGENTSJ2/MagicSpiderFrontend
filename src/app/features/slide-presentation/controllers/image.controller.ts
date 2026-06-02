@@ -1,13 +1,15 @@
 import { Image as KonvaImage, ImageConfig } from "konva/lib/shapes/Image";
-import { ComponentConfig, PresentationEventStream, PresentationEventType, ZIndexActions } from "../domain/EventModels/presentationEvents.model";
+import { ComponentConfig, PresentationEventStream, PresentationEventType, } from "../domain/EventModels/presentationEvents.model";
 import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, SerializableImageConfig, UpdateImageEvent } from "../domain/EventModels/imageEvent.model";
 import { Slide } from "../domain/canvasModels/slide.model";
 import BaseController from "./base.controller";
+import { ImageNodeService } from "../../../services/konva.services/image.service";
+import { inject } from "@angular/core";
 
 export default class ImageController extends BaseController {
     override node: KonvaImage;
     private slide: Slide;
-
+    private imageNodeService = inject(ImageNodeService);
     constructor(init: {
         slide: Slide,
         imageNode: KonvaImage,
@@ -86,35 +88,11 @@ export default class ImageController extends BaseController {
         if (!config) {
             return;
         }
-        const { imageSrc, ...attrs } = config.attrs;
-        this.node.setAttrs(attrs as ImageConfig);
-        if (imageSrc && imageSrc !== this.node.getAttr('imageSrc')) {
-            const imageElement = new Image();
-            imageElement.onload = () => {
-                this.node.image(imageElement);
-                this.node.setAttr('imageSrc', imageSrc);
-                this.node.getLayer()?.batchDraw();
-            };
-            imageElement.src = imageSrc;
-        }
-        if (event?.zIndexActions != undefined) {
-            switch (event.zIndexActions) {
-                case ZIndexActions.moveToFront:
-                    this.node.moveToTop();
-                    break;
-                case ZIndexActions.moveToBack:
-                    this.node.moveToBottom();
-                    break;
-                case ZIndexActions.moveDown:
-                    this.node.moveDown();
-                    break;
-                case ZIndexActions.moveUp:
-                    this.node.moveUp();
-                    break;
-            }
-            return;
-        }
-        this.node.zIndex(config.zIndex);
+        this.imageNodeService.updateImageNode({
+            currentConfig:config,
+            node:this.node,
+            zIndexActions:event.zIndexActions
+        })
     }
 
     private getSerializableConfig(): ComponentConfig<SerializableImageConfig> {

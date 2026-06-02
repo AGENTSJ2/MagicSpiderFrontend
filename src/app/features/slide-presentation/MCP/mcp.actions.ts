@@ -4,46 +4,78 @@ import {
   ComponentConfig,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
-import {
-  AddShapeEvent,
-  RemoveShapeEvent,
-  UpdateShapeEvent,
-} from '../domain/EventModels/shapeEvent.models';
 import ShapeComponent, {
   ShapeType,
 } from '../domain/canvasModels/shapeComponent.model';
 import { InternalMcpError } from './mcp.erros';
-import {
-  AddTextEvent,
-  RemoveTextEvent,
-  UpdateTextEvent,
-} from '../domain/EventModels/textEvent.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import {
-  AddImageEvent,
-  RemoveImageEvent,
-  UpdateImageEvent,
-} from '../domain/EventModels/imageEvent.model';
-import { ImageConfig } from '@angular/common';
+import { SerializableImageConfig } from '../domain/EventModels/imageEvent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
-import { AddSlideEvent, RemoveSlideEvent } from '../domain/EventModels/slideEvent.model';
+import { inject } from '@angular/core';
+import { ImageNodeService } from '../../../services/konva.services/image.service';
+import { TextNodeService } from '../../../services/konva.services/textNode.service';
+import { ShapeNodeService } from '../../../services/konva.services/shapeNode.service';
+import { SlideService } from '../../../services/konva.services/slide.service';
+import { Slide } from '../domain/canvasModels/slide.model';
+import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export class McpActions {
+  private imageNodeService = inject(ImageNodeService);
+  private textNodeService = inject(TextNodeService);
+  private shapeNodeService = inject(ShapeNodeService);
+  private slideService = inject(SlideService);
   constructor(private presentation: Presentation) {}
 
-  addShape(args: { slideId: string; shapeType: ShapeType }) {
-    this.presentation.publishEvent(
-      new AddShapeEvent({
-        nodeId: '',
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        shapeType: args.shapeType,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: undefined,
-        trackHistory: true,
-      }),
+  private getSlideOrThrow(slideId: string): Slide {
+    const slide = this.slideService.getSlideById({
+      slideId,
+      presentation: this.presentation,
+    });
+    if (!slide) {
+      throw new InternalMcpError('Slide not found');
+    }
+    return slide;
+  }
+
+  private getComponentOrThrow<T extends ICanvasComponent>(args: {
+    slideId: string;
+    nodeId: string;
+  }): T {
+    const slide = this.getSlideOrThrow(args.slideId);
+    const component = slide.components.find(
+      (comp) => comp.node._id.toString() === args.nodeId,
+    ) as T | undefined;
+
+    if (!component) {
+      throw new InternalMcpError('Node not found');
+    }
+    return component;
+  }
+
+  private removeComponent(args: { slideId: string; nodeId: string }) {
+    const slide = this.getSlideOrThrow(args.slideId);
+    const index = slide.components.findIndex(
+      (component) => component.node._id.toString() === args.nodeId,
     );
+    if (index < 0) {
+      throw new InternalMcpError('Node not found');
+    }
+
+    const component = slide.components.at(index)!;
+    slide.controller.removeSelectionOfComponent(component.node);
+    component.destroy();
+    slide.controller.layer.batchDraw();
+  }
+
+  addShape(args: { slideId: string; shapeType: ShapeType }) {
+    const slide = this.getSlideOrThrow(args.slideId);
+    this.shapeNodeService.addShapeNode({
+      eventBus: this.presentation.eventBus,
+      slide: slide,
+      shapeType: args.shapeType,
+      config: { attrs: {}, zIndex: 0 },
+    });
   }
 
   updateShape(args: {
@@ -52,78 +84,33 @@ export class McpActions {
     newConfig: ComponentConfig<ShapeConfig>;
     zIndexActions?: ZIndexActions;
   }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId == args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() == args.nodeId,
-      ) as ShapeComponent;
-    if (!node) {
-      throw new InternalMcpError();
-    }
-    const configs = node.controller.getConfigsOfNode({
-      newConfig: args.newConfig,
-    });
-
-    this.presentation.publishEvent(
-      new UpdateShapeEvent({
-        nodeId: args.nodeId,
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        shapeType: node.shapeType,
-        currentConfig: configs.currentConfig,
-        previousConfig: configs.previousConfig,
-        zIndexActions: args.zIndexActions,
-        trackHistory: true,
-      }),
-    );
-  }
-
-  deleteShape(args: {
-    slideId: string;
-    nodeId: string;
-    newConfig: ComponentConfig<ShapeConfig>;
-    zIndexActions?: ZIndexActions;
-  }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId == args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() == args.nodeId,
-      ) as ShapeComponent;
-    if (!node) {
-      throw new InternalMcpError();
-    }
+    const node = this.getComponentOrThrow<ShapeComponent>(args);
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
-        attrs: {},
-        zIndex: 0,
+        ...args.newConfig,
+        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
 
-    this.presentation.publishEvent(
-      new RemoveShapeEvent({
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        nodeId: args.nodeId,
-        trackHistory: true,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: configs.previousConfig,
-        shapeType: node.shapeType,
-      }),
-    );
+    this.shapeNodeService.updateShapeNode({
+      node: node.node,
+      config: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
+    });
+  }
+
+  deleteShape(args: { slideId: string; nodeId: string }) {
+    this.removeComponent(args);
   }
   // Text
 
   addText(args: { slideId: string }) {
-    this.presentation.publishEvent(
-      new AddTextEvent({
-        nodeId: '',
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: undefined,
-        trackHistory: true,
-      }),
-    );
+    const slide = this.getSlideOrThrow(args.slideId);
+    this.textNodeService.addTextNode({
+      eventBus: this.presentation.eventBus,
+      slide,
+      config: { attrs: {}, zIndex: 0 },
+    });
   }
 
   updateText(args: {
@@ -132,139 +119,61 @@ export class McpActions {
     newConfig: ComponentConfig<TextConfig>;
     zIndexActions?: ZIndexActions;
   }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId === args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() === args.nodeId,
-      ) as TextComponent;
-
-    if (!node) {
-      throw new InternalMcpError();
-    }
-
-    const configs = node.controller.getConfigsOfNode({
-      newConfig: args.newConfig,
-    });
-
-    this.presentation.publishEvent(
-      new UpdateTextEvent({
-        nodeId: args.nodeId,
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        currentConfig: configs.currentConfig,
-        previousConfig: configs.previousConfig,
-        zIndexActions: args.zIndexActions,
-        trackHistory: true,
-      }),
-    );
-  }
-
-  deleteText(args: { slideId: string; nodeId: string }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId === args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() === args.nodeId,
-      ) as TextComponent;
-
-    if (!node) {
-      throw new InternalMcpError();
-    }
+    const node = this.getComponentOrThrow<TextComponent>(args);
 
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
-        attrs: {},
-        zIndex: 0,
+        ...args.newConfig,
+        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
 
-    this.presentation.publishEvent(
-      new RemoveTextEvent({
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        nodeId: args.nodeId,
-        trackHistory: true,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: configs.previousConfig,
-      }),
-    );
+    this.textNodeService.updateTextNode({
+      node: node.node,
+      config: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
+    });
+  }
+
+  deleteText(args: { slideId: string; nodeId: string }) {
+    this.removeComponent(args);
   }
 
   // Image
 
   addImage(args: { slideId: string }) {
-    this.presentation.publishEvent(
-      new AddImageEvent({
-        nodeId: '',
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: undefined,
-        trackHistory: true,
-      }),
-    );
+    const slide = this.getSlideOrThrow(args.slideId);
+    this.imageNodeService.addImageNode({
+      eventBus: this.presentation.eventBus,
+      slide,
+      config: { attrs: {}, zIndex: 0 },
+    });
   }
 
   updateImage(args: {
     slideId: string;
     nodeId: string;
-    newConfig: ComponentConfig<ImageConfig>;
+    newConfig: ComponentConfig<SerializableImageConfig>;
     zIndexActions?: ZIndexActions;
   }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId === args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() === args.nodeId,
-      ) as ImageComponent;
-
-    if (!node) {
-      throw new InternalMcpError();
-    }
-
-    const configs = node.controller.getConfigsOfNode({
-      newConfig: args.newConfig,
-    });
-
-    this.presentation.publishEvent(
-      new UpdateImageEvent({
-        nodeId: args.nodeId,
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        currentConfig: configs.currentConfig,
-        previousConfig: configs.previousConfig,
-        zIndexActions: args.zIndexActions,
-        trackHistory: true,
-      }),
-    );
-  }
-
-  deleteImage(args: { slideId: string; nodeId: string }) {
-    const node = this.presentation.slides
-      .find((sl) => sl.slideId === args.slideId)
-      ?.components.find(
-        (comp) => comp.node._id.toString() === args.nodeId,
-      ) as ImageComponent;
-
-    if (!node) {
-      throw new InternalMcpError();
-    }
+    const node = this.getComponentOrThrow<ImageComponent>(args);
 
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
-        attrs: {},
-        zIndex: 0,
+        ...args.newConfig,
+        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
 
-    this.presentation.publishEvent(
-      new RemoveImageEvent({
-        presentationId: this.presentation.id,
-        slideId: args.slideId,
-        nodeId: args.nodeId,
-        trackHistory: true,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: configs.previousConfig,
-      }),
-    );
+    this.imageNodeService.updateImageNode({
+      node: node.node,
+      currentConfig: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
+    });
+  }
+
+  deleteImage(args: { slideId: string; nodeId: string }) {
+    this.removeComponent(args);
   }
 
   getSlides() {}
@@ -272,22 +181,13 @@ export class McpActions {
   getSlide() {}
 
   addSlide() {
-    const slideEvent = new AddSlideEvent({
-      presentationId: this.presentation.id,
-      slideId: '',
-      nodeId: '',
-      trackHistory: true,
-    });
-    this.presentation.publishEvent(slideEvent);
+    this.slideService.addSlide({ presentation: this.presentation });
   }
 
-  removeSlide(args:{slideId:string}) {
-    const removeSlideEvent = new RemoveSlideEvent({
-      presentationId: this.presentation.id,
+  removeSlide(args: { slideId: string }) {
+    this.slideService.removeSlide({
+      presentation: this.presentation,
       slideId: args.slideId,
-      nodeId: '',
-      trackHistory: true,
     });
-    this.presentation.publishEvent(removeSlideEvent);
   }
 }

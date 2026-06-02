@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import ShapeComponent, { ShapeType } from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
+import ShapeComponent, {
+  ShapeType,
+} from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
-import { ComponentConfig, PresentationEventStream } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
+import {
+  ComponentConfig,
+  PresentationEventStream,
+  ZIndexActions,
+} from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
 import { SerializableImageConfig } from '../../features/slide-presentation/domain/EventModels/imageEvent.model';
+import { Shape, ShapeConfig } from 'konva/lib/Shape';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +19,7 @@ export class ShapeNodeService {
     eventBus: PresentationEventStream;
     slide: Slide;
     config: ComponentConfig<SerializableImageConfig>;
-    shapeType:ShapeType
+    shapeType: ShapeType;
   }) {
     const component = new ShapeComponent({
       slide: params.slide,
@@ -22,5 +29,31 @@ export class ShapeNodeService {
     });
     params.slide.controller.addComponent(component);
     return component;
+  }
+
+  updateShapeNode(params: {
+    node: Shape;
+    zIndexActions?: ZIndexActions;
+    config: ComponentConfig<ShapeConfig>;
+  }):Shape | undefined {
+    params.node.setAttrs(params.config.attrs);
+    if (params?.zIndexActions != undefined) {
+      switch (params.zIndexActions) {
+        case ZIndexActions.moveToFront:
+          params.node.moveToTop();
+          break;
+        case ZIndexActions.moveToBack:
+          params.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          params.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          params.node.moveUp();
+          break;
+      }
+    }
+    params.node.zIndex(params.config.zIndex);
+    return params.node;
   }
 }
