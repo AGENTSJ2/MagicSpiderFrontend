@@ -157,74 +157,50 @@ export class AISlideDescriptionComponent {
   }
 }
 
-const content = `## ☀️ Solar Power: Harnessing the Ultimate Clean Energy
+// const content = `## ☀️ Solar Power: Harnessing the Ultimate Clean Energy
+// ---
 
----
+// ### Slide 1: Introduction to Solar Energy
 
-### Slide 1: Introduction to Solar Energy
+// *   **Title:** Solar Power: A Sustainable Energy Solution
+// *   **Definition:** Solar power is the process of converting sunlight directly into electricity or heat.
+// *   **The Resource:** The sun is a virtually inexhaustible source of clean energy, making it ideal for combating climate change.
+// *   **Key Concept:** It utilizes Photovoltaic (PV) technology to capture solar radiation.
+// *   **Goal:** To provide a reliable, decentralized, and environmentally friendly source of power generation.
 
-*   **Title:** Solar Power: A Sustainable Energy Solution
-*   **Definition:** Solar power is the process of converting sunlight directly into electricity or heat.
-*   **The Resource:** The sun is a virtually inexhaustible source of clean energy, making it ideal for combating climate change.
-*   **Key Concept:** It utilizes Photovoltaic (PV) technology to capture solar radiation.
-*   **Goal:** To provide a reliable, decentralized, and environmentally friendly source of power generation.
+// ### Slide 2: How Solar Photovoltaics Work (PV Effect)
 
-### Slide 2: How Solar Photovoltaics Work (PV Effect)
+// *   **Principle:** The Photovoltaic Effect.
+//     *   Semiconductor materials (typically silicon) are used to absorb photons (particles of light).
+//     *   When light strikes the material, it excites electrons, causing them to flow and generate an electric current (DC electricity).
+// *   **The Conversion Process:**
+//     1.  **Capture:** Solar panels absorb sunlight.
+//     2.  **Conversion:** Semiconductor layers create a direct current (DC).
+//     3.  **Inversion:** The DC electricity passes through an **Inverter**, which converts it into alternating current (AC) usable by homes and the grid.
+// *   **Diagrammatic Flow:** Sun → Panel → Inverter → Grid/Home Use
+// `;
 
-*   **Principle:** The Photovoltaic Effect.
-    *   Semiconductor materials (typically silicon) are used to absorb photons (particles of light).
-    *   When light strikes the material, it excites electrons, causing them to flow and generate an electric current (DC electricity).
-*   **The Conversion Process:**
-    1.  **Capture:** Solar panels absorb sunlight.
-    2.  **Conversion:** Semiconductor layers create a direct current (DC).
-    3.  **Inversion:** The DC electricity passes through an **Inverter**, which converts it into alternating current (AC) usable by homes and the grid.
-*   **Diagrammatic Flow:** Sun → Panel → Inverter → Grid/Home Use
+const content = `
+Create a set of 5 unique modern presentation slide templates.
 
-### Slide 3: Advantages and Impact
+Requirements:
+- Do not add any text, titles, placeholders, icons, or content.
+- Focus entirely on the visual design using shapes, lines, gradients, geometric elements, and layout composition.
+- Each slide should have a distinct modern style while maintaining a professional presentation aesthetic.
+- Use balanced spacing, alignment, and visual hierarchy.
+- Incorporate contemporary design trends such as:
+  - Abstract geometric patterns
+  - Glassmorphism-inspired elements
+  - Minimalist layouts
+  - Gradient accents
+  - Layered shapes and depth effects
+  - Subtle decorative elements
+- Ensure the designs are visually appealing without appearing cluttered.
+- Shapes must remain within the slide boundaries.
+- Utilize the available slide space effectively and create strong visual interest.
+- Each template should look suitable for business, technology, startup, or corporate presentations.
+- Vary the placement of decorative elements between slides to create diversity.
+- The slide canvas size is Width 1333 and Height 750.
 
-*   **Sustainability:**
-    *   **Renewable:** Sunlight is perpetually available.
-    *   **Clean:** Zero greenhouse gas emissions during operation.
-*   **Economic Benefits:**
-    *   **Low Operating Costs:** Minimal fuel costs after installation.
-    *   **Job Creation:** Driving growth in the green technology sector.
-*   **Energy Independence:**
-    *   Reduces reliance on centralized fossil fuel power plants.
-    *   Scalable from single devices to massive utility farms.
-
-### Slide 4: Applications and Types of Systems
-
-*   **Utility-Scale Solar Farms (Large Scale):**
-    *   Massive installations covering acres of land.
-    *   Powering entire cities or regional grids.
-*   **Commercial Rooftop Systems:**
-    *   Installed on businesses and large institutional buildings.
-    *   Ideal for reducing peak demand load.
-*   **Residential Systems:**
-    *   Small-to-medium scale installed on homes.
-    *   Often paired with **Battery Storage** (e.g., Lithium-ion) for nighttime use.
-*   **Concentrated Solar Power (CSP):**
-    *   Uses mirrors and lenses to focus a large area of sunlight onto a small receiver.
-    *   Generates heat to run a traditional steam turbine (suitable for continuous power).
-
-### Slide 5: Future Outlook & Challenges
-
-*   **Key Growth Drivers:**
-    *   Rapid cost reduction of PV panels (Moore's Law effect).
-    *   Increased efficiency of cell materials.
-    *   Global policy support and net-zero commitments.
-*   **Major Challenges:**
-    *   **Energy Storage:** Developing cheaper, denser, and safer battery storage solutions.
-    *   **Intermittency:** Solar power only generates electricity when the sun shines; requires robust grid management.
-    *   **Land Use:** Requires significant physical space for large-scale farms.
-*   **The Future:** Integration with smart grids, advanced material science, and global decentralized energy management.
-
----
-
-**Summary of Slides**
-
-*   **Slide 1:** Introduces solar power as a clean, inexhaustible energy source using PV technology.
-*   **Slide 2:** Explains the technical process of PV conversion: Sunlight → Electron Excitation (DC) → Inverter → AC Electricity.
-*   **Slide 3:** Highlights the benefits: zero emissions, renewable nature, and promotion of energy independence.
-*   **Slide 4:** Details the diverse applications, from massive utility farms to residential rooftop systems, including CSP technology.
-*   **Slide 5:** Addresses the path forward, emphasizing the need for better battery storage and smart grid solutions to overcome intermittency.`;
+Goal:
+Generate 5 polished, professional, and modern slide background templates that can later be populated with presentation content.`

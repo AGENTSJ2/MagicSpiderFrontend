@@ -5,8 +5,7 @@ import {
   GoogleGenAI,
   Part,
 } from '@google/genai';
-import { AbortableAsyncIterator, ChatRequest, ChatResponse } from 'ollama';
-import { OllamaChatService } from './Ollama.service';
+import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
 @Injectable({
