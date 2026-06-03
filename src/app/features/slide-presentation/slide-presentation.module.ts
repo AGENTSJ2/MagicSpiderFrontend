@@ -18,6 +18,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MagicSpiderAssistantComponent } from './components/magic-spider-assistant/magic-spider-assistant.component';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { MagicSpiderAssistantComponent } from './components/magic-spider-assista
     NzInputModule,
     NzSpinModule,
     NzTagModule,
-    NzButtonModule
+    NzButtonModule,
+    NzDrawerModule
   ]
 })
 export class SlidePresentationModule { }

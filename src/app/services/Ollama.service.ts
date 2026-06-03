@@ -13,24 +13,28 @@ export class OllamaChatService {
   async streamChat(request: Partial<ChatRequest>) {
     const stream = await this.ollama.chat({
       model: this.AvailableModel,
-      messages: [{
-        role:'user',
-        content:"write an poem about model context protocol"
-      }],
-      keep_alive:"1h",
+      messages: [
+        {
+          role: 'user',
+          content: 'write an poem about model context protocol',
+        },
+      ],
+      keep_alive: '1h',
       ...request,
       stream: true,
     });
-    return stream;
+    return { stream, provider: 'ollama' };
   }
   async chat(request: Partial<ChatRequest>) {
     const stream = await this.ollama.chat({
       model: this.AvailableModel,
-      messages: [{
-        role:'user',
-        content:"write an poem about model context protocol"
-      }],
-      keep_alive:"1h",
+      messages: [
+        {
+          role: 'user',
+          content: 'write an poem about model context protocol',
+        },
+      ],
+      keep_alive: '1h',
       ...request,
       stream: false,
     });

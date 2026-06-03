@@ -1,1 +1,14 @@
-<p>magic-spider-assistant works!</p>
+<div class="parent h-100">
+    <div>
+        <h4>Thinking</h4>
+        {{thinking}}
+    </div>
+    <div>
+        <h4>
+           Calls 
+        </h4>
+        <div *ngFor="let c of calls">
+            {{c}}
+        </div>
+    </div>
+</div>

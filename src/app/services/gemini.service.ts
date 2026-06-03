@@ -5,7 +5,7 @@ import {
   GoogleGenAI,
   Part,
 } from '@google/genai';
-import { ChatRequest, ChatResponse } from 'ollama';
+import { AbortableAsyncIterator, ChatRequest, ChatResponse } from 'ollama';
 import { OllamaChatService } from './Ollama.service';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
@@ -13,8 +13,9 @@ import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
   providedIn: 'root',
 })
 export class GeminiService {
-  private readonly API_KEY: string = 'AQ.Ab8RN6J6Tj9SD8OjYCOW3fuuGaarCrlIUGNkLE-mqkPDOEg4bw';
-  private readonly ModelName: string = 'gemini-3.5-flash';
+  private readonly API_KEY: string = 'AIzaSyCYPombOhSAqcDQMDm_LfPbu8YYrjHcYkU';
+  // private readonly ModelName: string = 'gemini-3.5-flash';
+  private readonly ModelName: string = 'gemma-4-26b-a4b-it';
   private gemini: GoogleGenAI;
 
   constructor() {
@@ -61,8 +62,23 @@ export class GeminiService {
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
-  async streamChat(request: Partial<ChatRequest>) {
-    return new OllamaChatService().streamChat(request);
+  async streamChat(request: Partial<ChatRequest>,tools?: McpTool[],) {
+    const gemTools = this.getGeminiTools(tools ?? []);
+    const stream = await this.gemini.models.generateContentStream({
+      model: request.model ?? this.ModelName,
+      contents: (request.messages ?? []).map((msg) => ({
+        role: msg.role === 'assistant' ? 'model' : msg.role,
+        parts: [{ text: msg.content }],
+      })),
+      config: {
+        systemInstruction: request.messages
+          ?.filter((m) => m.role === 'system')
+          .map((m) => m.content)
+          .join('\n'),
+        tools:gemTools
+      },
+    });
+    return { stream: stream, provider: 'google' };
   }
 
   private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
@@ -84,7 +100,6 @@ export function convertToChatResponse(
   return {
     model: result.modelVersion ?? 'gemini',
     created_at: result.createTime ? new Date(result.createTime) : new Date(),
-
     message: {
       role: 'assistant',
       content: result.text ?? '',
@@ -161,32 +176,6 @@ function toGeminiSchema(schema: unknown): Record<string, unknown> {
   }
 
   return Object.keys(next).length > 0 ? next : fallback;
-}
-
-function extractText(result: unknown): string {
-  if (!isRecord(result)) {
-    return '';
-  }
-
-  const candidates = result['candidates'];
-  if (!Array.isArray(candidates)) {
-    return '';
-  }
-
-  return candidates
-    .flatMap((candidate) => {
-      if (!isRecord(candidate) || !isRecord(candidate['content'])) {
-        return [];
-      }
-
-      const parts = candidate['content']['parts'];
-      return Array.isArray(parts) ? parts : [];
-    })
-    .map((part) =>
-      isRecord(part) && typeof part['text'] === 'string' ? part['text'] : '',
-    )
-    .filter(Boolean)
-    .join('\n');
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

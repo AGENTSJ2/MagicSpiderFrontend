@@ -6,7 +6,12 @@ export const createAddSchema = (isShape: boolean) => {
   if (isShape) {
     return z.object({
       slideId: z.string(),
-      shapeType: z.enum(ShapeType),
+      shapeType: z
+        .number()
+        .int()
+        .min(1)
+        .max(2)
+        .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
       initialConfig: InitialComponentConfigSchema.optional(),
     });
   }
@@ -44,4 +49,3 @@ export const InitialComponentConfigSchema = z.object({
   attrs: KonvaAttrsSchema.optional(),
   zIndex: z.number().optional(),
 });
-

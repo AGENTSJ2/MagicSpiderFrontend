@@ -2,25 +2,54 @@ import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { AddTextEvent, RemoveTextEvent, SelectTextEvent, TextEvent, UpdateTextEvent } from '../../domain/EventModels/textEvent.model';
-import { AddSlideEvent, RemoveSlideEvent } from '../../domain/EventModels/slideEvent.model';
-import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateShapeEvent } from '../../domain/EventModels/shapeEvent.models';
-import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
-import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
+import {
+  AddTextEvent,
+  RemoveTextEvent,
+  SelectTextEvent,
+  TextEvent,
+  UpdateTextEvent,
+} from '../../domain/EventModels/textEvent.model';
+import {
+  AddSlideEvent,
+  RemoveSlideEvent,
+} from '../../domain/EventModels/slideEvent.model';
+import {
+  AddShapeEvent,
+  RemoveShapeEvent,
+  SelectShapeEvent,
+  ShapeEvent,
+  UpdateShapeEvent,
+} from '../../domain/EventModels/shapeEvent.models';
+import {
+  AddImageEvent,
+  ImageEvent,
+  RemoveImageEvent,
+  SelectImageEvent,
+  UpdateImageEvent,
+} from '../../domain/EventModels/imageEvent.model';
+import {
+  ClearSelectionEvent,
+  PresentationEvent,
+} from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
+import { ShapeNodeService } from '../../../../services/konva.services/shapeNode.service';
 
 @Component({
   selector: 'app-workspace',
   templateUrl: './workspace.component.html',
-  styleUrl: './workspace.component.scss'
+  styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
-  constructor(private agentsService : LLM_Agents,public workSpaceController:WorkspaceController) { }
+  constructor(
+    private agentsService: LLM_Agents,
+    public workSpaceController: WorkspaceController,
+    private shapeService: ShapeNodeService,
+  ) {}
 
   ngOnInit(): void {
     this.presentation = new Presentation();
@@ -31,47 +60,40 @@ export class WorkspaceComponent implements OnInit {
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   handleAddText() {
-    const textEvent: TextEvent = new AddTextEvent(
-      {
-        nodeId: "",
-        presentationId: this.presentation.id,
-        slideId: this.activeSlide!.slideId,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: undefined,
-        trackHistory: true
-      }
-    )
-    this.presentation.publishEvent(textEvent)
+    const textEvent: TextEvent = new AddTextEvent({
+      nodeId: '',
+      presentationId: this.presentation.id,
+      slideId: this.activeSlide!.slideId,
+      currentConfig: { attrs: {}, zIndex: 0 },
+      previousConfig: undefined,
+      trackHistory: true,
+    });
+    this.presentation.publishEvent(textEvent);
   }
 
   addSlide() {
     const slideEvent = new AddSlideEvent({
       presentationId: this.presentation.id,
-      slideId: "",
+      slideId: '',
       nodeId: '',
       trackHistory: true,
-
     });
-    this.presentation.publishEvent(
-      slideEvent
-    )
+    this.presentation.publishEvent(slideEvent);
     if (this.presentation.slides.length == 1) {
       this.selectSlide(this.presentation.slides[0]);
     }
   }
 
   addShape(shapeType: ShapeType) {
-    const shapeEvent: ShapeEvent = new AddShapeEvent(
-      {
-        nodeId: '',
-        presentationId: this.presentation.id,
-        slideId: this.presentation.slides[0].slideId,
-        shapeType: shapeType,
-        currentConfig: { attrs: {}, zIndex: 0 },
-        previousConfig: undefined,
-        trackHistory: true
-      }
-    );
+    const shapeEvent: ShapeEvent = new AddShapeEvent({
+      nodeId: '',
+      presentationId: this.presentation.id,
+      slideId: this.presentation.slides[0].slideId,
+      shapeType: shapeType,
+      currentConfig: { attrs: {}, zIndex: 0 },
+      previousConfig: undefined,
+      trackHistory: true,
+    });
     this.presentation.publishEvent(shapeEvent);
   }
 
@@ -95,7 +117,7 @@ export class WorkspaceComponent implements OnInit {
           zIndex: 0,
         },
         previousConfig: undefined,
-        trackHistory: true
+        trackHistory: true,
       });
       this.presentation.publishEvent(imageEvent);
       input.value = '';
@@ -107,11 +129,11 @@ export class WorkspaceComponent implements OnInit {
     this.activeSlide = undefined;
     setTimeout(() => {
       this.activeSlide = slide;
-    })
+    });
   }
 
   handleUpdate(event: any) {
-    this.presentation.publishEvent(event)
+    this.presentation.publishEvent(event);
   }
 
   private listenPresentationEvents() {
@@ -147,7 +169,10 @@ export class WorkspaceComponent implements OnInit {
         this.selectedToolBox = ToolBoxType.None;
       }
     }
-    if (event instanceof UpdateTextEvent && (this.activeEvent?.nodeId == event.nodeId)) {
+    if (
+      event instanceof UpdateTextEvent &&
+      this.activeEvent?.nodeId == event.nodeId
+    ) {
       this.activeEvent = event;
     }
   }
@@ -162,7 +187,10 @@ export class WorkspaceComponent implements OnInit {
         this.selectedToolBox = ToolBoxType.None;
       }
     }
-    if (event instanceof UpdateShapeEvent && (this.activeEvent?.nodeId == event.nodeId)) {
+    if (
+      event instanceof UpdateShapeEvent &&
+      this.activeEvent?.nodeId == event.nodeId
+    ) {
       this.activeEvent = event;
     }
   }
@@ -177,30 +205,35 @@ export class WorkspaceComponent implements OnInit {
         this.selectedToolBox = ToolBoxType.None;
       }
     }
-    if (event instanceof UpdateImageEvent && (this.activeEvent?.nodeId == event.nodeId)) {
+    if (
+      event instanceof UpdateImageEvent &&
+      this.activeEvent?.nodeId == event.nodeId
+    ) {
       this.activeEvent = event;
     }
   }
 
-  handleRemoveSlide(item:Slide)
-  {
+  handleRemoveSlide(item: Slide) {
     this.presentation.publishEvent(
       new RemoveSlideEvent({
-        slideId:item.slideId,
-        nodeId:item.slideId,
-        presentationId:this.presentation.id,
-        trackHistory:false
-      })
-    )
+        slideId: item.slideId,
+        nodeId: item.slideId,
+        presentationId: this.presentation.id,
+        trackHistory: false,
+      }),
+    );
   }
-  handleOpenAiDescription()
-  {
+  handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
+  test() {
+    this.assistantVisible = true;
+  }
+  assistantVisible: boolean = false;
 }
 enum ToolBoxType {
   TextToolBox,
   ImageToolBox,
   ShapeTooLBox,
-  None
+  None,
 }

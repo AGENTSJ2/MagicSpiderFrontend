@@ -1,15 +1,21 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 
 enum StreamPhase {
-  idle = "Idle",
-  thinking = "Thinking",
-  content = "Content",
-  done = "Done",
-  error = "Error",
+  idle = 'Idle',
+  thinking = 'Thinking',
+  content = 'Content',
+  done = 'Done',
+  error = 'Error',
 }
 
 @Component({
@@ -18,8 +24,8 @@ enum StreamPhase {
   styleUrl: './aislide-description.component.scss',
 })
 export class AISlideDescriptionComponent {
-  @Input() presentation!:Presentation;
-  @Output() close:EventEmitter<boolean> = new EventEmitter();
+  @Input() presentation!: Presentation;
+  @Output() close: EventEmitter<boolean> = new EventEmitter();
   problemStatement = '';
   thinkingText = '';
   contentText = '';
@@ -33,12 +39,10 @@ export class AISlideDescriptionComponent {
   constructor(
     private cdr: ChangeDetectorRef,
     private agentService: LLM_Agents,
-    public workspaceController:WorkspaceController
+    public workspaceController: WorkspaceController,
   ) {}
 
   // ── Helpers ───────────────────────────────────────────────────────────────
-
-
 
   get phaseTagColor(): string {
     const map: Record<StreamPhase, string> = {
@@ -58,7 +62,11 @@ export class AISlideDescriptionComponent {
   }
 
   handleCancel(): void {
-    if (this.phase === StreamPhase.thinking || this.phase === StreamPhase.content) return;
+    if (
+      this.phase === StreamPhase.thinking ||
+      this.phase === StreamPhase.content
+    )
+      return;
     this.workspaceController.showSlideDescription = false;
     this.reset();
   }
@@ -80,6 +88,7 @@ export class AISlideDescriptionComponent {
     if (!this.problemStatement.trim()) return;
 
     this.thinkingText = '';
+    const prevContent = this.contentText;
     this.contentText = '';
     this.phase = StreamPhase.thinking;
     this.errorMessage = '';
@@ -87,15 +96,16 @@ export class AISlideDescriptionComponent {
     try {
       const stream$ = await this.agentService.ContentCreator({
         userProblemStatement: this.problemStatement.trim(),
+        previousContent: prevContent,
       });
 
       this.streamSub = stream$.responseEvent.subscribe({
         next: (event: AgentStreamEvent) => {
           if (event.action === 'thinking') {
             this.thinkingText += event.message;
-            if (this.phase !== StreamPhase.thinking){
+            if (this.phase !== StreamPhase.thinking) {
               this.phase = StreamPhase.thinking;
-            } 
+            }
           } else if (event.action === 'content') {
             this.phase = StreamPhase.content;
             this.contentText += event.message;
@@ -120,6 +130,8 @@ export class AISlideDescriptionComponent {
       this.errorMessage =
         err instanceof Error ? err.message : 'Failed to start generation.';
       this.cdr.detectChanges();
+    } finally {
+      this.problemStatement = '';
     }
   }
 
@@ -136,12 +148,11 @@ export class AISlideDescriptionComponent {
     this.interrupt$.complete();
   }
 
-  handleInvokeMagicSpider()
-  {
-    this.agentService.MagicSpider({
-      slideContent:content,
-      presentation:this.presentation
-    })
+  handleInvokeMagicSpider() {
+    this.workspaceController.triggerMagicSpider({
+      slideContent: content,
+      presentation: this.presentation,
+    });
     this.close.emit(true);
   }
 }

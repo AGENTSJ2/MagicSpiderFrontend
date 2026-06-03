@@ -41,25 +41,13 @@
         </label>
         <div class="menu-item d-flex gap-1 flex-column " (click)="handleOpenAiDescription()">
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
-          <p class="mb-0 text-center">Test</p>
+          <p class="mb-0 text-center">Spider</p>
+        </div>
+        <div class="menu-item d-flex gap-1 flex-column " (click)="test()">
+          <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">MagicSpiderDescriptor</p>
         </div>
       </div>
-      <!-- @if(selectedToolBox!=TooBoxType.None)
-      {
-        <div class="tool-display">
-            @switch (selectedToolBox) {
-              @case (TooBoxType.TextToolBox) {
-                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
-              }
-              @case (TooBoxType.ShapeTooLBox) {
-                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
-              }
-              @case (TooBoxType.ImageToolBox) {
-                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
-              }
-            }
-        </div>
-      } -->
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">
@@ -109,4 +97,13 @@
 </div>
 
 <app-aislide-description  [presentation]="presentation"></app-aislide-description>
-
+<nz-drawer
+  [nzVisible]="assistantVisible"
+  nzTitle="Magic Spider"
+  (nzOnClose)="assistantVisible = false"
+  [nzMask]="false"
+>
+  <ng-container *nzDrawerContent>
+    <app-magic-spider-assistant></app-magic-spider-assistant>
+  </ng-container>
+</nz-drawer>

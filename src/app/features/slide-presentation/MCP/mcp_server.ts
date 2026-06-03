@@ -123,9 +123,9 @@ const addShapeTool: Tool = {
           'The identifier of the slide where the shape should be added.',
       },
       shapeType: {
-        type: 'string',
+        type: 'number',
         description:
-          'The type of shape to create (rectangle, circle, star, arrow, etc.).',
+          'The type of shape to create (rectangle = 2, circle = 1,).',
       },
       initialConfig: {
         type: 'object',

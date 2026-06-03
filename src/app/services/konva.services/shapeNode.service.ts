@@ -26,6 +26,7 @@ export class ShapeNodeService {
       shapeType: params.shapeType,
       eventBus: params.eventBus,
     });
+    component.node.moveToTop();
     params.slide.controller.addComponent(component);
     return component;
   }
