@@ -5,13 +5,17 @@ import {
   PresentationEventStream,
   PresentationEventType,
 } from '../domain/EventModels/presentationEvents.model';
+import { Slide } from '../domain/canvasModels/slide.model';
+import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export default abstract class BaseController {
+  canvasComponent: ICanvasComponent;
   node: Shape;
-  eventBus: PresentationEventStream;
-  constructor(init: { node: Shape; eventBus: PresentationEventStream }) {
-    this.node = init.node;
-    this.eventBus = init.eventBus;
+  slide: Slide;
+  constructor(init: { canvasComponent: ICanvasComponent; slide: Slide }) {
+    this.canvasComponent = init.canvasComponent;
+    this.node = init.canvasComponent.node;
+    this.slide = init.slide;
   }
 
   /**
@@ -20,27 +24,15 @@ export default abstract class BaseController {
    */
   protected abstract registerEvents(): void;
 
-  protected abstract listenPresentationEventStream(): void;
+  // protected abstract listenPresentationEventStream(): void;
 
   protected abstract destroy(): void;
 
   protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
 
-  protected abstract getEventObject(data: {
-    eventType: PresentationEventType;
-    newConfig: ComponentConfig<ShapeConfig>;
-    previousConfig?: ComponentConfig<ShapeConfig>;
-    trackHistory?: boolean;
-  }): PresentationEvent;
-
   protected handleNodeClick(): void {
     this.node.on('click', () => {
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.SELECT,
-          newConfig: { attrs: {}, zIndex: this.node.zIndex() },
-        }),
-      );
+      this.slide.selectComponent(this.node);
     });
   }
 
@@ -52,22 +44,19 @@ export default abstract class BaseController {
       YBeforeDrag = this.node.y();
     });
     this.node.on('dragend', () => {
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: {
-            attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
-            zIndex: this.node.zIndex(),
+      this.canvasComponent.updateComponent({
+        newConfig: {
+          attrs: {}, // doesn't require manual setting of x and y since the drag operation sets the x and y directly
+          zIndex: this.node.zIndex(),
+        },
+        previousConfig: {
+          attrs: {
+            x: XBeforeDrag,
+            y: YBeforeDrag,
           },
-          previousConfig: {
-            attrs: {
-              x: XBeforeDrag,
-              y: YBeforeDrag,
-            },
-            zIndex: this.node.zIndex(),
-          },
-        }),
-      );
+          zIndex: this.node.zIndex(),
+        },
+      });
       XBeforeDrag = this.node.x();
       YBeforeDrag = this.node.y();
     });
@@ -99,13 +88,10 @@ export default abstract class BaseController {
         },
         zIndex: this.node.getZIndex(),
       };
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: updatedConfig,
-          trackHistory: false,
-        }),
-      );
+      this.canvasComponent.updateComponent({
+        newConfig: updatedConfig,
+        trackHistory: false,
+      });
     });
 
     this.node.on('transformend', () => {
@@ -129,25 +115,17 @@ export default abstract class BaseController {
         },
         zIndex: this.node.getZIndex(),
       };
-      this.eventBus.next(
-        this.getEventObject({
-          eventType: PresentationEventType.UPDATE,
-          newConfig: updatedConfig,
-          previousConfig: prevConfig,
-          trackHistory: true,
-        }),
-      );
+      this.canvasComponent.updateComponent({
+        newConfig: updatedConfig,
+        previousConfig: prevConfig,
+        trackHistory: true,
+      });
     });
   }
 
   protected handleRotationEvents() {}
   protected handleRemove() {
-    this.eventBus.next(
-      this.getEventObject({
-        eventType: PresentationEventType.REMOVE,
-        newConfig: { attrs: {}, zIndex: this.node.getZIndex() },
-      }),
-    );
+    this.slide.removeComponent(this.canvasComponent);
   }
 
   getConfigsOfNode(data: {
@@ -159,7 +137,10 @@ export default abstract class BaseController {
   } {
     const configs = {
       currentConfig: {
-        attrs: { ...structuredClone(this.node.getAttrs()), ...data.newConfig.attrs },
+        attrs: {
+          ...structuredClone(this.node.getAttrs()),
+          ...data.newConfig.attrs,
+        },
         zIndex: data.newConfig.zIndex,
       },
       previousConfig: structuredClone(

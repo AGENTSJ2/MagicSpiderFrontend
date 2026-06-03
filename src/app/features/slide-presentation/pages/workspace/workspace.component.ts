@@ -3,18 +3,15 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 import {
-  AddTextEvent,
   RemoveTextEvent,
   SelectTextEvent,
   TextEvent,
   UpdateTextEvent,
 } from '../../domain/EventModels/textEvent.model';
 import {
-  AddSlideEvent,
   RemoveSlideEvent,
 } from '../../domain/EventModels/slideEvent.model';
 import {
-  AddShapeEvent,
   RemoveShapeEvent,
   SelectShapeEvent,
   ShapeEvent,
@@ -60,41 +57,16 @@ export class WorkspaceComponent implements OnInit {
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   handleAddText() {
-    const textEvent: TextEvent = new AddTextEvent({
-      nodeId: '',
-      presentationId: this.presentation.id,
-      slideId: this.activeSlide!.slideId,
-      currentConfig: { attrs: {}, zIndex: 0 },
-      previousConfig: undefined,
-      trackHistory: true,
-    });
-    this.presentation.publishEvent(textEvent);
+    this.activeSlide?.addText({});
   }
 
   addSlide() {
-    const slideEvent = new AddSlideEvent({
-      presentationId: this.presentation.id,
-      slideId: '',
-      nodeId: '',
-      trackHistory: true,
-    });
-    this.presentation.publishEvent(slideEvent);
-    if (this.presentation.slides.length == 1) {
-      this.selectSlide(this.presentation.slides[0]);
-    }
+    const slide = this.presentation.addSlide();
+    this.selectSlide(slide);
   }
 
   addShape(shapeType: ShapeType) {
-    const shapeEvent: ShapeEvent = new AddShapeEvent({
-      nodeId: '',
-      presentationId: this.presentation.id,
-      slideId: this.presentation.slides[0].slideId,
-      shapeType: shapeType,
-      currentConfig: { attrs: {}, zIndex: 0 },
-      previousConfig: undefined,
-      trackHistory: true,
-    });
-    this.presentation.publishEvent(shapeEvent);
+    this.activeSlide?.addShape({ shapeType: shapeType });
   }
 
   handleImageUpload(event: Event) {
@@ -103,23 +75,16 @@ export class WorkspaceComponent implements OnInit {
     if (!file || !this.activeSlide) {
       return;
     }
-
     const reader = new FileReader();
     reader.onload = () => {
-      const imageEvent: ImageEvent = new AddImageEvent({
-        nodeId: '',
-        presentationId: this.presentation.id,
-        slideId: this.activeSlide!.slideId,
-        currentConfig: {
+      this.activeSlide?.addImage({
+        config: {
           attrs: {
             imageSrc: reader.result as string,
           },
           zIndex: 0,
         },
-        previousConfig: undefined,
-        trackHistory: true,
       });
-      this.presentation.publishEvent(imageEvent);
       input.value = '';
     };
     reader.readAsDataURL(file);
