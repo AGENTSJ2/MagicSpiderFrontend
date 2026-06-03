@@ -1,4 +1,4 @@
-<nz-modal [(nzVisible)]="isVisible" [nzTitle]="modalTitle" [nzFooter]="modalFooter" [nzWidth]="760"
+<nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="modalFooter" [nzWidth]="760"
   [nzMaskClosable]="phase === StreamPhase.idle"
   [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
   (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal">

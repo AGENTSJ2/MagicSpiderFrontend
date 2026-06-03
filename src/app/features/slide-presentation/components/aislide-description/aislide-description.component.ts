@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angu
 import { Subject, Subscription } from 'rxjs';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
+import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 
 enum StreamPhase {
   idle = "Idle",
@@ -17,7 +18,6 @@ enum StreamPhase {
   styleUrl: './aislide-description.component.scss',
 })
 export class AISlideDescriptionComponent {
-  @Input() isVisible = false;
   @Input() presentation!:Presentation;
   @Output() close:EventEmitter<boolean> = new EventEmitter();
   problemStatement = '';
@@ -33,6 +33,7 @@ export class AISlideDescriptionComponent {
   constructor(
     private cdr: ChangeDetectorRef,
     private agentService: LLM_Agents,
+    public workspaceController:WorkspaceController
   ) {}
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -53,12 +54,12 @@ export class AISlideDescriptionComponent {
   // ── Lifecycle ─────────────────────────────────────────────────────────────
 
   open(): void {
-    this.isVisible = true;
+    this.workspaceController.showSlideDescription = true;
   }
 
   handleCancel(): void {
     if (this.phase === StreamPhase.thinking || this.phase === StreamPhase.content) return;
-    this.close.emit();
+    this.workspaceController.showSlideDescription = false;
     this.reset();
   }
 

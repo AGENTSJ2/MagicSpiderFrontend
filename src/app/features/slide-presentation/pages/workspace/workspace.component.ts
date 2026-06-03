@@ -8,6 +8,7 @@ import { AddShapeEvent, RemoveShapeEvent, SelectShapeEvent, ShapeEvent, UpdateSh
 import { AddImageEvent, ImageEvent, RemoveImageEvent, SelectImageEvent, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
 import { ClearSelectionEvent, PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
+import { WorkspaceController } from './workspace.controller';
 
 @Component({
   selector: 'app-workspace',
@@ -19,7 +20,7 @@ export class WorkspaceComponent implements OnInit {
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
-  constructor(private agentsService : LLM_Agents) { }
+  constructor(private agentsService : LLM_Agents,public workSpaceController:WorkspaceController) { }
 
   ngOnInit(): void {
     this.presentation = new Presentation();
@@ -192,9 +193,9 @@ export class WorkspaceComponent implements OnInit {
       })
     )
   }
-  isVisible:boolean = false;
-  handleTest() {
-    this.isVisible = true;
+  handleOpenAiDescription()
+  {
+    this.workSpaceController.showSlideDescription = true;
   }
 }
 enum ToolBoxType {

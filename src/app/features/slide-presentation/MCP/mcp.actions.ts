@@ -54,7 +54,7 @@ export class McpActions {
       (component) => component.node._id.toString() === args.nodeId,
     );
     if (index < 0) {
-      throw new InternalMcpError('Node of ');
+      throw new InternalMcpError(`No node of ${args.nodeId} is found`);
     }
     const component = slide.components.splice(index, 1)[0];
     slide.controller.removeSelectionOfComponent(component.node);

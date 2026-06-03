@@ -39,7 +39,7 @@
           <p class="mb-0 text-center">Upload</p>
           <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
         </label>
-        <div class="menu-item d-flex gap-1 flex-column " (click)="handleTest()">
+        <div class="menu-item d-flex gap-1 flex-column " (click)="handleOpenAiDescription()">
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center">Test</p>
         </div>
@@ -108,4 +108,5 @@
   </div>
 </div>
 
-<app-aislide-description [isVisible]="isVisible" [presentation]="presentation" (close)="isVisible = false"></app-aislide-description>
+<app-aislide-description  [presentation]="presentation"></app-aislide-description>
+

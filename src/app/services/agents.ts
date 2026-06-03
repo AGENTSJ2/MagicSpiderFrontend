@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
-import { OllamaChatService } from './OllamaChatService';
+import { OllamaChatService } from './Ollama.service';
 import { Subject } from 'rxjs';
-import { AbortableAsyncIterator, ChatResponse, Tool } from 'ollama';
+import { AbortableAsyncIterator, ChatResponse, Message, Tool } from 'ollama';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { McpService } from './mcp.service';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
+import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
+import { GeminiService } from './gemini.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LLM_Agents {
+  private chatService = new GeminiService();
   constructor(
-    private chatService: OllamaChatService,
+    // private chatService: OllamaChatService,
     private mcpService: McpService,
   ) {}
 
@@ -46,8 +49,11 @@ export class LLM_Agents {
   }
   private readonly MagicSpiderPrompt = [
     'You are an Agent who can access slide creation tools that have been provided to u ',
+    `The slide is a canvas of Height 750 Width 1333 so u can use x and y with in this limit and position`,
     'You can use them to create and update slide u can use each tool appropriately',
-    'Tou can call multiple tools at an time if u need as an list'
+    'you can call multiple tools at an time if u need as an list',
+    'If you believe that task is complete then make the response function call list empty so that we can stop gracefully',
+    'Never continue issuing tool calls after the task is complete.'
   ].join(' ');
   async MagicSpider(params: {
     slideContent: string;
@@ -62,29 +68,44 @@ export class LLM_Agents {
       },
       {
         role: 'user',
-        content:`Slide Description ${params.slideContent}` ,
+        content: `Slide Description ${params.slideContent}`,
       },
     ];
-    for (let i = 0; i < 10; i++) {
-      const slideJson = JSON.stringify((params.presentation.slides.map((sl)=>sl.toJson())))
-      const response: ChatResponse = await this.chatService.chat({
-        messages: [
-          ...messages,
-          {
-            role:'user',
-            content : `Latest Slide JSON ${slideJson}`
-          }
-        ],
-        tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
-      });
+    for (let i = 0; i < 20; i++) {
+      const slideJson = JSON.stringify(
+        params.presentation.slides.map((sl) => sl.toJson()),
+      );
+      const response: ChatResponse = await this.chatService.chat(
+        {
+          messages: [
+            ...messages,
+            {
+              role: 'user',
+              content: `Latest Slide JSON ${slideJson}`,
+            },
+          ],
+          tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
+        },
+        tools,
+      );
       console.log(response.message.tool_calls);
-      messages.push(response.message);
+      const ackMessage: Message = {
+        role: 'system',
+        content: '',
+      };
       for (let tool of response.message.tool_calls ?? []) {
-        await mcp.callTool({
-          toolName: tool.function.name,
-          args: tool.function.arguments,
-        });
+        try {
+          await mcp.callTool({
+            toolName: tool.function.name,
+            args: tool.function.arguments,
+          });
+          ackMessage.content += `Successfully called[${tool.function.name}]\n`;
+        } catch (error) {
+          ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
+          console.log(error);
+        }
       }
+      messages.push(ackMessage);
     }
   }
 

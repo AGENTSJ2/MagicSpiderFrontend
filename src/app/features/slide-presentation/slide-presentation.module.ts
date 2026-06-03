@@ -17,6 +17,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { MagicSpiderAssistantComponent } from './components/magic-spider-assistant/magic-spider-assistant.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
     ShapeToolBoxComponent,
     ImageToolBoxComponent,
     AISlideDescriptionComponent,
+    MagicSpiderAssistantComponent,
   ],
   imports: [
     CommonModule,
