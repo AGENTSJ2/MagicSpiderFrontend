@@ -1,9 +1,11 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   Output,
+  ViewChild,
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
@@ -35,6 +37,10 @@ export class AISlideDescriptionComponent {
 
   private streamSub?: Subscription;
   private interrupt$ = new Subject<boolean>();
+  @ViewChild('genContent')
+  genContentElement!: ElementRef;
+  @ViewChild('thinkingBox')
+  thinkingBoxElement!: ElementRef;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -106,9 +112,17 @@ export class AISlideDescriptionComponent {
             if (this.phase !== StreamPhase.thinking) {
               this.phase = StreamPhase.thinking;
             }
+            this.thinkingBoxElement?.nativeElement.scrollTo({
+              top: this.thinkingBoxElement.nativeElement.scrollHeight,
+              behavior: 'smooth',
+            });
           } else if (event.action === 'content') {
             this.phase = StreamPhase.content;
             this.contentText += event.message;
+            this.genContentElement?.nativeElement.scrollTo({
+              top: this.genContentElement.nativeElement.scrollHeight,
+              behavior: 'smooth',
+            });
           }
           this.cdr.detectChanges();
         },
@@ -203,4 +217,4 @@ Requirements:
 - The slide canvas size is Width 1333 and Height 750.
 
 Goal:
-Generate 5 polished, professional, and modern slide background templates that can later be populated with presentation content.`
+Generate 5 polished, professional, and modern slide background templates that can later be populated with presentation content.`;

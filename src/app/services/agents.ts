@@ -181,7 +181,7 @@ export class LLM_Agents {
               arguments: event.functionCall.args,
             },
           });
-          
+
           toolCalls.push({
             function: {
               name: event.functionCall.name!,
@@ -253,18 +253,19 @@ export class LLM_Agents {
                 action: 'thinking',
                 message: part.text,
               });
+              continue;
             }
             if (part.functionCall) {
               responseEvent.next({
                 action: 'functionCall',
                 functionCall: part.functionCall,
               });
-            } else {
-              responseEvent.next({
-                action: 'content',
-                message: part.text,
-              });
+              continue;
             }
+            responseEvent.next({
+              action: 'content',
+              message: part.text,
+            });
           }
         }
       }

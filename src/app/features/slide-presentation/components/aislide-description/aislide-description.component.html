@@ -1,12 +1,12 @@
-<nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="modalFooter" [nzWidth]="760"
+<nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="modalFooter"
   [nzMaskClosable]="phase === StreamPhase.idle"
   [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
-  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal">
+  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'10px'}" nzWidth="80vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
     <div class="modal-title">
       <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
-      AI Slide Content Creator
+      Magic Spider Content Creator
       <nz-tag [nzColor]="phaseTagColor" class="phase-tag">
         {{ phase }}
       </nz-tag>
@@ -16,6 +16,13 @@
   <!-- Body -->
   <ng-container *nzModalContent>
     <div class="modal-body">
+      <div class="idle" *ngIf="phase === StreamPhase.idle">
+        <div class="idle-content">
+          <i class="fi fi-rr-bulb d-flex justify-content-center align-items-center fs-4"></i>
+          <h3>Spill Your Idea</h3>
+          <p>Describe your topic, goal, or problem to get started.</p>
+        </div>
+      </div>
       <!-- ── Thinking ───────────────────────────────────────── -->
       <div class="thinking-section" *ngIf="phase === StreamPhase.thinking">
         <div class="thinking-header">
@@ -41,21 +48,30 @@
             Copy
           </button>
         </div>
-        <div class="markdown-output">
+        <div class="markdown-output" #genContent>
           <markdown [data]="contentText"></markdown>
           <span class="cursor" *ngIf="phase === StreamPhase.content">▌</span>
         </div>
       </div>
       <!-- ── Input ───────────────────────────────────────────── -->
       <div class="input-section" *ngIf="phase === StreamPhase.idle || phase === StreamPhase.done">
-        <p class="input-label">
-          <span nz-icon nzType="edit" nzTheme="outline"></span>
-          Describe your topic or request changes
-        </p>
-        <textarea nz-input [(ngModel)]="problemStatement"
-          placeholder="e.g. Explain the impact of climate change on coastal cities over the next 50 years…"
-          [nzAutosize]="{ minRows: 4, maxRows: 8 }" class="problem-input"></textarea>
-        <p class="char-count">{{ problemStatement.length }} characters</p>
+        <div class="input-label d-flex gap-2">
+          <div>
+            Describe your topic or request changes
+          </div>
+          <span class="char-count">{{ problemStatement.length }} characters</span>
+
+        </div>
+        <div class="d-flex w-100 justify-content-center align-items-center gap-2">
+          <div class="flex-fill">
+            <textarea [(ngModel)]="problemStatement"
+              placeholder="e.g. Explain the impact of climate change on coastal cities over the next 50 years…"
+              class="problem-input w-100 p-1"></textarea>
+          </div>
+          <button class="send-btn" (click)="generate()">
+            <i class="fi fi-sr-paper-plane-top d-flex justify-content-between align-items-center"></i>
+          </button>
+        </div>
       </div>
       <!-- ── Error ──────────────────────────────────────────────────── -->
       <nz-alert *ngIf="phase === StreamPhase.error" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
@@ -66,17 +82,8 @@
   <!-- Footer Template -->
   <ng-template #modalFooter>
     <div class="modal-footer">
-      <button nz-button nzType="default" (click)="handleCancel()"
-      [disabled]="phase === StreamPhase.thinking || phase === StreamPhase.content">
-      {{ phase === StreamPhase.done || phase === StreamPhase.error ? 'Close' : 'Cancel' }}
-    </button>
-    <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
-      Start Magic Spider
-    </button>
-      <button nz-button nzType="primary" (click)="generate()"
-        *ngIf="phase !=StreamPhase.thinking">
-        <span nz-icon nzType="thunderbolt" nzTheme="fill"></span>
-        {{phase == StreamPhase.done? 'Update Slides' : 'Generate Slides'}}
+      <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
+        Start Magic Spider
       </button>
     </div>
   </ng-template>

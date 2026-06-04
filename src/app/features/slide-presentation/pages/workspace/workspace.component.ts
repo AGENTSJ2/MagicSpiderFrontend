@@ -8,9 +8,7 @@ import {
   TextEvent,
   UpdateTextEvent,
 } from '../../domain/EventModels/textEvent.model';
-import {
-  RemoveSlideEvent,
-} from '../../domain/EventModels/slideEvent.model';
+import { RemoveSlideEvent } from '../../domain/EventModels/slideEvent.model';
 import {
   RemoveShapeEvent,
   SelectShapeEvent,
@@ -179,14 +177,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   handleRemoveSlide(item: Slide) {
-    this.presentation.publishEvent(
-      new RemoveSlideEvent({
-        slideId: item.slideId,
-        nodeId: item.slideId,
-        presentationId: this.presentation.id,
-        trackHistory: false,
-      }),
-    );
+    this.presentation.removeSlide(item);
   }
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;

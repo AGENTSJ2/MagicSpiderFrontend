@@ -40,4 +40,17 @@ export class Presentation {
     this.slides.push(ConfiguredSlide);
     return ConfiguredSlide;
   }
+
+  removeSlide(slide:Slide)
+  {
+    const slideIdx = this.slides.findIndex(
+      (sl) => sl.slideId == slide.slideId,
+    );
+    if (slideIdx < 0) {
+      throw new Error('No Slide of this id is found');
+    }
+    this.slides.splice(slideIdx, 1);
+    slide?.destroy();
+    return slide;
+  }
 }
