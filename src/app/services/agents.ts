@@ -32,6 +32,7 @@ export class LLM_Agents {
     const interrupt = new Subject<boolean>();
 
     const { stream, provider } = await this.chatService.streamChat({
+      model:"gemma-4-26b-a4b-it",
       messages: [
         {
           role: 'system',
@@ -63,6 +64,7 @@ export class LLM_Agents {
     'you can call multiple tools at an time if u need as an list',
     'If you believe that task is complete then make the response function call list empty so that we can stop gracefully',
     'Never continue issuing tool calls after the task is complete.',
+    'The Slide style should be modern and attractive ato look at',
   ].join(' ');
   async MagicSpider(params: {
     slideContent: string;

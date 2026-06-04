@@ -19,10 +19,10 @@ export class WorkspaceController {
   }) {
     this.showMagicSpiderAssistant = true;
     this.showSlideDescription = false;
-    // this.agentService.MagicSpiderStream({
-    //   ...params,
-    //   responseStream: this.magicSpiderEvent,
-    //   interrupt: this.magicSpiderInterrupt,
-    // });
+    this.agentService.MagicSpiderStream({
+      ...params,
+      responseStream: this.magicSpiderEvent,
+      interrupt: this.magicSpiderInterrupt,
+    });
   }
 }

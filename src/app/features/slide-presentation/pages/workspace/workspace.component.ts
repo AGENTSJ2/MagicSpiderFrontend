@@ -16,7 +16,6 @@ import {
   UpdateShapeEvent,
 } from '../../domain/EventModels/shapeEvent.models';
 import {
-  AddImageEvent,
   ImageEvent,
   RemoveImageEvent,
   SelectImageEvent,
@@ -29,6 +28,7 @@ import {
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
 import { ShapeNodeService } from '../../../../services/konva.services/shapeNode.service';
+import { PresentationService } from '../../../../services/konva.services/presentation.service';
 
 @Component({
   selector: 'app-workspace',
@@ -44,6 +44,7 @@ export class WorkspaceComponent implements OnInit {
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
     private shapeService: ShapeNodeService,
+    private presentationService:PresentationService
   ) {}
 
   ngOnInit(): void {
@@ -184,6 +185,10 @@ export class WorkspaceComponent implements OnInit {
   }
   showMagicAssistant(state:boolean) {
     this.workSpaceController.showMagicSpiderAssistant = state;
+  }
+  savePpt()
+  {
+    this.presentationService.savePresentation(this.presentation);
   }
 }
 enum ToolBoxType {

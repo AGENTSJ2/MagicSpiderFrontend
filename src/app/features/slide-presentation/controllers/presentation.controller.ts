@@ -3,48 +3,9 @@ import {
   PresentationEvent,
   PresentationEventStream,
 } from '../domain/EventModels/presentationEvents.model';
-import { Slide } from '../domain/canvasModels/slide.model';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
-import {
-  AddTextEvent,
-  RemoveTextEvent,
-  RestoreTextEvent,
-  SelectTextEvent,
-  TextEvent,
-  UpdateTextEvent,
-} from '../domain/EventModels/textEvent.model';
-import {
-  AddSlideEvent,
-  RemoveSlideEvent,
-  SlideEvent,
-} from '../domain/EventModels/slideEvent.model';
-import {
-  AddShapeEvent,
-  RemoveShapeEvent,
-  RestoreShapeEvent,
-  SelectShapeEvent,
-  ShapeEvent,
-  UpdateShapeEvent,
-} from '../domain/EventModels/shapeEvent.models';
-import {
-  AddImageEvent,
-  ImageEvent,
-  RemoveImageEvent,
-  RestoreImageEvent,
-  SelectImageEvent,
-  UpdateImageEvent,
-} from '../domain/EventModels/imageEvent.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
-import {
-  AddTrashEvents,
-  RemoveFromTrashEvents,
-  TrashEvent,
-} from '../domain/EventModels/trashEvents.model';
-import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
-import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
-import { slideService } from '../../../services/konva.services/slide.service';
 
 export class PresentationController {
   readonly eventBus: PresentationEventStream = new PresentationEventStream();
