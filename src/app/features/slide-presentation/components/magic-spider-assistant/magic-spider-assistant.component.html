@@ -1,14 +1,14 @@
 <div class="parent h-100">
-    <div>
-        <h4>Thinking</h4>
-        {{thinking}}
-    </div>
-    <div>
-        <h4>
-           Calls 
-        </h4>
-        <div *ngFor="let c of calls">
-            {{c}}
+    <div class="thinking-section">
+        <div class="thinking-header">
+          <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+          <span nz-icon nzType="bulb" nzTheme="twotone"
+            style="color:#faad14"></span>
+          <span class="thinking-label">Thinking process</span>
         </div>
-    </div>
+        <div class="thinking-box" #thinkingBox>
+          <pre
+            class="thinking-text">{{ thinkingText }}<span class="cursor">▌</span></pre>
+        </div>
+      </div>
 </div>

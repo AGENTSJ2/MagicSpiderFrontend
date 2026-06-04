@@ -164,7 +164,7 @@ export class AISlideDescriptionComponent {
 
   handleInvokeMagicSpider() {
     this.workspaceController.triggerMagicSpider({
-      slideContent: content,
+      slideContent: this.contentText,
       presentation: this.presentation,
     });
     this.close.emit(true);

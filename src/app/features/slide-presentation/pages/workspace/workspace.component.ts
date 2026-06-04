@@ -182,10 +182,9 @@ export class WorkspaceComponent implements OnInit {
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
-  test() {
-    this.assistantVisible = true;
+  showMagicAssistant(state:boolean) {
+    this.workSpaceController.showMagicSpiderAssistant = state;
   }
-  assistantVisible: boolean = false;
 }
 enum ToolBoxType {
   TextToolBox,

@@ -43,7 +43,7 @@
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center">Spider</p>
         </div>
-        <div class="menu-item d-flex gap-1 flex-column " (click)="test()">
+        <div class="menu-item d-flex gap-1 flex-column " (click)="showMagicAssistant(true)">
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center">MagicSpiderDescriptor</p>
         </div>
@@ -98,9 +98,9 @@
 
 <app-aislide-description  [presentation]="presentation"></app-aislide-description>
 <nz-drawer
-  [nzVisible]="assistantVisible"
+  [nzVisible]="workSpaceController.showMagicSpiderAssistant"
   nzTitle="Magic Spider"
-  (nzOnClose)="assistantVisible = false"
+  (nzOnClose)="showMagicAssistant(false)"
   [nzMask]="false"
 >
   <ng-container *nzDrawerContent>
