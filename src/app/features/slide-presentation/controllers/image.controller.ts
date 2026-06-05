@@ -2,21 +2,12 @@ import { Image as KonvaImage, ImageConfig } from 'konva/lib/shapes/Image';
 import {
   ComponentConfig,
   PresentationEventStream,
-  PresentationEventType,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
-import {
-  AddImageEvent,
-  ImageEvent,
-  RemoveImageEvent,
-  SelectImageEvent,
-  SerializableImageConfig,
-  UpdateImageEvent,
-} from '../domain/EventModels/imageEvent.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
 import { imageNodeService } from '../../../services/konva.services/image.service';
-import { ImageComponent } from '../domain/canvasModels/imageComponent';
+import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
 
 export default class ImageController extends BaseController {
   override node: KonvaImage;

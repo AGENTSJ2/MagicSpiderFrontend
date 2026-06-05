@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
-import { SelectImageEvent, SerializableImageConfig, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
+import { SerializableImageConfig } from '../../domain/canvasModels/imageComponent';
 
 @Component({
   selector: 'app-image-tool-box',
@@ -18,7 +18,6 @@ import { SelectImageEvent, SerializableImageConfig, UpdateImageEvent } from '../
 })
 export class ImageToolBoxComponent implements OnChanges {
 
-  @Input() event!: SelectImageEvent;
   @Input() presentation!: Presentation;
 
   form!: FormGroup;
@@ -29,11 +28,6 @@ export class ImageToolBoxComponent implements OnChanges {
   constructor(private fb: FormBuilder) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['event'] && this.event?.currentConfig) {
-      this.localConfig = structuredClone(this.event.currentConfig);
-      this.initForm();
-      this.listenToChanges();
-    }
   }
 
   initForm() {
@@ -83,14 +77,14 @@ export class ImageToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
 
   move(action: ZIndexActions) {
-    const updateEvent = new UpdateImageEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true,
-      zIndexActions: action
-    });
-    this.presentation.publishEvent(updateEvent);
+    // const updateEvent = new UpdateImageEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true,
+    //   zIndexActions: action
+    // });
+    // this.presentation.publishEvent(updateEvent);
   }
 
   replaceImage(event: Event) {
@@ -110,12 +104,14 @@ export class ImageToolBoxComponent implements OnChanges {
   }
 
   applyChanges() {
-    const updateEvent = new UpdateImageEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true
-    });
-    this.presentation.publishEvent(updateEvent);
+    // const updateEvent = new UpdateImageEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true
+    // });
+    // this.presentation.publishEvent(updateEvent);
+    throw Error('Not implemented')
+
   }
 }

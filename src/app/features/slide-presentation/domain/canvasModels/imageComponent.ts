@@ -1,6 +1,5 @@
 import { Image as KonvaImage, ImageConfig } from 'konva/lib/shapes/Image';
 import ImageController from '../../controllers/image.controller';
-import { SerializableImageConfig } from '../EventModels/imageEvent.model';
 import {
   ComponentConfig,
   PresentationEventStream,
@@ -9,7 +8,7 @@ import {
 import { Slide } from './slide.model';
 import { ICanvasComponent } from './ICanvasComponent';
 import { ShapeConfig } from 'konva/lib/Shape';
-
+export type SerializableImageConfig = Partial<ImageConfig> & { imageSrc?: string };
 export class ImageComponent implements ICanvasComponent {
   node: KonvaImage;
   config: ComponentConfig<SerializableImageConfig>;

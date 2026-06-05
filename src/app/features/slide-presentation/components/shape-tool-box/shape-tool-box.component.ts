@@ -8,7 +8,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ShapeConfig } from 'konva/lib/Shape';
 import { Subscription } from 'rxjs';
 
-import { SelectShapeEvent, UpdateShapeEvent } from '../../domain/EventModels/shapeEvent.models';
 import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 
@@ -19,7 +18,6 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 })
 export class ShapeToolBoxComponent implements OnChanges {
 
-  @Input() event!: SelectShapeEvent;
   @Input() presentation!: Presentation;
 
   form!: FormGroup;
@@ -30,11 +28,7 @@ export class ShapeToolBoxComponent implements OnChanges {
   constructor(private fb: FormBuilder) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['event'] && this.event?.currentConfig) {
-      this.localConfig = structuredClone(this.event.currentConfig);
-      this.initForm();
-      this.listenToChanges();
-    }
+    
   }
 
   initForm() {
@@ -97,14 +91,15 @@ export class ShapeToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
 
   move(action: ZIndexActions) {
-    const updateEvent = new UpdateShapeEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true,
-      zIndexActions: action
-    });
-    this.presentation.publishEvent(updateEvent);
+    throw Error('Not implemented')
+    // const updateEvent = new UpdateShapeEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true,
+    //   zIndexActions: action
+    // });
+    // this.presentation.publishEvent(updateEvent);
   }
 
   applyChanges() {
@@ -123,13 +118,14 @@ export class ShapeToolBoxComponent implements OnChanges {
       this.localConfig.attrs.fill = this.form.value.fill;
       this.localConfig.attrs.fillLinearGradientColorStops = undefined;
     }
+    throw Error('Not implemented')
 
-    const updateEvent = new UpdateShapeEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true
-    });
-    this.presentation.publishEvent(updateEvent);
+    // const updateEvent = new UpdateShapeEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true
+    // });
+    // this.presentation.publishEvent(updateEvent);
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
+import { ImageComponent, SerializableImageConfig } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
 import {
   ComponentConfig,
@@ -7,7 +7,6 @@ import {
   ZIndexActions,
 } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
 import { Image as KonvaImage, ImageConfig } from 'konva/lib/shapes/Image';
-import { SerializableImageConfig } from '../../features/slide-presentation/domain/EventModels/imageEvent.model';
 
 @Injectable({
   providedIn: 'root',

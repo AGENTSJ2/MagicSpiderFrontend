@@ -10,10 +10,24 @@ export class PresentationController {
   readonly eventBus: PresentationEventStream = new PresentationEventStream();
   private eventHistory: PresentationEvent[] = [];
   private eventIdx: number = -1;
-  private readonly MAX_HISTORY_LENGTH = 100;
+  private readonly MAX_HISTORY_LENGTH = 1000;
   private trash: ICanvasComponent[] = [];
   constructor(private presentation: Presentation) {
     this.registerEvent();
+  }
+
+  listenToPresentationEvent()
+  {
+    this.eventBus.subscribe((event)=>{
+      if(event.trackHistory)
+      {
+        if(this.eventHistory.length===this.MAX_HISTORY_LENGTH)
+        {
+          this.eventHistory.shift()
+        }
+        this.eventHistory.push(event);
+      }
+    })
   }
 
   publishEvent(event: PresentationEvent) {

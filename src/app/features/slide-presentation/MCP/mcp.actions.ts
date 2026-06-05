@@ -10,8 +10,7 @@ import ShapeComponent, {
 import { InternalMcpError } from './mcp.erros';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import { SerializableImageConfig } from '../domain/EventModels/imageEvent.model';
-import { ImageComponent } from '../domain/canvasModels/imageComponent';
+import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
 import { imageNodeService } from '../../../services/konva.services/image.service';
 import { textNodeService } from '../../../services/konva.services/textNode.service';
 import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';

@@ -5,11 +5,10 @@ import {
   PresentationEventStream,
 } from '../EventModels/presentationEvents.model';
 import { ICanvasComponent } from './ICanvasComponent';
-import { SerializableImageConfig } from '../EventModels/imageEvent.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from './textComponent.model';
 import ShapeComponent, { ShapeType } from './shapeComponent.model';
-import { ImageComponent } from './imageComponent';
+import { ImageComponent, SerializableImageConfig } from './imageComponent';
 
 export class Slide {
   slideId: string;

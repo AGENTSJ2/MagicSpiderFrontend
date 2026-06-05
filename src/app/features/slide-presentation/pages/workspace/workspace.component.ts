@@ -3,25 +3,6 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 import {
-  RemoveTextEvent,
-  SelectTextEvent,
-  TextEvent,
-  UpdateTextEvent,
-} from '../../domain/EventModels/textEvent.model';
-import { RemoveSlideEvent } from '../../domain/EventModels/slideEvent.model';
-import {
-  RemoveShapeEvent,
-  SelectShapeEvent,
-  ShapeEvent,
-  UpdateShapeEvent,
-} from '../../domain/EventModels/shapeEvent.models';
-import {
-  ImageEvent,
-  RemoveImageEvent,
-  SelectImageEvent,
-  UpdateImageEvent,
-} from '../../domain/EventModels/imageEvent.model';
-import {
   PresentationEvent,
 } from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
@@ -101,74 +82,7 @@ export class WorkspaceComponent implements OnInit {
 
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
-    listener.subscribe((event) => {
-      if (event instanceof TextEvent) {
-        this.handleTextSpecificEvents(event);
-        return;
-      }
-      if (event instanceof ShapeEvent) {
-        this.handleShapeSpecificEvents(event);
-        return;
-      }
-      if (event instanceof ImageEvent) {
-        this.handleImageSpecificEvents(event);
-        return;
-      }
-    });
-  }
-
-  private handleTextSpecificEvents(event: TextEvent) {
-    if (event instanceof SelectTextEvent) {
-      this.selectedToolBox = ToolBoxType.TextToolBox;
-      this.activeEvent = event;
-    }
-    if (event instanceof RemoveTextEvent) {
-      if (this.activeEvent?.nodeId == event.nodeId) {
-        this.selectedToolBox = ToolBoxType.None;
-      }
-    }
-    if (
-      event instanceof UpdateTextEvent &&
-      this.activeEvent?.nodeId == event.nodeId
-    ) {
-      this.activeEvent = event;
-    }
-  }
-
-  private handleShapeSpecificEvents(event: ShapeEvent) {
-    if (event instanceof SelectShapeEvent) {
-      this.selectedToolBox = ToolBoxType.ShapeTooLBox;
-      this.activeEvent = event;
-    }
-    if (event instanceof RemoveShapeEvent) {
-      if (this.activeEvent?.nodeId == event.nodeId) {
-        this.selectedToolBox = ToolBoxType.None;
-      }
-    }
-    if (
-      event instanceof UpdateShapeEvent &&
-      this.activeEvent?.nodeId == event.nodeId
-    ) {
-      this.activeEvent = event;
-    }
-  }
-
-  private handleImageSpecificEvents(event: ImageEvent) {
-    if (event instanceof SelectImageEvent) {
-      this.selectedToolBox = ToolBoxType.ImageToolBox;
-      this.activeEvent = event;
-    }
-    if (event instanceof RemoveImageEvent) {
-      if (this.activeEvent?.nodeId == event.nodeId) {
-        this.selectedToolBox = ToolBoxType.None;
-      }
-    }
-    if (
-      event instanceof UpdateImageEvent &&
-      this.activeEvent?.nodeId == event.nodeId
-    ) {
-      this.activeEvent = event;
-    }
+ 
   }
 
   handleRemoveSlide(item: Slide) {

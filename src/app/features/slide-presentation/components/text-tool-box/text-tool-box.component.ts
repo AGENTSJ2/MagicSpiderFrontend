@@ -5,11 +5,6 @@ import {
   SimpleChanges
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-
-import {
-  SelectTextEvent,
-  UpdateTextEvent
-} from '../../domain/EventModels/textEvent.model';
 import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
@@ -24,7 +19,6 @@ import { BulletStyle, ListType, NumberStyle, TextToolboxConfig } from '../../dom
 })
 export class TextToolBoxComponent implements OnChanges {
 
-  @Input() event!: SelectTextEvent;
   @Input() presentation!: Presentation;
 
   form!: FormGroup;
@@ -34,11 +28,7 @@ export class TextToolBoxComponent implements OnChanges {
   constructor(private fb: FormBuilder) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['event'] && this.event?.currentConfig) {
-      this.localConfig = structuredClone(this.event.currentConfig);
-      this.initForm();
-      this.listenToChanges();
-    }
+    
   }
 
   initForm() {
@@ -95,14 +85,7 @@ export class TextToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
   move(action:ZIndexActions)
   {
-    const updateEvent = new UpdateTextEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true,
-      zIndexActions:action
-    });
-    this.presentation.publishEvent(updateEvent);
+    throw Error('Not implemented')
   }
 
   applyChanges() {
@@ -120,13 +103,14 @@ export class TextToolBoxComponent implements OnChanges {
     } else {
       this.localConfig.attrs.fill = this.form.value.fill;
     }
-    const updateEvent = new UpdateTextEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true
-    });
-    this.presentation.publishEvent(updateEvent);
+    throw Error('Not implemented')
+    // const updateEvent = new UpdateTextEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true
+    // });
+    // this.presentation.publishEvent(updateEvent);
   }
 
   private getFormattedText(
