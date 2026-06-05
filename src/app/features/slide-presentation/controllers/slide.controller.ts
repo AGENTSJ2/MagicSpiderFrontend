@@ -135,6 +135,7 @@ export default class SlideController {
   }
 
   selectComponent(node: Shape, options?: { anchors: string[] }) {
+    this.transformer.moveToTop(); // always move to top
     this.transformer.nodes([node]);
     this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
     this.layer.batchDraw();
