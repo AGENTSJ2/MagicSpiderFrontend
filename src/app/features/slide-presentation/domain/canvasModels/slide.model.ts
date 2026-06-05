@@ -11,17 +11,25 @@ import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from './textComponent.model';
 import ShapeComponent, { ShapeType } from './shapeComponent.model';
 import { ImageComponent, SerializableImageConfig } from './imageComponent';
+import type { Presentation } from './presenatation.model';
 
 export class Slide {
-  slideId: string;
-  presentationId: string;
+  readonly slideId: string;
+  readonly presentationId: string;
+  readonly presentation: Presentation;
   components: ICanvasComponent[];
   readonly controller: SlideController;
   containerDiv!: HTMLDivElement;
   private eventBus: PresentationEventStream;
-  constructor(init: Partial<Slide> & { eventBus: PresentationEventStream }) {
-    this.slideId = init.slideId!;
-    this.presentationId = init.presentationId!;
+  constructor(init: {
+    presentation: Presentation;
+    slideId?: string;
+    components?: ICanvasComponent[];
+    eventBus: PresentationEventStream;
+  }) {
+    this.presentation = init.presentation;
+    this.slideId = init.slideId ?? crypto.randomUUID().toString();
+    this.presentationId = init.presentation.id;
     this.components = init.components ?? [];
     this.eventBus = init.eventBus;
     this.controller = new SlideController({

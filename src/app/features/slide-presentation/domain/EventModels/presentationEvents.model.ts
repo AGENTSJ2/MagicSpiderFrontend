@@ -1,17 +1,20 @@
 import { Subject } from "rxjs";
 import { ShapeConfig } from "konva/lib/Shape";
+import type { Presentation } from "../canvasModels/presenatation.model";
+import type { Slide } from "../canvasModels/slide.model";
 
 export class PresentationEvent {
-    nodeId: string;
-    presentationId: string;
-    slideId: string;
-    currentConfig?: ComponentConfig<ShapeConfig>;
-    previousConfig?: ComponentConfig<ShapeConfig>;
-    trackHistory: boolean;
-    eventType:PresentationEventType;
+    readonly nodeId: string;
+    readonly presentationId: string;
+    readonly slideId: string;
+    readonly currentConfig?: ComponentConfig<ShapeConfig>;
+    readonly previousConfig?: ComponentConfig<ShapeConfig>;
+    readonly trackHistory: boolean;
+    readonly eventType:PresentationEventType;
+
     constructor(init: PresentationEvent) {
         this.nodeId = init.nodeId;
-        this.presentationId = init.presentationId ?? '';
+        this.presentationId = init.presentationId;
         this.slideId = init.slideId;
         this.currentConfig = init.currentConfig;
         this.previousConfig = init.previousConfig;
@@ -19,8 +22,6 @@ export class PresentationEvent {
         this.eventType = init.eventType;
     }
 }
-
-
 
 export interface ComponentConfig<T> {
     attrs: T;

@@ -154,7 +154,7 @@ export default class SlideController {
     this.eventBusSubscription.unsubscribe();
     this.transformer.destroy();
   }
-  
+
   private emitEvent(params: {
     component: ICanvasComponent;
     eventType: PresentationEventType;

@@ -7,13 +7,9 @@ import { Presentation } from '../../features/slide-presentation/domain/canvasMod
 })
 export class SlideService {
   addSlide(params: { presentation: Presentation }): Slide {
-    const slide: Partial<Slide> = {
-      presentationId: params.presentation.id,
-      slideId: crypto.randomUUID().toString(),
-      components: [],
-    };
     const ConfiguredSlide = new Slide({
-      ...slide,
+      presentation: params.presentation,
+      components: [],
       eventBus: params.presentation.eventBus,
     });
     params.presentation.slides.push(ConfiguredSlide);

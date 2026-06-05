@@ -28,13 +28,9 @@ export class Presentation {
   }
 
   addSlide() {
-    const slide: Partial<Slide> = {
-      presentationId: this.id,
-      slideId: crypto.randomUUID().toString(),
-      components: [],
-    };
     const ConfiguredSlide = new Slide({
-      ...slide,
+      presentation: this,
+      components: [],
       eventBus: this.eventBus,
     });
     this.slides.push(ConfiguredSlide);
