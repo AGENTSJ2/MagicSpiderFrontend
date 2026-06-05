@@ -69,13 +69,13 @@
       <div class="tool-display">
         @switch (selectedToolBox) {
         @case (TooBoxType.TextToolBox) {
-        <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
+        <app-text-tool-box  [presentation]="presentation"></app-text-tool-box>
         }
         @case (TooBoxType.ShapeTooLBox) {
-        <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
+        <app-shape-tool-box [presentation]="presentation"></app-shape-tool-box>
         }
         @case (TooBoxType.ImageToolBox) {
-        <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
+        <app-image-tool-box [presentation]="presentation"></app-image-tool-box>
         }
         }
       </div>

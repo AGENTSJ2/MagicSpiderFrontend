@@ -3,12 +3,14 @@ import ImageController from '../../controllers/image.controller';
 import {
   ComponentConfig,
   PresentationEventStream,
+  PresentationEventType,
   ZIndexActions,
 } from '../EventModels/presentationEvents.model';
 import { Slide } from './slide.model';
 import { ICanvasComponent } from './ICanvasComponent';
-import { ShapeConfig } from 'konva/lib/Shape';
-export type SerializableImageConfig = Partial<ImageConfig> & { imageSrc?: string };
+export type SerializableImageConfig = Partial<ImageConfig> & {
+  imageSrc?: string;
+};
 export class ImageComponent implements ICanvasComponent {
   node: KonvaImage;
   config: ComponentConfig<SerializableImageConfig>;
@@ -54,7 +56,7 @@ export class ImageComponent implements ICanvasComponent {
     });
   }
 
-  getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
+  private getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
     const attrs = { ...this.node.getAttrs() };
     delete attrs['image'];
     return {
@@ -69,14 +71,30 @@ export class ImageComponent implements ICanvasComponent {
   }
 
   updateComponent(params: {
-    newConfig: ComponentConfig<ShapeConfig>;
-    previousConfig?: ComponentConfig<ShapeConfig>;
+    newConfig: ComponentConfig<SerializableImageConfig>;
+    previousConfig?: ComponentConfig<SerializableImageConfig>;
     trackHistory?: boolean;
     zIndexActions?: ZIndexActions;
   }): ImageComponent {
+    const zIndex = this.node.zIndex();
+    const oldConfig: ComponentConfig<ImageConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
     const updatedComp = this.controller.applyConfigurations({
       currentConfig: params.newConfig,
       zIndexActions: params.zIndexActions,
+    });
+    const newConfig: ComponentConfig<ImageConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
+    this.slide.presentation.emitEvent({
+      slide: this.slide,
+      component: this,
+      eventType: PresentationEventType.UPDATE,
+      oldConfig: oldConfig,
+      newConfig: newConfig,
     });
     return updatedComp;
   }

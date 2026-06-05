@@ -1,9 +1,13 @@
+import { ShapeConfig } from 'konva/lib/Shape';
 import { PresentationController } from '../../controllers/presentation.controller';
 import {
+  ComponentConfig,
   PresentationEvent,
   PresentationEventStream,
+  PresentationEventType,
 } from '../EventModels/presentationEvents.model';
 import { DocumentConfiguration } from '../models/documentConfiguration.model';
+import { ICanvasComponent } from './ICanvasComponent';
 import { Slide } from './slide.model';
 
 export class Presentation {
@@ -23,8 +27,24 @@ export class Presentation {
   listenEvent() {
     return this.controller.listen();
   }
-  publishEvent(event: PresentationEvent) {
-    this.controller.publishEvent(event);
+
+  emitEvent(params: {
+    slide: Slide;
+    component: ICanvasComponent;
+    eventType: PresentationEventType;
+    newConfig: ComponentConfig<ShapeConfig> | undefined;
+    oldConfig?: ComponentConfig<ShapeConfig>;
+  }) {
+    const event: PresentationEvent = new PresentationEvent({
+      eventType: params.eventType,
+      nodeId: params.component.node._id.toString(),
+      currentConfig: params.newConfig,
+      previousConfig: params.oldConfig,
+      trackHistory: true,
+      presentationId: this.id,
+      slideId: params?.slide?.slideId,
+    });
+    this.eventBus.next(event);
   }
 
   addSlide() {
@@ -37,11 +57,8 @@ export class Presentation {
     return ConfiguredSlide;
   }
 
-  removeSlide(slide:Slide)
-  {
-    const slideIdx = this.slides.findIndex(
-      (sl) => sl.slideId == slide.slideId,
-    );
+  removeSlide(slide: Slide) {
+    const slideIdx = this.slides.findIndex((sl) => sl.slideId == slide.slideId);
     if (slideIdx < 0) {
       throw new Error('No Slide of this id is found');
     }

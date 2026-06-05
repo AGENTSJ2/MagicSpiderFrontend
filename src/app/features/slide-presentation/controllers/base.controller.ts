@@ -32,7 +32,7 @@ export default abstract class BaseController {
 
   protected handleNodeClick(): void {
     this.node.on('click', () => {
-      this.slide.selectComponent(this.node);
+      this.slide.selectComponent(this.canvasComponent);
     });
   }
 

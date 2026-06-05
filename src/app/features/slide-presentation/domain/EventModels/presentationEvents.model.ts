@@ -6,7 +6,7 @@ import type { Slide } from "../canvasModels/slide.model";
 export class PresentationEvent {
     readonly nodeId: string;
     readonly presentationId: string;
-    readonly slideId: string;
+    readonly slideId?: string;
     readonly currentConfig?: ComponentConfig<ShapeConfig>;
     readonly previousConfig?: ComponentConfig<ShapeConfig>;
     readonly trackHistory: boolean;

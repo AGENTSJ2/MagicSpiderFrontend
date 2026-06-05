@@ -45,6 +45,16 @@ export class Slide {
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
+    this.presentation.emitEvent({
+      slide: this,
+      component: component,
+      eventType: PresentationEventType.ADD,
+      oldConfig: undefined,
+      newConfig: {
+        attrs: component.node.attrs,
+        zIndex: component.node.zIndex(),
+      },
+    });
     return component;
   }
 
@@ -59,6 +69,16 @@ export class Slide {
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
+    this.presentation.emitEvent({
+      slide: this,
+      component: component,
+      eventType: PresentationEventType.ADD,
+      oldConfig: undefined,
+      newConfig: {
+        attrs: component.node.attrs,
+        zIndex: component.node.zIndex(),
+      },
+    });
     return component;
   }
 
@@ -69,6 +89,17 @@ export class Slide {
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
+    
+    this.presentation.emitEvent({
+      slide: this,
+      component: component,
+      eventType: PresentationEventType.ADD,
+      oldConfig: undefined,
+      newConfig: {
+        attrs: component.node.attrs,
+        zIndex: component.node.zIndex(),
+      },
+    });
     return component;
   }
 
@@ -82,10 +113,33 @@ export class Slide {
     const removed = this.components.splice(index, 1)[0];
     removed.node.remove();
     this.controller.removeSelectionOfComponent(removed.node);
+    this.presentation.emitEvent({
+      slide: this,
+      component: removed,
+      eventType: PresentationEventType.REMOVE,
+      oldConfig: { attrs: removed.node.attrs, zIndex: removed.node.zIndex() },
+      newConfig: undefined,
+    });
   }
 
-  selectComponent(node: Shape, options?: { anchors: string[] }) {
-    this.controller.selectComponent(node, options);
+  selectComponent(
+    canvasComponent: ICanvasComponent,
+    options?: { anchors: string[] },
+  ) {
+    this.controller.selectComponent(canvasComponent.node, options);
+    this.presentation.emitEvent({
+      slide: this,
+      component: canvasComponent,
+      eventType: PresentationEventType.SELECT,
+      oldConfig: {
+        attrs: canvasComponent.node.attrs,
+        zIndex: canvasComponent.node.zIndex(),
+      },
+      newConfig: {
+        attrs: canvasComponent.node.attrs,
+        zIndex: canvasComponent.node.zIndex(),
+      },
+    });
   }
 
   destroy() {
@@ -105,6 +159,4 @@ export class Slide {
     };
     return json;
   }
-
-  
 }

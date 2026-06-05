@@ -14,6 +14,7 @@ export class PresentationController {
   private trash: ICanvasComponent[] = [];
   constructor(private presentation: Presentation) {
     this.registerEvent();
+    this.listenToPresentationEvent()
   }
 
   listenToPresentationEvent()
@@ -26,7 +27,9 @@ export class PresentationController {
           this.eventHistory.shift()
         }
         this.eventHistory.push(event);
+        
       }
+      console.log(event);
     })
   }
 

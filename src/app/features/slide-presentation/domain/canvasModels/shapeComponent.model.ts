@@ -8,6 +8,7 @@ import { Slide } from './slide.model';
 import {
   ComponentConfig,
   PresentationEventStream,
+  PresentationEventType,
   ZIndexActions,
 } from '../EventModels/presentationEvents.model';
 export default class ShapeComponent implements ICanvasComponent {
@@ -66,12 +67,29 @@ export default class ShapeComponent implements ICanvasComponent {
     newConfig: ComponentConfig<ShapeConfig>;
     previousConfig?: ComponentConfig<ShapeConfig>;
     trackHistory?: boolean;
-    zIndexActions?:ZIndexActions;
+    zIndexActions?: ZIndexActions;
   }): ShapeComponent {
-    return this.controller.applyConfigurations({
-        currentConfig:params.newConfig,
-        zIndexActions:params.zIndexActions
+    const zIndex = this.node.zIndex();
+    const oldConfig: ComponentConfig<ShapeConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
+    const updatedComp = this.controller.applyConfigurations({
+      currentConfig: params.newConfig,
+      zIndexActions: params.zIndexActions,
     });
+    const newConfig: ComponentConfig<ShapeConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
+    this.slide.presentation.emitEvent({
+      slide: this.slide,
+      component: this,
+      eventType: PresentationEventType.UPDATE,
+      oldConfig: oldConfig,
+      newConfig: newConfig,
+    });
+    return updatedComp;
   }
 }
 export enum ShapeType {

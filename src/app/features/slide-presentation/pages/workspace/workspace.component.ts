@@ -77,7 +77,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   handleUpdate(event: any) {
-    this.presentation.publishEvent(event);
+    // this.presentation.publishEvent(event);
   }
 
   private listenPresentationEvents() {

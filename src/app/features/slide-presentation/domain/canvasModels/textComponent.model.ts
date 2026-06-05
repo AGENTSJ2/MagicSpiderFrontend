@@ -5,6 +5,7 @@ import { ICanvasComponent } from './ICanvasComponent';
 import {
   ComponentConfig,
   PresentationEventStream,
+  PresentationEventType,
   ZIndexActions,
 } from '../EventModels/presentationEvents.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
@@ -40,15 +41,32 @@ export class TextComponent implements ICanvasComponent {
     this.node.destroy();
   }
   updateComponent(params: {
-    newConfig: ComponentConfig<ShapeConfig>;
-    previousConfig?: ComponentConfig<ShapeConfig>;
+    newConfig: ComponentConfig<TextConfig>;
+    previousConfig?: ComponentConfig<TextConfig>;
     trackHistory?: boolean;
-    zIndexAction?: ZIndexActions;
+    zIndexActions?: ZIndexActions;
   }): TextComponent {
-    return this.controller.applyConfigurations({
+    const zIndex = this.node.zIndex();
+    const oldConfig: ComponentConfig<TextConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
+    const updatedComp = this.controller.applyConfigurations({
       currentConfig: params.newConfig,
-      zIndexActions: params.zIndexAction,
+      zIndexActions: params.zIndexActions,
     });
+    const newConfig: ComponentConfig<TextConfig> = {
+      attrs: this.node.toObject().attrs,
+      zIndex: zIndex,
+    };
+    this.slide.presentation.emitEvent({
+      slide: this.slide,
+      component: this,
+      eventType: PresentationEventType.UPDATE,
+      oldConfig: oldConfig,
+      newConfig: newConfig,
+    });
+    return updatedComp;
   }
 }
 export type ListType = 'none' | 'bullet' | 'number';
