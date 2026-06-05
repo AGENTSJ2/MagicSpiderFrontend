@@ -38,29 +38,33 @@ export class Slide {
     });
   }
 
-  addText(params?: { config?: ComponentConfig<TextConfig> }) {
+  addText(params: { config?: ComponentConfig<TextConfig> ,trackHistory?:boolean}) {
     const component = new TextComponent({
       slide: this,
       config: params?.config,
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    this.presentation.emitEvent({
-      slide: this,
-      component: component,
-      eventType: PresentationEventType.ADD,
-      oldConfig: undefined,
-      newConfig: {
-        attrs: component.node.attrs,
-        zIndex: component.node.zIndex(),
-      },
-    });
+    if(params.trackHistory == undefined || params!.trackHistory)
+    {
+      this.presentation.emitEvent({
+        slide: this,
+        component: component,
+        eventType: PresentationEventType.ADD,
+        oldConfig: undefined,
+        newConfig: {
+          attrs: component.node.attrs,
+          zIndex: component.node.zIndex(),
+        },
+      });
+    }
     return component;
   }
 
   addShape(params: {
     config?: ComponentConfig<ShapeConfig>;
     shapeType: ShapeType;
+    trackHistory?:boolean
   }) {
     const component = new ShapeComponent({
       slide: this,
@@ -69,37 +73,42 @@ export class Slide {
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    this.presentation.emitEvent({
-      slide: this,
-      component: component,
-      eventType: PresentationEventType.ADD,
-      oldConfig: undefined,
-      newConfig: {
-        attrs: component.node.attrs,
-        zIndex: component.node.zIndex(),
-      },
-    });
+    if(params.trackHistory == undefined || params.trackHistory)
+    {
+      this.presentation.emitEvent({
+        slide: this,
+        component: component,
+        eventType: PresentationEventType.ADD,
+        oldConfig: undefined,
+        newConfig: {
+          attrs: component.node.attrs,
+          zIndex: component.node.zIndex(),
+        },
+      });
+    }
     return component;
   }
 
-  addImage(params: { config: ComponentConfig<SerializableImageConfig> }) {
+  addImage(params: { config?: ComponentConfig<SerializableImageConfig> ,trackHistory?:boolean}) {
     const component = new ImageComponent({
       slide: this,
       config: params.config,
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    
-    this.presentation.emitEvent({
-      slide: this,
-      component: component,
-      eventType: PresentationEventType.ADD,
-      oldConfig: undefined,
-      newConfig: {
-        attrs: component.node.attrs,
-        zIndex: component.node.zIndex(),
-      },
-    });
+    if(params.trackHistory == undefined || params.trackHistory)
+    {
+      this.presentation.emitEvent({
+        slide: this,
+        component: component,
+        eventType: PresentationEventType.ADD,
+        oldConfig: undefined,
+        newConfig: {
+          attrs: component.node.attrs,
+          zIndex: component.node.zIndex(),
+        },
+      });
+    }
     return component;
   }
 
@@ -113,6 +122,7 @@ export class Slide {
     const removed = this.components.splice(index, 1)[0];
     removed.node.remove();
     this.controller.removeSelectionOfComponent(removed.node);
+    this.presentation.controller.addToTrash(removed);
     if(trackHistory == undefined || trackHistory)
     {
       this.presentation.emitEvent({
@@ -123,6 +133,18 @@ export class Slide {
         newConfig: undefined,
       });
     }
+  }
+
+  restoreComponent(nodeId:string)
+  {
+    const compToRestore = this.presentation.controller.takeFromTrash(nodeId);
+    if(!compToRestore)
+    {
+      throw new Error("No node found to restore");
+    }
+    this.controller.addComponent(compToRestore);
+    console.log(compToRestore.node._id);
+    
   }
 
   selectComponent(

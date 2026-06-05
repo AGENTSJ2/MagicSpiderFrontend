@@ -35,11 +35,13 @@ export class Presentation {
     newConfig: ComponentConfig<ShapeConfig> | undefined;
     oldConfig?: ComponentConfig<ShapeConfig>;
   }) {
+    const newConfig = structuredClone(params.newConfig);
+    const oldConfig = structuredClone(params.oldConfig);
     const event: PresentationEvent = new PresentationEvent({
       eventType: params.eventType,
       nodeId: params.component.node._id.toString(),
-      currentConfig: params.newConfig,
-      previousConfig: params.oldConfig,
+      currentConfig: newConfig,
+      previousConfig: oldConfig,
       trackHistory: true,
       presentationId: this.id,
       slideId: params?.slide?.slideId,

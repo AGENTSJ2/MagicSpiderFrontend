@@ -15,7 +15,7 @@ export default class ShapeComponent implements ICanvasComponent {
   shapeType: ShapeType;
   config: ComponentConfig<ShapeConfig>;
   node: Shape;
-  controller!: ShapeController;
+  readonly controller!: ShapeController;
   slide: Slide;
 
   constructor(

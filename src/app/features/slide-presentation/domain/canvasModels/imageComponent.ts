@@ -15,7 +15,7 @@ export class ImageComponent implements ICanvasComponent {
   node: KonvaImage;
   config: ComponentConfig<SerializableImageConfig>;
   slide: Slide;
-  controller: ImageController;
+  readonly controller: ImageController;
 
   constructor(
     init: Partial<ImageComponent> & { eventBus: PresentationEventStream },

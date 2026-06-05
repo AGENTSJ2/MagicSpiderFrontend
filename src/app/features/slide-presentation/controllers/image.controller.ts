@@ -1,6 +1,7 @@
 import { Image as KonvaImage, ImageConfig } from 'konva/lib/shapes/Image';
 import {
   ComponentConfig,
+  PresentationEvent,
   PresentationEventStream,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
@@ -10,6 +11,12 @@ import { imageNodeService } from '../../../services/konva.services/image.service
 import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
 
 export default class ImageController extends BaseController {
+  override undoEvent(presentationEvent: PresentationEvent): void {
+    throw new Error('Method not implemented.');
+  }
+  override redoEvent(presentationEvent: PresentationEvent): void {
+    throw new Error('Method not implemented.');
+  }
   override node: KonvaImage;
   override canvasComponent:ImageComponent;
   constructor(init: {

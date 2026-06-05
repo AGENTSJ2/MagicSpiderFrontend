@@ -12,7 +12,6 @@ import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { textNodeService } from '../../../services/konva.services/textNode.service';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export default class TextController extends BaseController {
   private readonly positionSlack = 5;
@@ -66,25 +65,40 @@ export default class TextController extends BaseController {
   };
 
   override undoEvent(presentationEvent: PresentationEvent) {
-    throw new Error('Method not implemented.');
+    switch (presentationEvent.eventType) {
+      case PresentationEventType.ADD:
+        this.slide.removeComponent(this.canvasComponent, false);
+        break;
+      case PresentationEventType.REMOVE:
+        this.slide.restoreComponent(presentationEvent.nodeId);
+        break;
+      case PresentationEventType.UPDATE:
+        this.canvasComponent.updateComponent({
+          newConfig: presentationEvent.previousConfig!,
+          trackHistory: false,
+        });
+        break;
+      default:
+        throw new Error('Undo for this event is not determined.');
+    }
   }
 
   override redoEvent(presentationEvent: PresentationEvent) {
-    switch(presentationEvent.eventType)
-    {
+    switch (presentationEvent.eventType) {
       case PresentationEventType.ADD:
-        this.slide.removeComponent(this.canvasComponent,false);
+        this.slide.restoreComponent(presentationEvent.nodeId);
         break;
       case PresentationEventType.REMOVE:
-        throw new Error('Method not implemented.');
+        this.slide.removeComponent(this.canvasComponent, false);
+        break;
       case PresentationEventType.UPDATE:
         this.canvasComponent.updateComponent({
-          newConfig:presentationEvent.previousConfig!,
-          trackHistory:false,
+          newConfig: presentationEvent.currentConfig!,
+          trackHistory: false,
         });
         break;
-      case PresentationEventType.RESTORE:
-        throw new Error('Method not implemented.');
+      default:
+        throw new Error('Redo for this event is not determined.');
     }
   }
 }

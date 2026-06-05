@@ -154,22 +154,4 @@ export default class SlideController {
     this.eventBusSubscription.unsubscribe();
     this.transformer.destroy();
   }
-
-  private emitEvent(params: {
-    component: ICanvasComponent;
-    eventType: PresentationEventType;
-    newConfig: ComponentConfig<ShapeConfig>;
-    oldConfig: ComponentConfig<ShapeConfig>;
-  }) {
-    const event: PresentationEvent = new PresentationEvent({
-      eventType: params.eventType,
-      nodeId: params.component.node._id.toString(),
-      currentConfig: params.newConfig,
-      previousConfig: params.oldConfig,
-      trackHistory: true,
-      presentationId: this.slide.presentationId,
-      slideId: this.slide.slideId,
-    });
-    this.eventBus.next(event);
-  }
 }
