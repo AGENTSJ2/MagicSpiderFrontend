@@ -18,18 +18,7 @@ export class PresentationEvent {
     }
 }
 
-export class ClearSelectionEvent extends PresentationEvent {
-    constructor(init: { slideId: string, presentationId: string }) {
-        super({
-            nodeId: '',
-            slideId: init.slideId,
-            presentationId: init.presentationId,
-            currentConfig: undefined,
-            previousConfig: undefined,
-            trackHistory: false,
-        });
-    }
-}
+
 
 export interface ComponentConfig<T> {
     attrs: T;
@@ -50,6 +39,7 @@ export enum PresentationEventType {
     UPDATE,
     REMOVE,
     SELECT,
-    RESTORE
+    RESTORE,
+    CLEAR_SELECT
 }
 

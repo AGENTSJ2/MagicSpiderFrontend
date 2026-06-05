@@ -22,7 +22,6 @@ import {
   UpdateImageEvent,
 } from '../../domain/EventModels/imageEvent.model';
 import {
-  ClearSelectionEvent,
   PresentationEvent,
 } from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
@@ -103,11 +102,6 @@ export class WorkspaceComponent implements OnInit {
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
     listener.subscribe((event) => {
-      if (event instanceof ClearSelectionEvent) {
-        this.activeEvent = undefined;
-        this.selectedToolBox = ToolBoxType.None;
-        return;
-      }
       if (event instanceof TextEvent) {
         this.handleTextSpecificEvents(event);
         return;

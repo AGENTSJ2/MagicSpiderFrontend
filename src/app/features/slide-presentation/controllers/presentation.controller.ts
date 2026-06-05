@@ -5,7 +5,6 @@ import {
 } from '../domain/EventModels/presentationEvents.model';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
-import { RedoEvent, UndoEvent } from '../domain/EventModels/undoRedo.model';
 
 export class PresentationController {
   readonly eventBus: PresentationEventStream = new PresentationEventStream();
@@ -31,19 +30,7 @@ export class PresentationController {
         if (this.eventIdx <= 0) {
           return;
         }
-        const lastEvent = this.eventHistory[this.eventIdx];
-        let undoEvent: UndoEvent | undefined;
-        const EventClass = lastEvent.constructor as new (
-          init: PresentationEvent,
-        ) => PresentationEvent;
-        const newEvent = new EventClass({
-          ...lastEvent,
-          currentConfig: lastEvent.previousConfig,
-          trackHistory: false,
-        });
-        undoEvent = new UndoEvent(newEvent);
-        this.publishEvent(undoEvent!);
-        this.eventIdx--;
+        // UNDO
       }
 
       if (event.ctrlKey && event.key.toLowerCase() === 'y') {
@@ -51,19 +38,7 @@ export class PresentationController {
         if (nextIdx >= this.eventHistory.length) {
           return;
         }
-        this.eventIdx = nextIdx;
-        const nextEvent = this.eventHistory[this.eventIdx];
-        const EventClass = nextEvent.constructor as new (
-          init: PresentationEvent,
-        ) => PresentationEvent;
-        const newCopy = structuredClone(nextEvent);
-        let redoEvent: RedoEvent | undefined;
-        const newEvent = new EventClass({
-          ...newCopy,
-          trackHistory: false,
-        });
-        redoEvent = new RedoEvent(newEvent);
-        this.publishEvent(redoEvent!);
+        // REDO
       }
     });
   }

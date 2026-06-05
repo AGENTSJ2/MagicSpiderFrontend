@@ -6,7 +6,6 @@ import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
-  ClearSelectionEvent,
   PresentationEventStream,
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
@@ -92,11 +91,6 @@ export default class SlideController {
       if (e.target === this.mainCover) {
         this.transformer?.nodes([]); // clears selection
         this.layer?.batchDraw();
-        const clearSelection = new ClearSelectionEvent({
-          slideId: this.slide.slideId,
-          presentationId: this.slide.presentationId,
-        });
-        this.eventBus.next(clearSelection);
         return;
       }
     });
