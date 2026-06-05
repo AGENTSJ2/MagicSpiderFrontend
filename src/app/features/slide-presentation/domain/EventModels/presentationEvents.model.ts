@@ -8,6 +8,7 @@ export class PresentationEvent {
     currentConfig?: ComponentConfig<ShapeConfig>;
     previousConfig?: ComponentConfig<ShapeConfig>;
     trackHistory: boolean;
+    eventType:PresentationEventType;
     constructor(init: PresentationEvent) {
         this.nodeId = init.nodeId;
         this.presentationId = init.presentationId ?? '';
@@ -15,6 +16,7 @@ export class PresentationEvent {
         this.currentConfig = init.currentConfig;
         this.previousConfig = init.previousConfig;
         this.trackHistory = init.trackHistory;
+        this.eventType = init.eventType;
     }
 }
 

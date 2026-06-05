@@ -1,5 +1,4 @@
 import { Shape, ShapeConfig } from "konva/lib/Shape";
-import { ImageConfig } from "konva/lib/shapes/Image";
 import { ComponentConfig, ZIndexActions } from "../EventModels/presentationEvents.model";
 
 export interface ICanvasComponent

@@ -2,7 +2,9 @@ import SlideController from '../../controllers/slide.controller';
 import { Shape, ShapeConfig } from 'konva/lib/Shape';
 import {
   ComponentConfig,
+  PresentationEvent,
   PresentationEventStream,
+  PresentationEventType,
 } from '../EventModels/presentationEvents.model';
 import { ICanvasComponent } from './ICanvasComponent';
 import { TextConfig } from 'konva/lib/shapes/Text';
@@ -77,6 +79,7 @@ export class Slide {
   selectComponent(node: Shape, options?: { anchors: string[] }) {
     this.controller.selectComponent(node, options);
   }
+
   destroy() {
     this.controller.destroy();
   }
@@ -94,4 +97,6 @@ export class Slide {
     };
     return json;
   }
+
+  
 }
