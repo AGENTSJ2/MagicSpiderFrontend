@@ -13,12 +13,6 @@ import ShapeComponent, {
 import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
 
 export default class ShapeController extends BaseController {
-  override undoEvent(presentationEvent: PresentationEvent): void {
-    throw new Error('Method not implemented.');
-  }
-  override redoEvent(presentationEvent: PresentationEvent): void {
-    throw new Error('Method not implemented.');
-  }
   override node: Shape;
   override canvasComponent: ShapeComponent;
   shapeType: ShapeType;

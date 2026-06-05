@@ -70,10 +70,12 @@ export default class ShapeComponent implements ICanvasComponent {
     zIndexActions?: ZIndexActions;
   }): ShapeComponent {
     const zIndex = this.node.zIndex();
-    const oldConfig: ComponentConfig<ShapeConfig> = {
-      attrs: this.node.toObject().attrs,
-      zIndex: zIndex,
-    };
+    const oldConfig: ComponentConfig<ShapeConfig> = params.previousConfig
+      ? structuredClone(params.previousConfig)
+      : {
+          attrs: this.node.toObject().attrs,
+          zIndex: zIndex,
+        };
     const updatedComp = this.controller.applyConfigurations({
       currentConfig: params.newConfig,
       zIndexActions: params.zIndexActions,
@@ -82,8 +84,7 @@ export default class ShapeComponent implements ICanvasComponent {
       attrs: this.node.toObject().attrs,
       zIndex: zIndex,
     };
-    if(params.trackHistory == undefined || params.trackHistory)
-    {
+    if (params.trackHistory == undefined || params.trackHistory) {
       this.slide.presentation.emitEvent({
         slide: this.slide,
         component: this,

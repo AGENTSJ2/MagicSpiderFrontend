@@ -63,42 +63,4 @@ export default class TextController extends BaseController {
       super.handleRemove();
     }
   };
-
-  override undoEvent(presentationEvent: PresentationEvent) {
-    switch (presentationEvent.eventType) {
-      case PresentationEventType.ADD:
-        this.slide.removeComponent(this.canvasComponent, false);
-        break;
-      case PresentationEventType.REMOVE:
-        this.slide.restoreComponent(presentationEvent.nodeId);
-        break;
-      case PresentationEventType.UPDATE:
-        this.canvasComponent.updateComponent({
-          newConfig: presentationEvent.previousConfig!,
-          trackHistory: false,
-        });
-        break;
-      default:
-        throw new Error('Undo for this event is not determined.');
-    }
-  }
-
-  override redoEvent(presentationEvent: PresentationEvent) {
-    switch (presentationEvent.eventType) {
-      case PresentationEventType.ADD:
-        this.slide.restoreComponent(presentationEvent.nodeId);
-        break;
-      case PresentationEventType.REMOVE:
-        this.slide.removeComponent(this.canvasComponent, false);
-        break;
-      case PresentationEventType.UPDATE:
-        this.canvasComponent.updateComponent({
-          newConfig: presentationEvent.currentConfig!,
-          trackHistory: false,
-        });
-        break;
-      default:
-        throw new Error('Redo for this event is not determined.');
-    }
-  }
 }

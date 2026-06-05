@@ -30,8 +30,8 @@ export default abstract class BaseController {
 
   protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
 
-  abstract undoEvent(presentationEvent: PresentationEvent):void;
-  abstract redoEvent(presentationEvent: PresentationEvent) :void;
+  // abstract undoEvent(presentationEvent: PresentationEvent):void;
+  // abstract redoEvent(presentationEvent: PresentationEvent) :void;
 
   protected handleNodeClick(): void {
     this.node.on('click', () => {
@@ -127,6 +127,7 @@ export default abstract class BaseController {
   }
 
   protected handleRotationEvents() {}
+  
   protected handleRemove() {
     this.slide.removeComponent(this.canvasComponent);
   }
@@ -153,5 +154,43 @@ export default abstract class BaseController {
       ),
     };
     return configs;
+  }
+  
+  undoEvent(presentationEvent: PresentationEvent) {
+    switch (presentationEvent.eventType) {
+      case PresentationEventType.ADD:
+        this.slide.removeComponent(this.canvasComponent, false);
+        break;
+      case PresentationEventType.REMOVE:
+        this.slide.restoreComponent(presentationEvent.nodeId);
+        break;
+      case PresentationEventType.UPDATE:
+        this.canvasComponent.updateComponent({
+          newConfig: presentationEvent.previousConfig!,
+          trackHistory: false,
+        });
+        break;
+      default:
+        throw new Error('Undo for this event is not determined.');
+    }
+  }
+
+  redoEvent(presentationEvent: PresentationEvent) {
+    switch (presentationEvent.eventType) {
+      case PresentationEventType.ADD:
+        this.slide.restoreComponent(presentationEvent.nodeId);
+        break;
+      case PresentationEventType.REMOVE:
+        this.slide.removeComponent(this.canvasComponent, false);
+        break;
+      case PresentationEventType.UPDATE:
+        this.canvasComponent.updateComponent({
+          newConfig: presentationEvent.currentConfig!,
+          trackHistory: false,
+        });
+        break;
+      default:
+        throw new Error('Redo for this event is not determined.');
+    }
   }
 }
