@@ -30,6 +30,9 @@ export default abstract class BaseController {
 
   protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
 
+  abstract undoEvent(presentationEvent: PresentationEvent):void;
+  abstract redoEvent(presentationEvent: PresentationEvent) :void;
+
   protected handleNodeClick(): void {
     this.node.on('click', () => {
       this.slide.selectComponent(this.canvasComponent);

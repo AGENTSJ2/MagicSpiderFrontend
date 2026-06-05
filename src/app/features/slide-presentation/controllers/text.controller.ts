@@ -3,13 +3,16 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
 import {
   ComponentConfig,
+  PresentationEvent,
   PresentationEventStream,
+  PresentationEventType,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { textNodeService } from '../../../services/konva.services/textNode.service';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
+import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 
 export default class TextController extends BaseController {
   private readonly positionSlack = 5;
@@ -61,4 +64,27 @@ export default class TextController extends BaseController {
       super.handleRemove();
     }
   };
+
+  override undoEvent(presentationEvent: PresentationEvent) {
+    throw new Error('Method not implemented.');
+  }
+
+  override redoEvent(presentationEvent: PresentationEvent) {
+    switch(presentationEvent.eventType)
+    {
+      case PresentationEventType.ADD:
+        this.slide.removeComponent(this.canvasComponent,false);
+        break;
+      case PresentationEventType.REMOVE:
+        throw new Error('Method not implemented.');
+      case PresentationEventType.UPDATE:
+        this.canvasComponent.updateComponent({
+          newConfig:presentationEvent.previousConfig!,
+          trackHistory:false,
+        });
+        break;
+      case PresentationEventType.RESTORE:
+        throw new Error('Method not implemented.');
+    }
+  }
 }

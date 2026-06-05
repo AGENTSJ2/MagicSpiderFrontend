@@ -103,7 +103,7 @@ export class Slide {
     return component;
   }
 
-  removeComponent(node: ICanvasComponent) {
+  removeComponent(node: ICanvasComponent,trackHistory:boolean = true) {
     const index = this.components.findIndex(
       (x) => x.node._id.toString() === node.node._id.toString(),
     );
@@ -113,13 +113,16 @@ export class Slide {
     const removed = this.components.splice(index, 1)[0];
     removed.node.remove();
     this.controller.removeSelectionOfComponent(removed.node);
-    this.presentation.emitEvent({
-      slide: this,
-      component: removed,
-      eventType: PresentationEventType.REMOVE,
-      oldConfig: { attrs: removed.node.attrs, zIndex: removed.node.zIndex() },
-      newConfig: undefined,
-    });
+    if(trackHistory == undefined || trackHistory)
+    {
+      this.presentation.emitEvent({
+        slide: this,
+        component: removed,
+        eventType: PresentationEventType.REMOVE,
+        oldConfig: { attrs: removed.node.attrs, zIndex: removed.node.zIndex() },
+        newConfig: undefined,
+      });
+    }
   }
 
   selectComponent(
@@ -127,19 +130,6 @@ export class Slide {
     options?: { anchors: string[] },
   ) {
     this.controller.selectComponent(canvasComponent.node, options);
-    this.presentation.emitEvent({
-      slide: this,
-      component: canvasComponent,
-      eventType: PresentationEventType.SELECT,
-      oldConfig: {
-        attrs: canvasComponent.node.attrs,
-        zIndex: canvasComponent.node.zIndex(),
-      },
-      newConfig: {
-        attrs: canvasComponent.node.attrs,
-        zIndex: canvasComponent.node.zIndex(),
-      },
-    });
   }
 
   destroy() {

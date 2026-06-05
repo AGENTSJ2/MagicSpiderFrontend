@@ -33,10 +33,6 @@ export class PresentationController {
     })
   }
 
-  publishEvent(event: PresentationEvent) {
-    this.eventBus.next(event);
-  }
-
   listen(): Observable<PresentationEvent> {
     return this.eventBus.asObservable();
   }

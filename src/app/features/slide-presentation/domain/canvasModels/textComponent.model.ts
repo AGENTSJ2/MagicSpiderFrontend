@@ -59,13 +59,16 @@ export class TextComponent implements ICanvasComponent {
       attrs: this.node.toObject().attrs,
       zIndex: zIndex,
     };
-    this.slide.presentation.emitEvent({
-      slide: this.slide,
-      component: this,
-      eventType: PresentationEventType.UPDATE,
-      oldConfig: oldConfig,
-      newConfig: newConfig,
-    });
+    if(params.trackHistory == undefined || params.trackHistory)
+    {
+      this.slide.presentation.emitEvent({
+        slide: this.slide,
+        component: this,
+        eventType: PresentationEventType.UPDATE,
+        oldConfig: oldConfig,
+        newConfig: newConfig,
+      });
+    }
     return updatedComp;
   }
 }
