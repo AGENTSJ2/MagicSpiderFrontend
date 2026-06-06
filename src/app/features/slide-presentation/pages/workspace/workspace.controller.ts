@@ -9,6 +9,8 @@ import { Subject } from 'rxjs';
 export class WorkspaceController {
   showMagicSpiderAssistant: boolean = false;
   showSlideDescription: boolean = false;
+  showToolBox: boolean = false;
+
   constructor(private agentService: LLM_Agents) {}
   _activePresentation?: Presentation;
   public get activePresentation(): Presentation | undefined {
@@ -28,6 +30,15 @@ export class WorkspaceController {
     this.showSlideDescription = false;
   }
 
+  toggleToolBox(show:boolean)
+  {
+    if(show)
+    {
+      this.showMagicSpiderAssistant = false;
+      this.showSlideDescription = false;
+    }
+    this.showToolBox = show;
+  }
   triggerMagicSpider(params: {
     slideContent: string;
     presentation: Presentation;

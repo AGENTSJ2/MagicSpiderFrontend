@@ -13,7 +13,7 @@ import {
   TextComponent,
   TextToolboxConfig,
 } from '../../domain/canvasModels/textComponent.model';
-import { TextConfig } from 'konva/lib/shapes/Text';
+import { Text, TextConfig } from 'konva/lib/shapes/Text';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 
 @Component({
@@ -35,19 +35,22 @@ export class TextToolBoxComponent implements OnChanges {
   }
 
   initForm() {
-    const nodeClone = this.component.node.toObject();
+    const attrs = (this.component.node as Text).toObject()
+      .attrs as TextToolboxConfig;
+    if (!attrs) {
+      return;
+    }
     this.localConfig = {
-      attrs: nodeClone.attrs,
+      attrs: attrs,
       zIndex: this.component.node.zIndex(),
     };
-    const attrs = this.localConfig.attrs;
     const isGradientEnabled = attrs.fill == undefined;
     this.sub?.unsubscribe();
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
-        x:[attrs.x?.toFixed(1)],
-        y:[attrs.y?.toFixed(1)],
+        x: [attrs.x?.toFixed(1)],
+        y: [attrs.y?.toFixed(1)],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
@@ -81,7 +84,7 @@ export class TextToolBoxComponent implements OnChanges {
         },
       );
     }
-    this.listenToChanges()
+    this.listenToChanges();
   }
 
   listenToChanges() {
@@ -123,8 +126,8 @@ export class TextToolBoxComponent implements OnChanges {
       this.localConfig.attrs.fill = this.form.value.fill;
     }
     this.component.updateComponent({
-      newConfig:this.localConfig, 
-    })
+      newConfig: this.localConfig,
+    });
   }
 
   private getFormattedText(

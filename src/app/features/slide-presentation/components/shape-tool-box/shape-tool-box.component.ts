@@ -32,17 +32,24 @@ export class ShapeToolBoxComponent implements OnChanges {
   }
 
   initForm() {
-    const attrs = this.component.node.toObject().attrs;
+    const attrs = this.component?.node.toObject().attrs;
+    if(!attrs)
+    {
+      return
+    }
+    this.localConfig = {
+      attrs: attrs,
+      zIndex: this.component.node.zIndex(),
+    };
     const isGradientEnabled = attrs.fill == undefined;
-
     if (!this.form) {
       this.form = this.fb.group({
-        x: [attrs.x?.toFixed(1)],
-        y: [attrs.y?.toFixed(1)],
-        width: [attrs.width?.toFixed(1)],
-        height: [attrs.height?.toFixed(1)],
-        rotation: [attrs.rotation?.toFixed(1)],
-        opacity: [attrs.opacity?.toFixed(1)],
+        x: [attrs.x],
+        y: [attrs.y],
+        width: [this.component.node.width()],
+        height: [this.component.node.height()],
+        rotation: [this.component.node.rotation()],
+        opacity: [attrs.opacity],
         fill: [attrs.fill ?? '#ffffff'],
         stroke: [attrs.stroke || '#000000'],
         strokeWidth: [attrs.strokeWidth || 0],
@@ -58,12 +65,12 @@ export class ShapeToolBoxComponent implements OnChanges {
     } else {
       this.form.patchValue(
         {
-          x: attrs.x ?? 10,
-          y: attrs.y ?? 10,
-          width: attrs.width ?? 100,
-          height: attrs.height ?? 100,
-          rotation: attrs.rotation ?? 0,
-          opacity: attrs.opacity ?? 1,
+          x: attrs.x ,
+          y: attrs.y ,
+          width: attrs.width,
+          height: attrs.height,
+          rotation: attrs.rotation,
+          opacity: attrs.opacity,
           fill: attrs.fill ?? '#ffffff',
           stroke: attrs.stroke || '#000000',
           strokeWidth: attrs.strokeWidth || 0,

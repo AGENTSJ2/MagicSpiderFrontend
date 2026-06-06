@@ -97,12 +97,8 @@ export class WorkspaceComponent {
     });
   }
 
-  handleUpdate(event: any) {
-    // this.presentation.publishEvent(event);
-  }
-
   slideTimeOutMap: Map<string, any> = new Map();
-  selectedComponent?:ICanvasComponent;
+  selectedComponent?: ICanvasComponent;
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
     listener.subscribe((event) => {
@@ -119,16 +115,24 @@ export class WorkspaceComponent {
         }, 1000);
         this.slideTimeOutMap.set(slideId!, timeOutTracker);
       }
+      const comp = targetSlide?.components.find(
+        (cm) => event.nodeId == cm.node._id.toString(),
+      );
 
       if (event.eventType == PresentationEventType.SELECT) {
-        const comp = targetSlide?.components.find(
-          (cm) => event.nodeId == cm.node._id.toString(),
-        );
         this.selectedToolBox = this.getToolBoxType(comp!);
-        this.selectedComponent = comp;
       }
+      this.setSelectedComponent(comp);
     });
   }
+  setSelectedComponent(component: ICanvasComponent | undefined) {
+    this.selectedComponent = undefined;
+    setTimeout(() => {
+      this.selectedComponent = component;
+      this.toggleShowProperties(true);
+    });
+  }
+
   getToolBoxType(comp: ICanvasComponent): ToolBoxType {
     switch (comp.node.className) {
       case 'Text':
@@ -148,9 +152,11 @@ export class WorkspaceComponent {
     event.stopImmediatePropagation();
     this.presentation.removeSlide(item);
   }
+
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
+
   toggleMagicAssistant(state: boolean) {
     if (state) {
       this.workSpaceController.showMagicSpider({ slideContent: '' });
@@ -158,10 +164,14 @@ export class WorkspaceComponent {
       this.workSpaceController.showMagicSpiderAssistant = false;
     }
   }
+  toggleShowProperties(show: boolean) {
+    this.workSpaceController.toggleToolBox(show);
+  }
   savePpt() {
     this.presentation.name = this.name;
     this.presentationService.savePresentation(this.presentation);
   }
+
   pptTimeOutTracker: any;
   handleNameBlur() {
     if (this.name.trim().length == 0) {
