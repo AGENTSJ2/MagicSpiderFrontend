@@ -58,7 +58,8 @@ export default class TextController extends BaseController {
   protected override handleKeyboardStrokes = (event: KeyboardEvent) => {
     if (
       event.key === 'Delete' &&
-      this.slide.controller.isNodeSelected(this.node)
+      this.slide.controller.isNodeSelected(this.node) &&
+      this.slide.slideId == this.slide.presentation.getActiveSlide?.slideId
     ) {
       super.handleRemove();
     }

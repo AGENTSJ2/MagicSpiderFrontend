@@ -140,7 +140,11 @@ export default class SlideController {
     this.transformer.nodes(selected);
     this.layer.batchDraw();
   }
-
+  clearSelections()
+  {
+    this.transformer.nodes([]);
+    this.layer.batchDraw()
+  }
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
     this.slide.components.push(node);

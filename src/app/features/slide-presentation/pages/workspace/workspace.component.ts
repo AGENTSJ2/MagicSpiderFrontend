@@ -15,7 +15,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class WorkspaceComponent implements OnInit {
   presentation!: Presentation;
-  activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
   name: string = '';
@@ -37,29 +36,29 @@ export class WorkspaceComponent implements OnInit {
     this.setUpPresentation(id!);
   }
 
-  ngOnInit(): void {
-    this.listenPresentationEvents();
-  }
+  ngOnInit(): void {}
+
   async setUpPresentation(presentationId: string) {
     this.presentation =
       this.presentationService.getPresentation(presentationId);
     this.name = this.presentation.name;
     this.workSpaceController.setActivePresentation = this.presentation;
     const firstSlide = this.presentation.slides.at(0);
+    this.listenPresentationEvents();
     if (firstSlide) {
       this.selectSlide(firstSlide);
     }
 
-    for (let slide of this.presentation.slides) {
-      const image = await slide.getLatestSlideImage();
-      this.slideImages.set(slide.slideId, image);
-    }
+    // for (let slide of this.presentation.slides) {
+    //   const image = await slide.getLatestSlideImage();
+    //   this.slideImages.set(slide.slideId, image);
+    // }
     console.log(this.slideImages);
   }
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   handleAddText() {
-    this.activeSlide?.addText({});
+    this.presentation.getActiveSlide?.addText({});
   }
 
   addSlide() {
@@ -68,18 +67,18 @@ export class WorkspaceComponent implements OnInit {
   }
 
   addShape(shapeType: ShapeType) {
-    this.activeSlide?.addShape({ shapeType: shapeType });
+    this.presentation.getActiveSlide?.addShape({ shapeType: shapeType });
   }
 
   handleImageUpload(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file || !this.activeSlide) {
+    if (!file || !this.presentation.getActiveSlide) {
       return;
     }
     const reader = new FileReader();
     reader.onload = () => {
-      this.activeSlide?.addImage({
+      this.presentation.getActiveSlide?.addImage({
         config: {
           attrs: {
             imageSrc: reader.result as string,
@@ -93,9 +92,9 @@ export class WorkspaceComponent implements OnInit {
   }
 
   selectSlide(slide: Slide) {
-    this.activeSlide = undefined;
+    this.presentation.setActiveSlide = undefined;
     setTimeout(async () => {
-      this.activeSlide = slide;
+      this.presentation.setActiveSlide = slide;
       const image = await slide.getLatestSlideImage();
       this.slideImages.set(slide.slideId, image);
     });
@@ -104,9 +103,26 @@ export class WorkspaceComponent implements OnInit {
   handleUpdate(event: any) {
     // this.presentation.publishEvent(event);
   }
-
+  slideTimeOutMap: Map<string, any> = new Map();
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
+    listener.subscribe((event) => {
+      const slideId = event.slideId;
+      const targetSlide = this.presentation.slides.find(
+        (sl) => sl.slideId == slideId,
+      );
+      if (targetSlide) {
+        let timeOutTracker = this.slideTimeOutMap.get(slideId!);
+        clearTimeout(timeOutTracker);
+        timeOutTracker = setTimeout(async () => {
+          const image = await targetSlide.getLatestSlideImage();
+          this.slideImages.set(slideId!, image);
+          console.log("set");
+          
+        }, 1000);
+        this.slideTimeOutMap.set(slideId!, timeOutTracker);
+      }
+    });
   }
 
   handleRemoveSlide(item: Slide, event: Event) {

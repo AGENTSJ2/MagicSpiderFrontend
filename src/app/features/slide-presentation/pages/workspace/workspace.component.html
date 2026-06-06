@@ -64,7 +64,7 @@
           </div>
           }
           @else {
-          <app-slide *ngIf="activeSlide?.slideId" [slide]="activeSlide!"></app-slide>
+          <app-slide *ngIf="presentation.getActiveSlide" [slide]="presentation.getActiveSlide!"></app-slide>
           }
         </div>
       </div>

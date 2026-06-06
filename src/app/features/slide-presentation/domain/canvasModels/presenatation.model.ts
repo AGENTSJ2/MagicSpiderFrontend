@@ -15,6 +15,19 @@ export class Presentation {
   name:string;
   slides: Slide[];
   config: DocumentConfiguration;
+  private _activeSlide?:Slide;
+
+  get getActiveSlide()
+  {
+    return this._activeSlide;
+  }
+
+  set setActiveSlide(v:Slide | undefined)
+  {
+    this._activeSlide?.controller.clearSelections();
+    this._activeSlide = v
+  }
+
   readonly controller: PresentationController = new PresentationController(
     this,
   );
@@ -36,7 +49,9 @@ export class Presentation {
     eventType: PresentationEventType;
     newConfig: ComponentConfig<ShapeConfig> | undefined;
     oldConfig?: ComponentConfig<ShapeConfig>;
+    trackHistory?:boolean;
   }) {
+    const trackHistory = params.trackHistory == undefined || params.trackHistory;
     const newConfig = structuredClone(params.newConfig);
     const oldConfig = structuredClone(params.oldConfig);
     const event: PresentationEvent = new PresentationEvent({
@@ -44,13 +59,29 @@ export class Presentation {
       nodeId: params.component.node._id.toString(),
       currentConfig: newConfig,
       previousConfig: oldConfig,
-      trackHistory: true,
+      trackHistory: trackHistory,
       presentationId: this.id,
       slideId: params?.slide?.slideId,
     });
     this.eventBus.next(event);
   }
 
+  // emitPresentationEvent(params:{
+  //   trackHistory:boolean,
+  //   slideId:string,
+  //   nodeId:string
+  // })
+  // {
+  //   this.eventBus.next({
+  //     trackHistory:params.trackHistory,
+  //     presentationId:this.id,
+  //     slideId:params.slideId,
+  //     previousConfig:undefined,
+  //     currentConfig:undefined,
+  //     nodeId:params.nodeId,
+  //     eventType:PresentationEventType
+  //   })
+  // }
   addSlide() {
     const ConfiguredSlide = new Slide({
       presentation: this,
@@ -71,3 +102,4 @@ export class Presentation {
     return slide;
   }
 }
+// export 

@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import {
   PresentationEvent,
   PresentationEventStream,
+  PresentationEventType,
 } from '../domain/EventModels/presentationEvents.model';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
@@ -55,7 +56,6 @@ export class PresentationController {
     if (this.eventIdx < 0) {
       return;
     }
-
     const event = this.eventHistory.at(this.eventIdx);
     // improve this search
     let component = this.presentation.slides
@@ -67,6 +67,13 @@ export class PresentationController {
       );
     }
     component?.controller.undoEvent(event!);
+    this.presentation.emitEvent({
+      slide: (component as any).slide,
+      component: component!,
+      trackHistory: false,
+      eventType: PresentationEventType.UNDO,
+      newConfig: undefined,
+    });
     this.eventIdx--;
   }
   private handleRedo() {
@@ -86,6 +93,13 @@ export class PresentationController {
       );
     }
     component?.controller.redoEvent(event!);
+    this.presentation.emitEvent({
+      slide: (component as any).slide,
+      component: component!,
+      trackHistory: false,
+      eventType: PresentationEventType.REDO,
+      newConfig: undefined,
+    });
     this.eventIdx++;
   }
 
@@ -101,7 +115,7 @@ export class PresentationController {
     const index = this.TRASH_BIN.findIndex(
       (binElm) => binElm.node._id.toString() == nodeId,
     );
-    if (index < 0 ) {
+    if (index < 0) {
       return undefined;
     }
     const trashedElm = this.TRASH_BIN.splice(index, 1)[0];

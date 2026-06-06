@@ -43,6 +43,10 @@ export enum PresentationEventType {
     REMOVE,
     SELECT,
     RESTORE,
-    CLEAR_SELECT
+    CLEAR_SELECT,
+    ADD_SLIDE,
+    REMOVE_SLIDE,
+    UNDO,
+    REDO
 }
 
