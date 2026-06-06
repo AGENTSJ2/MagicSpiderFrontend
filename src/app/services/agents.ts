@@ -9,6 +9,7 @@ import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { GeminiService } from './gemini.service';
 import { FunctionCall, GenerateContentResponse } from '@google/genai';
 import type { AbortableAsyncIterator, ToolCall } from 'ollama';
+import { MCP } from '../features/slide-presentation/MCP/mcp_server';
 @Injectable({
   providedIn: 'root',
 })
@@ -32,7 +33,7 @@ export class LLM_Agents {
     const interrupt = new Subject<boolean>();
 
     const { stream, provider } = await this.chatService.streamChat({
-      model:"gemma-4-26b-a4b-it",
+      model: 'gemma-4-26b-a4b-it',
       messages: [
         {
           role: 'system',
@@ -66,7 +67,7 @@ export class LLM_Agents {
     'Never continue issuing tool calls after the task is complete.',
     'The Slide style should be modern and attractive ato look at',
   ].join(' ');
-  async MagicSpider(params: {
+  private async MagicSpider(params: {
     slideContent: string;
     presentation: Presentation;
   }) {
@@ -127,94 +128,93 @@ export class LLM_Agents {
 
   async MagicSpiderStream(params: {
     slideContent: string;
+    userComment: string;
     presentation: Presentation;
     responseStream: Subject<AgentStreamEvent>;
     interrupt: Subject<boolean>;
   }) {
-    let stop: boolean = false;
-    params.interrupt.subscribe((intr) => {
-      stop = intr;
-    });
-    
-    const mcp = this.mcpService.getPresentationMcp(params.presentation);
-    const tools = mcp.listTools();
-    const messages = [
-      {
-        role: 'system',
-        content: this.MagicSpiderPrompt,
-      },
-      {
-        role: 'user',
-        content: `Slide Description ${params.slideContent}`,
-      },
-    ];
-    for (let i = 0; i < 20; i++) {
-      if (stop) {
-        return;
-      }
-      const responseEvent = new Subject<AgentStreamEvent>();
-      const slideJson = JSON.stringify(
-        params.presentation.slides.map((sl) => sl.toJson()),
-      );
-      const response = await this.chatService.streamChat(
-        {
-          messages: [
-            ...messages,
-            {
-              role: 'user',
-              content: `Latest Slide JSON ${slideJson}`,
-            },
-          ],
-          tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
-        },
-        tools,
-      );
-      const ackMessage: Message = {
-        role: 'system',
-        content: '',
-      };
-      const toolCalls: ToolCall[] = [];
-      responseEvent.subscribe((event) => {
-        params.responseStream.next(event);
-        if (event.functionCall) {
-          console.log({
-            function: {
-              name: event.functionCall.name!,
-              arguments: event.functionCall.args,
-            },
-          });
-
-          toolCalls.push({
-            function: {
-              name: event.functionCall.name!,
-              arguments: event.functionCall.args,
-            },
-          });
-        }
+    try {
+      let stop: boolean = false;
+      params.interrupt.subscribe((intr) => {
+        stop = intr;
       });
-      await this.pipeResponseToStream(
-        responseEvent,
-        response.stream,
-        response.provider,
-      );
-      console.log(toolCalls);
-      if (toolCalls.length == 0) {
-        console.log('stopped gracefully');
-        break;
-      }
-      for (let tool of toolCalls) {
-        try {
-          await mcp.callTool({
-            toolName: tool.function.name,
-            args: tool.function.arguments,
-          });
-          ackMessage.content += `Successfully called[${tool.function.name}]\n`;
-        } catch (error) {
-          ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
-          console.log(error);
+      params.responseStream.next({
+        action: AgentState.invoked,
+        message: 'Magic Spider has been called',
+      });
+      const mcp = this.mcpService.getPresentationMcp(params.presentation);
+      const tools = mcp.listTools();
+      const messages = [
+        {
+          role: 'system',
+          content: this.MagicSpiderPrompt,
+        },
+        {
+          role: 'user',
+          content: `Slide Description ${params.slideContent}`,
+        },
+        {
+          role: 'user',
+          content: '',
+        },
+      ];
+      for (let i = 0; i < 20; i++) {
+        if (stop) {
+          break;
         }
+        const responseEvent = new Subject<AgentStreamEvent>();
+        const slideJson = JSON.stringify(
+          params.presentation.slides.map((sl) => sl.toJson()),
+        );
+        const response = await this.chatService.streamChat(
+          {
+            messages: [
+              ...messages,
+              {
+                role: 'user',
+                content: `Latest Slide JSON ${slideJson}`,
+              },
+            ],
+            tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
+          },
+          tools,
+        );
+
+        const toolCalls: ToolCall[] = [];
+        responseEvent.subscribe((event) => {
+          params.responseStream.next(event);
+          if (event.functionCall) {
+            toolCalls.push({
+              function: {
+                name: event.functionCall.name!,
+                arguments: event.functionCall.args,
+              },
+            });
+          }
+        });
+        await this.pipeResponseToStream(
+          responseEvent,
+          response.stream,
+          response.provider,
+        );
+        console.log(toolCalls);
+        responseEvent.complete();
+        if (toolCalls.length == 0) {
+          console.log('stopped gracefully');
+          break;
+        }
+        const ackMessage = await this.invokeTools(toolCalls, mcp);
+        messages.push(ackMessage);
       }
-      messages.push(ackMessage);
+      params.responseStream.next({
+        action: AgentState.done,
+        message: 'Success fully stopped',
+      });
+    } catch (error) {
+      params.responseStream.next({
+        action: AgentState.error,
+        message: error?.toString() ?? 'Unknown error',
+      });
     }
   }
 
@@ -277,14 +277,39 @@ export class LLM_Agents {
       responseEvent.error(error);
     }
   }
+
+  private async invokeTools(toolCalls: ToolCall[], mcp: MCP): Promise<Message> {
+    const ackMessage: Message = {
+      role: 'system',
+      content: '',
+    };
+    for (let tool of toolCalls) {
+      try {
+        await mcp.callTool({
+          toolName: tool.function.name,
+          args: tool.function.arguments,
+        });
+        ackMessage.content += `Successfully called[${tool.function.name}]\n`;
+      } catch (error) {
+        ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
+        console.log(error);
+      }
+    }
+    return ackMessage;
+  }
 }
+
 export enum AgentState {
-  Idle,
-  Running,
-  Errored
+  invoked = "invoked",
+  thinking = "thinking",
+  content = "content",
+  function = "function",
+  done = "done",
+  error = "error",
+  idle = "idle",
 }
 export interface AgentStreamEvent {
-  action: 'thinking' | 'content' | 'function';
+  action: AgentState;
   message: string;
   functionCall?: any;
 }

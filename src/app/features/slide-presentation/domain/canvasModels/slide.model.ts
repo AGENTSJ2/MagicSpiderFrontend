@@ -157,7 +157,12 @@ export class Slide {
   destroy() {
     this.controller.destroy();
   }
-
+  
+  getLatestSlideImage()
+  {
+    const img = this.controller.getStageSnapShot();
+    return img;  
+  }
   toJson() {
     const json = {
       slideId: this.slideId,

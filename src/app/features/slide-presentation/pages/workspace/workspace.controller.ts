@@ -10,15 +10,29 @@ export class WorkspaceController {
   showMagicSpiderAssistant: boolean = false;
   showSlideDescription: boolean = false;
   constructor(private agentService: LLM_Agents) {}
+  _activePresentation?: Presentation;
+  public get activePresentation(): Presentation | undefined {
+    return this._activePresentation;
+  }
+
+  public set setActivePresentation(v: Presentation | undefined) {
+    this._activePresentation = v;
+  }
+
   magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
   magicSpiderInterrupt: Subject<boolean> = new Subject();
+  latestSlideMarkdown: string = ``;
+  showMagicSpider(params: { slideContent: string }) {
+    this.latestSlideMarkdown = params.slideContent.trim();
+    this.showMagicSpiderAssistant = true;
+    this.showSlideDescription = false;
+  }
 
   triggerMagicSpider(params: {
     slideContent: string;
     presentation: Presentation;
+    userComment: string;
   }) {
-    this.showMagicSpiderAssistant = true;
-    this.showSlideDescription = false;
     this.agentService.MagicSpiderStream({
       ...params,
       responseStream: this.magicSpiderEvent,

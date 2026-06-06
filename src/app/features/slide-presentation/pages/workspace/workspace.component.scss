@@ -135,7 +135,12 @@
     align-items: center;
     border: 1px solid var(--border-color-primary);
     position: relative;
-
+    img
+    {
+      max-height: 100px;
+      width: auto;
+      object-fit: contain;
+    }
     .del-btn {
       position: absolute;
       top: 0px;

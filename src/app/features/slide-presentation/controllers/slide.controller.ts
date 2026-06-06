@@ -1,14 +1,13 @@
-import { Shape,} from 'konva/lib/Shape';
+import { Shape } from 'konva/lib/Shape';
 import { Layer } from 'konva/lib/Layer';
 import { Rect } from 'konva/lib/shapes/Rect';
 import { Transformer } from 'konva/lib/shapes/Transformer';
 import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
-import {
-  PresentationEventStream,
-} from '../domain/EventModels/presentationEvents.model';
+import { PresentationEventStream } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
+import { waitForMilliseconds } from '../../../core/utilities';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -90,33 +89,38 @@ export default class SlideController {
       }
     });
   }
-
+  resizeInProgress: boolean = true;
   triggerResize(options: {
     divElm: HTMLDivElement;
     config: DocumentConfiguration;
   }) {
-    this.slide.containerDiv = options.divElm;
-    const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
-    const desiredWidth =
-      desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+    try {
+      this.resizeInProgress = true;
+      this.slide.containerDiv = options.divElm;
+      const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
+      const desiredWidth =
+        desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+      const containerWidth = options.divElm.offsetWidth;
+      const containerHeight =
+        containerWidth * (options.config.ratio.den / options.config.ratio.num);
+      const xScaleFactor = containerWidth / desiredWidth;
+      const yScaleFactor = containerHeight / desiredHeight;
 
-    const containerWidth = options.divElm.offsetWidth;
-    const containerHeight =
-      containerWidth * (options.config.ratio.den / options.config.ratio.num);
-    const xScaleFactor = containerWidth / desiredWidth;
-    const yScaleFactor = containerHeight / desiredHeight;
+      this.stage.container(options.divElm);
+      this.stage.height(containerHeight);
+      this.stage.width(containerWidth);
+      this.mainCover.height(desiredHeight);
+      this.mainCover.width(desiredWidth);
 
-    this.stage.container(options.divElm);
-    this.stage.height(containerHeight);
-    this.stage.width(containerWidth);
-    this.mainCover.height(desiredHeight);
-    this.mainCover.width(desiredWidth);
-
-    this.stage.scale({
-      x: xScaleFactor,
-      y: yScaleFactor,
-    });
-    this.layer.batchDraw();
+      this.stage.scale({
+        x: xScaleFactor,
+        y: yScaleFactor,
+      });
+      this.layer.batchDraw();
+    } catch (error) {
+    } finally {
+      this.resizeInProgress = false;
+    }
   }
 
   isNodeSelected(node: Shape): boolean {
@@ -145,5 +149,18 @@ export default class SlideController {
 
   destroy() {
     this.transformer.destroy();
+  }
+
+  async getStageSnapShot() {
+    const maxAttempts = 1000;
+    let attempt = 10;
+    while (maxAttempts > attempt) {
+      if (!this.resizeInProgress) {
+        return this.stage?.toDataURL();
+      }
+      attempt++;
+      await waitForMilliseconds(100);
+    }
+    return this.stage?.toDataURL();
   }
 }

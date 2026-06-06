@@ -88,7 +88,8 @@
         <div class="bottom-list w-100">
           @for (item of presentation.slides; track $index) {
             <div class="slide-prev" (click)="selectSlide(item)">
-              {{$index}}
+              <!-- {{$index}} -->
+               <img [src]="slideImages.get(item.slideId)" [alt]="$index" >
               <button (click)="handleRemoveSlide(item,$event)" class="del-btn"><i class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i></button>
             </div>
           }

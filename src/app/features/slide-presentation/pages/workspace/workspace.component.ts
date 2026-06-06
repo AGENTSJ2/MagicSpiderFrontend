@@ -14,11 +14,12 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
-  readonly presentation!: Presentation;
+  presentation!: Presentation;
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
   name: string = '';
+  slideImages: Map<string, string> = new Map();
   constructor(
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
@@ -27,26 +28,34 @@ export class WorkspaceComponent implements OnInit {
     private router: Router,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
-    if (id) {
-      this.presentation = presentationService.getPresentation(id);
-      this.name = this.presentation.name;
-    }
     if (id === 'new') {
       this.router.navigate(['/workspace/ppt', this.presentation.id], {
         replaceUrl: true,
       });
       return;
     }
-    const firstSlide = this.presentation.slides.at(0);
-    if (firstSlide) {
-      this.selectSlide(firstSlide);
-    }
+    this.setUpPresentation(id!);
   }
 
   ngOnInit(): void {
     this.listenPresentationEvents();
   }
+  async setUpPresentation(presentationId: string) {
+    this.presentation =
+      this.presentationService.getPresentation(presentationId);
+    this.name = this.presentation.name;
+    this.workSpaceController.setActivePresentation = this.presentation;
+    const firstSlide = this.presentation.slides.at(0);
+    if (firstSlide) {
+      this.selectSlide(firstSlide);
+    }
 
+    for (let slide of this.presentation.slides) {
+      const image = await slide.getLatestSlideImage();
+      this.slideImages.set(slide.slideId, image);
+    }
+    console.log(this.slideImages);
+  }
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   handleAddText() {
