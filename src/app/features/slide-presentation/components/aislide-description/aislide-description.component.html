@@ -1,7 +1,7 @@
 <nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="modalFooter"
   [nzMaskClosable]="phase === StreamPhase.idle"
   [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
-  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'10px'}" nzWidth="80vw">
+  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'30px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
     <div class="modal-title">
@@ -18,8 +18,8 @@
     <div class="modal-body">
       <div class="idle" *ngIf="phase === StreamPhase.idle">
         <div class="idle-content">
-          <i class="fi fi-rr-bulb d-flex justify-content-center align-items-center fs-4"></i>
-          <h3>Spill Your Idea</h3>
+          <i class="fi fi-rr-bulb d-flex justify-content-center align-items-center idle-icon"></i>
+          <h3 class="mt-3">Spill Your Idea</h3>
           <p>Describe your topic, goal, or problem to get started.</p>
         </div>
       </div>

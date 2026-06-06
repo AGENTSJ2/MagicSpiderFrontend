@@ -135,7 +135,7 @@ export class LLM_Agents {
     params.interrupt.subscribe((intr) => {
       stop = intr;
     });
-
+    
     const mcp = this.mcpService.getPresentationMcp(params.presentation);
     const tools = mcp.listTools();
     const messages = [
@@ -277,6 +277,11 @@ export class LLM_Agents {
       responseEvent.error(error);
     }
   }
+}
+export enum AgentState {
+  Idle,
+  Running,
+  Errored
 }
 export interface AgentStreamEvent {
   action: 'thinking' | 'content' | 'function';
