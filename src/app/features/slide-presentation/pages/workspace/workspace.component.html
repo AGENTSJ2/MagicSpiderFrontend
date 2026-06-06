@@ -39,8 +39,12 @@
           <p class="mb-0 text-center">Upload</p>
           <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
         </label>
+        <div class="menu-item d-flex gap-1 flex-column " (click)="addSlide()">
+          <i class="fi fi-rr-rectangle-vertical-history d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Slide</p>
+        </div>
         <div class="menu-item d-flex gap-1 flex-column " (click)="handleOpenAiDescription()">
-          <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
+          <i class="fi fi-rr-sparkles d-flex justify-content-center align-items-center fs-4"></i>
           <p class="mb-0 text-center">Spider</p>
         </div>
         <div class="menu-item d-flex gap-1 flex-column " (click)="showMagicAssistant(true)">
@@ -59,7 +63,6 @@
           </div>
           }
           @else {
-
           <app-slide *ngIf="activeSlide?.slideId" [slide]="activeSlide!"></app-slide>
           }
         </div>
@@ -69,7 +72,7 @@
       <div class="tool-display">
         @switch (selectedToolBox) {
         @case (TooBoxType.TextToolBox) {
-        <app-text-tool-box  [presentation]="presentation"></app-text-tool-box>
+        <app-text-tool-box [presentation]="presentation"></app-text-tool-box>
         }
         @case (TooBoxType.ShapeTooLBox) {
         <app-shape-tool-box [presentation]="presentation"></app-shape-tool-box>
@@ -80,29 +83,28 @@
         }
       </div>
       }
-      <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
-        @for (item of presentation.slides; track $index) {
-
-        <div class="slide-preview-wrapper" (click)="selectSlide(item)">
-          slide {{$index+1}}
-          <button (click)="handleRemoveSlide(item)">delete</button>
+      <div class="d-flex w-100 justify-content-between bottom">
+        <div class="bottom-list w-100">
+          @for (item of presentation.slides; track $index) {
+            <div class="slide-prev" (click)="selectSlide(item)">
+              {{$index}}
+              <button (click)="handleRemoveSlide(item,$event)" class="del-btn"><i class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i></button>
+            </div>
+          }
         </div>
-        }
-        <button class="add-slide" (click)="addSlide()">
-          <i class="fi fi-ss-add"></i>
-        </button>
+        <!-- <div class="add-slide">
+          <button class="" (click)="addSlide()">
+            <i class="fi fi-ss-add d-flex justify-content-center align-items-center"></i>
+          </button>
+        </div> -->
       </div>
     </div>
   </div>
 </div>
 
-<app-aislide-description  [presentation]="presentation"></app-aislide-description>
-<nz-drawer
-  [nzVisible]="workSpaceController.showMagicSpiderAssistant"
-  nzTitle="Magic Spider"
-  (nzOnClose)="showMagicAssistant(false)"
-  [nzMask]="false"
->
+<app-aislide-description [presentation]="presentation"></app-aislide-description>
+<nz-drawer [nzVisible]="workSpaceController.showMagicSpiderAssistant" nzTitle="Magic Spider"
+  (nzOnClose)="showMagicAssistant(false)" [nzMask]="false">
   <ng-container *nzDrawerContent>
     <app-magic-spider-assistant></app-magic-spider-assistant>
   </ng-container>

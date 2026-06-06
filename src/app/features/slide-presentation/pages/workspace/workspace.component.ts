@@ -29,7 +29,9 @@ export class WorkspaceComponent implements OnInit {
 
   ngOnInit(): void {
     this.presentation = new Presentation();
-    this.addSlide(); // TODO REMOVE
+    for (let index = 0; index <1; index++) {
+      this.addSlide(); // TODO REMOVE
+    }
     this.listenPresentationEvents();
   }
 
@@ -73,6 +75,8 @@ export class WorkspaceComponent implements OnInit {
     this.activeSlide = undefined;
     setTimeout(() => {
       this.activeSlide = slide;
+      console.log(this.activeSlide);
+      
     });
   }
 
@@ -85,7 +89,8 @@ export class WorkspaceComponent implements OnInit {
  
   }
 
-  handleRemoveSlide(item: Slide) {
+  handleRemoveSlide(item: Slide , event:Event) {
+    event.stopImmediatePropagation();
     this.presentation.removeSlide(item);
   }
   handleOpenAiDescription() {
