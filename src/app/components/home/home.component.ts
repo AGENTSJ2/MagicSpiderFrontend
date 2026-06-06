@@ -15,4 +15,10 @@ export class HomeComponent  implements OnInit{
   ngOnInit(): void {
     this.presentations = this.presentationService.getPresentations();
   }
+  handleRemovePPT(ppt:PresentationMetaData,event:Event)
+  {
+    event.stopImmediatePropagation()
+    this.presentationService.removePresentation(ppt.id);
+    this.presentations = this.presentations.filter((p)=>p.id != ppt.id)
+  }
 }

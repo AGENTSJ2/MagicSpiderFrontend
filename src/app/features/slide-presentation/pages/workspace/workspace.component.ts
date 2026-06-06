@@ -5,7 +5,6 @@ import { Slide } from '../../domain/canvasModels/slide.model';
 import { PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
-import { ShapeNodeService } from '../../../../services/konva.services/shapeNode.service';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { ActivatedRoute } from '@angular/router';
 

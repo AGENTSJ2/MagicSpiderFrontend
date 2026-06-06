@@ -84,8 +84,8 @@ export class PresentationService {
     );
   }
 
-  removePresentation(ppt: Presentation) {
-    const key = this.getPresentationKey(ppt.id);
+  removePresentation(pptId:string) {
+    const key = this.getPresentationKey(pptId);
     let test = localStorage.getItem(key)
     localStorage.removeItem(key);
     test = localStorage.getItem(key)
@@ -93,7 +93,7 @@ export class PresentationService {
     let pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
     );
-    pptIds = pptIds.filter((id: string) => id != ppt.id);
+    pptIds = pptIds.filter((id: string) => id != pptId);
     localStorage.setItem(
       this.presentationCollectionKey,
       JSON.stringify(pptIds),
@@ -101,7 +101,7 @@ export class PresentationService {
   }
 
   savePresentation(ppt: Presentation) {
-    this.removePresentation(ppt);
+    this.removePresentation(ppt.id);
     this.addPresentation(ppt);
   }
 
