@@ -4,7 +4,7 @@
 <div class="presentations">
     <h5>Presentations</h5>
     <div class="d-flex gap-3 p-2 ppt-prev-list">
-        <div routerLink="/workspace/ppt" [queryParams]="{ id: 'new' }" class="ppt-prev p-2">
+        <div (click)="handleNewPPT()" class="ppt-prev p-2">
             Add New
         </div>
         @for (item of presentations; track $index) {

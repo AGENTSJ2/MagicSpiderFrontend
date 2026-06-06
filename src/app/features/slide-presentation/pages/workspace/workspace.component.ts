@@ -6,7 +6,6 @@ import {
   PresentationEvent,
   PresentationEventType,
 } from '../../domain/EventModels/presentationEvents.model';
-import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,19 +26,11 @@ export class WorkspaceComponent {
   pptList!: ElementRef;
 
   constructor(
-    private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
     private route: ActivatedRoute,
-    private router: Router,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
-    if (id === 'new') {
-      this.router.navigate(['/workspace/ppt', this.presentation.id], {
-        replaceUrl: true,
-      });
-      return;
-    }
     this.setUpPresentation(id!);
   }
 
@@ -59,21 +50,23 @@ export class WorkspaceComponent {
   activeEvent?: PresentationEvent;
   handleAddText() {
     this.presentation.getActiveSlide?.addText({});
+    this.toggleShowProperties(true);
   }
 
   addSlide() {
     const slide = this.presentation.addSlide();
     this.selectSlide(slide);
-    setTimeout(()=>{
+    setTimeout(() => {
       this.pptList?.nativeElement.scrollTo({
         left: this.pptList.nativeElement.scrollWidth,
         behavior: 'smooth',
       });
-    })
+    });
   }
 
   addShape(shapeType: ShapeType) {
     this.presentation.getActiveSlide?.addShape({ shapeType: shapeType });
+    this.toggleShowProperties(true);
   }
 
   handleImageUpload(event: Event) {
@@ -92,6 +85,8 @@ export class WorkspaceComponent {
           zIndex: 0,
         },
       });
+      this.toggleShowProperties(true);
+
       input.value = '';
     };
     reader.readAsDataURL(file);

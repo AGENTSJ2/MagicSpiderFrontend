@@ -12,6 +12,7 @@ export class WorkspaceController {
   showToolBox: boolean = false;
 
   constructor(private agentService: LLM_Agents) {}
+
   _activePresentation?: Presentation;
   public get activePresentation(): Presentation | undefined {
     return this._activePresentation;
@@ -29,7 +30,7 @@ export class WorkspaceController {
     this.showMagicSpiderAssistant = true;
     this.showSlideDescription = false;
   }
-  userHasClosedPreviously: boolean = false;
+
   toggleToolBox(show: boolean) {
     if (show) {
       this.showMagicSpiderAssistant = false;
@@ -37,6 +38,7 @@ export class WorkspaceController {
     }
     this.showToolBox = show;
   }
+  
   triggerMagicSpider(params: {
     slideContent: string;
     presentation: Presentation;

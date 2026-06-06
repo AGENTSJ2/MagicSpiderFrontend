@@ -180,3 +180,26 @@
     border: 1px solid white;
   }
 }
+.empty
+{
+  justify-content: center;
+  align-items: center;
+  .empty-card
+  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: var(--background-secondary);
+    padding: 30px;
+    p
+    {
+      font-size: 17px;
+      font-weight: 600;
+    }
+  }
+  img{
+    width: 100px;
+    height: auto;
+  }
+}

@@ -28,7 +28,6 @@ export class ShapeToolBoxComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.initForm();
-    this.listenToChanges();
   }
 
   initForm() {
@@ -87,6 +86,7 @@ export class ShapeToolBoxComponent implements OnChanges {
         },
       );
     }
+    this.listenToChanges();
   }
 
   listenToChanges() {

@@ -106,11 +106,9 @@
     <app-magic-spider-assistant></app-magic-spider-assistant>
   </ng-container>
 </nz-drawer>
-<nz-drawer [nzVisible]="workSpaceController.showToolBox" nzTitle="Tool Box" (nzOnClose)="toggleShowProperties(false)"
+<nz-drawer [nzVisible]="workSpaceController.showToolBox" nzTitle="Properties" (nzOnClose)="toggleShowProperties(false)"
   [nzMask]="false">
   <ng-container *nzDrawerContent>
-    @if(selectedToolBox!=TooBoxType.None)
-    {
     @switch (selectedToolBox) {
     @case (TooBoxType.TextToolBox) {
     <app-text-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-text-tool-box>
@@ -121,6 +119,15 @@
     @case (TooBoxType.ImageToolBox) {
     <app-image-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-image-tool-box>
     }
+    @case (TooBoxType.None) {
+      <div class="empty d-flex flex-column justify-content-center align-items-center h-100">
+        <div class="empty-card">
+          <img src="/images/building.png">
+          <p>
+            No Component selected
+          </p>
+        </div>
+      </div>
     }
     }
   </ng-container>

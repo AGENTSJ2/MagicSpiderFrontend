@@ -52,7 +52,6 @@ export class PresentationController {
   }
 
   private handleUndo() {
-    console.log(this.eventIdx);
     if (this.eventIdx < 0) {
       return;
     }
@@ -78,8 +77,6 @@ export class PresentationController {
   }
   private handleRedo() {
     const nextIdx = this.eventIdx + 1;
-    console.log(nextIdx, this.eventHistory.length);
-
     if (nextIdx >= this.eventHistory.length) {
       return;
     }

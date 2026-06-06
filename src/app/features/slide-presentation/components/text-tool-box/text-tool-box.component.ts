@@ -35,8 +35,7 @@ export class TextToolBoxComponent implements OnChanges {
   }
 
   initForm() {
-    const attrs = (this.component.node as Text).toObject()
-      .attrs as TextToolboxConfig;
+    const attrs = (this.component?.node as Text)?.toObject().attrs as TextToolboxConfig;
     if (!attrs) {
       return;
     }
