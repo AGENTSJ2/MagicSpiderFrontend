@@ -4,7 +4,9 @@
       <div class="home-btn">
         <i class="fi fi-rs-home"></i>
       </div>
-      <p class="mb-0">File Name</p>
+      <!-- {{this.presentation.name}} -->
+      <span contentEditableModel [ngModel]="this.presentation.name" contenteditable="true">
+      </span>
     </div>
     <div>
       <button class="share-btn" (click)="savePpt()">

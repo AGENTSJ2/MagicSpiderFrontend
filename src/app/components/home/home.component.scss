@@ -1,0 +1,12 @@
+.ppt-prev-list
+{
+    overflow: auto;
+    .ppt-prev
+    {
+        width: 200px;
+        background-color: white;
+        border-radius: 0.5rem;
+        border: 1px solid var(--border-color-primary);
+        cursor: pointer;
+    }
+}

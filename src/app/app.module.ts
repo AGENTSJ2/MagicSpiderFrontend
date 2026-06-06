@@ -10,7 +10,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

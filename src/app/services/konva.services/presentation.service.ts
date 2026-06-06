@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Presentation } from '../../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
-import { ICanvasComponent } from '../../features/slide-presentation/domain/canvasModels/ICanvasComponent';
-import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import { ShapeType } from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
 
 @Injectable({
@@ -10,24 +8,31 @@ import { ShapeType } from '../../features/slide-presentation/domain/canvasModels
 })
 export class PresentationService {
   private readonly presentationCollectionKey = 'presentations';
+  constructor() {
+    console.log(this.getPresentations());
+  }
   private getPresentationKey(id: string) {
     return `PPT-${id}`;
   }
 
-  getPresentations(): Presentation[] {
-    const pptJsonArray = JSON.parse(
+  getPresentations(): PresentationMetaData[] {
+    const pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
     ) as any[];
-    return pptJsonArray;
+    const ppts = pptIds.map((id) => this.getPresentationMetaData(id));
+    return ppts;
   }
+
   getPresentation(id: string) {
     const key = this.getPresentationKey(id);
     const pptJson = JSON.parse(localStorage.getItem(key)!);
+    console.log(pptJson);
+    
     const ppt = new Presentation();
     const slides = pptJson.slides as Slide[];
     for (let slideObj of slides) {
       const slide = ppt.addSlide();
-      const components = slide.components;
+      const components = slideObj.components;
       for (let compObj of components) {
         const type = compObj.node.className;
         if (type == 'Text') {
@@ -52,9 +57,22 @@ export class PresentationService {
     }
     return ppt;
   }
+  getPresentationMetaData(id: string): PresentationMetaData {
+    const key = this.getPresentationKey(id);
+    const pptJson = JSON.parse(localStorage.getItem(key)!);
+    return {
+      name: pptJson.name,
+      id: pptJson.id,
+      slideCount: pptJson.slides.length,
+    };
+  }
   addPresentation(ppt: Presentation) {
+    console.log(ppt.name);
+    
     const key = this.getPresentationKey(ppt.id);
     const pttJsonString = this.pptToJsonString(ppt);
+    console.log(pttJsonString);
+    
     localStorage.setItem(key, pttJsonString);
     const pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
@@ -68,7 +86,10 @@ export class PresentationService {
 
   removePresentation(ppt: Presentation) {
     const key = this.getPresentationKey(ppt.id);
+    let test = localStorage.getItem(key)
     localStorage.removeItem(key);
+    test = localStorage.getItem(key)
+    
     let pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
     );
@@ -86,10 +107,16 @@ export class PresentationService {
 
   pptToJsonString(ppt: Presentation) {
     const pptJson = {
+      name:ppt.name,
       id: ppt.id,
       slides: ppt.slides.map((sl) => sl.toJson()),
       config: ppt.config,
     };
     return JSON.stringify(pptJson);
   }
+}
+export interface PresentationMetaData {
+  name: string;
+  id: string;
+  slideCount: number;
 }

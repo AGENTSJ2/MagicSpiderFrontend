@@ -12,6 +12,7 @@ import { Slide } from './slide.model';
 
 export class Presentation {
   id: string;
+  name:string;
   slides: Slide[];
   config: DocumentConfiguration;
   readonly controller: PresentationController = new PresentationController(
@@ -19,6 +20,7 @@ export class Presentation {
   );
   readonly eventBus: PresentationEventStream;
   constructor(init?: Partial<Presentation>) {
+    this.name = init?.name ?? 'Untitled Presentation'
     this.id = init?.id ?? crypto.randomUUID();
     this.slides = init?.slides ?? [];
     this.config = init?.config ?? { ratio: { num: 16, den: 9 }, pixelRatio: 1 };

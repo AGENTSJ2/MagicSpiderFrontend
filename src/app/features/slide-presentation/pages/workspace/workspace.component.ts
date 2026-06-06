@@ -2,13 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import {
-  PresentationEvent,
-} from '../../domain/EventModels/presentationEvents.model';
+import { PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
 import { ShapeNodeService } from '../../../../services/konva.services/shapeNode.service';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-workspace',
@@ -23,14 +22,29 @@ export class WorkspaceComponent implements OnInit {
   constructor(
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
-    private shapeService: ShapeNodeService,
-    private presentationService:PresentationService
-  ) {}
+    private presentationService: PresentationService,
+    private route: ActivatedRoute,
+  ) {
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if(id)
+    {
+      this.presentation = presentationService.getPresentation(id);
+      const firstSlide = this.presentation.slides.at(0);
+      console.log(firstSlide);
+      if(firstSlide)
+      {
+        this.selectSlide(firstSlide)
+      }
+    }
+  }
 
   ngOnInit(): void {
-    this.presentation = new Presentation();
-    for (let index = 0; index <1; index++) {
-      this.addSlide(); // TODO REMOVE
+    if(!this.presentation)
+    {
+      this.presentation = new Presentation();
+      for (let index = 0; index < 1; index++) {
+        this.addSlide(); // TODO REMOVE
+      }
     }
     this.listenPresentationEvents();
   }
@@ -75,8 +89,6 @@ export class WorkspaceComponent implements OnInit {
     this.activeSlide = undefined;
     setTimeout(() => {
       this.activeSlide = slide;
-      console.log(this.activeSlide);
-      
     });
   }
 
@@ -86,21 +98,19 @@ export class WorkspaceComponent implements OnInit {
 
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
- 
   }
 
-  handleRemoveSlide(item: Slide , event:Event) {
+  handleRemoveSlide(item: Slide, event: Event) {
     event.stopImmediatePropagation();
     this.presentation.removeSlide(item);
   }
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
-  showMagicAssistant(state:boolean) {
+  showMagicAssistant(state: boolean) {
     this.workSpaceController.showMagicSpiderAssistant = state;
   }
-  savePpt()
-  {
+  savePpt() {
     this.presentationService.savePresentation(this.presentation);
   }
 }

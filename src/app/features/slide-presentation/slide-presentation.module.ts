@@ -19,6 +19,8 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MagicSpiderAssistantComponent } from './components/magic-spider-assistant/magic-spider-assistant.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { ContentEditableSpanDirective } from '../.././directives/content-editable-span.directive';
+
 
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
     ImageToolBoxComponent,
     AISlideDescriptionComponent,
     MagicSpiderAssistantComponent,
+    ContentEditableSpanDirective
   ],
   imports: [
     CommonModule,
