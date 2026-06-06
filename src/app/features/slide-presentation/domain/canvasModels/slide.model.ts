@@ -151,7 +151,7 @@ export class Slide {
     canvasComponent: ICanvasComponent,
     options?: { anchors: string[] },
   ) {
-    this.controller.selectComponent(canvasComponent.node, options);
+    this.controller.selectComponent(canvasComponent, options);
   }
 
   destroy() {

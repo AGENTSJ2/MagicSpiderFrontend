@@ -2,18 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { PresentationEvent } from '../../domain/EventModels/presentationEvents.model';
+import {
+  PresentationEvent,
+  PresentationEventType,
+} from '../../domain/EventModels/presentationEvents.model';
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 
 @Component({
   selector: 'app-workspace',
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
-export class WorkspaceComponent implements OnInit {
+export class WorkspaceComponent {
   presentation!: Presentation;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
@@ -36,8 +40,6 @@ export class WorkspaceComponent implements OnInit {
     this.setUpPresentation(id!);
   }
 
-  ngOnInit(): void {}
-
   async setUpPresentation(presentationId: string) {
     this.presentation =
       this.presentationService.getPresentation(presentationId);
@@ -48,13 +50,8 @@ export class WorkspaceComponent implements OnInit {
     if (firstSlide) {
       this.selectSlide(firstSlide);
     }
-
-    // for (let slide of this.presentation.slides) {
-    //   const image = await slide.getLatestSlideImage();
-    //   this.slideImages.set(slide.slideId, image);
-    // }
-    console.log(this.slideImages);
   }
+
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   handleAddText() {
@@ -103,7 +100,9 @@ export class WorkspaceComponent implements OnInit {
   handleUpdate(event: any) {
     // this.presentation.publishEvent(event);
   }
+
   slideTimeOutMap: Map<string, any> = new Map();
+  selectedComponent?:ICanvasComponent;
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
     listener.subscribe((event) => {
@@ -117,12 +116,32 @@ export class WorkspaceComponent implements OnInit {
         timeOutTracker = setTimeout(async () => {
           const image = await targetSlide.getLatestSlideImage();
           this.slideImages.set(slideId!, image);
-          console.log("set");
-          
         }, 1000);
         this.slideTimeOutMap.set(slideId!, timeOutTracker);
       }
+
+      if (event.eventType == PresentationEventType.SELECT) {
+        const comp = targetSlide?.components.find(
+          (cm) => event.nodeId == cm.node._id.toString(),
+        );
+        this.selectedToolBox = this.getToolBoxType(comp!);
+        this.selectedComponent = comp;
+      }
     });
+  }
+  getToolBoxType(comp: ICanvasComponent): ToolBoxType {
+    switch (comp.node.className) {
+      case 'Text':
+        return ToolBoxType.TextToolBox;
+      case 'Image':
+        return ToolBoxType.ImageToolBox;
+      case 'Rect':
+        return ToolBoxType.ShapeTooLBox;
+      case 'Circle':
+        return ToolBoxType.ShapeTooLBox;
+      default:
+        return ToolBoxType.None;
+    }
   }
 
   handleRemoveSlide(item: Slide, event: Event) {
@@ -132,8 +151,12 @@ export class WorkspaceComponent implements OnInit {
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
-  showMagicAssistant(state: boolean) {
-    this.workSpaceController.showMagicSpiderAssistant = state;
+  toggleMagicAssistant(state: boolean) {
+    if (state) {
+      this.workSpaceController.showMagicSpider({ slideContent: '' });
+    } else {
+      this.workSpaceController.showMagicSpiderAssistant = false;
+    }
   }
   savePpt() {
     this.presentation.name = this.name;
@@ -149,8 +172,8 @@ export class WorkspaceComponent implements OnInit {
   }
 }
 enum ToolBoxType {
-  TextToolBox,
-  ImageToolBox,
-  ShapeTooLBox,
-  None,
+  TextToolBox = 'Text',
+  ImageToolBox = 'Image',
+  ShapeTooLBox = 'Shape',
+  None = 'None',
 }

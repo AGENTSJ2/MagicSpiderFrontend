@@ -24,14 +24,9 @@ export default abstract class BaseController {
    */
   protected abstract registerEvents(): void;
 
-  // protected abstract listenPresentationEventStream(): void;
-
   protected abstract destroy(): void;
 
   protected abstract handleKeyboardStrokes: (event: KeyboardEvent) => void;
-
-  // abstract undoEvent(presentationEvent: PresentationEvent):void;
-  // abstract redoEvent(presentationEvent: PresentationEvent) :void;
 
   protected handleNodeClick(): void {
     this.node.on('click', () => {

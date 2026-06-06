@@ -5,7 +5,10 @@ import { Transformer } from 'konva/lib/shapes/Transformer';
 import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
-import { PresentationEventStream } from '../domain/EventModels/presentationEvents.model';
+import {
+  PresentationEventStream,
+  PresentationEventType,
+} from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { waitForMilliseconds } from '../../../core/utilities';
 
@@ -127,11 +130,22 @@ export default class SlideController {
     return this.transformer.nodes().some((nd) => nd == node);
   }
 
-  selectComponent(node: Shape, options?: { anchors: string[] }) {
+  selectComponent(
+    canvasComponent: ICanvasComponent,
+    options?: { anchors: string[] },
+  ) {
     this.transformer.moveToTop(); // always move to top
-    this.transformer.nodes([node]);
+    this.transformer.nodes([canvasComponent.node]);
     this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
     this.layer.batchDraw();
+    this.slide.presentation.emitEvent({
+      slide: this.slide,
+      newConfig: undefined,
+      trackHistory: false,
+      component: canvasComponent,
+      oldConfig: undefined,
+      eventType: PresentationEventType.SELECT,
+    });
   }
 
   removeSelectionOfComponent(node: Shape) {
@@ -140,15 +154,14 @@ export default class SlideController {
     this.transformer.nodes(selected);
     this.layer.batchDraw();
   }
-  clearSelections()
-  {
+  clearSelections() {
     this.transformer.nodes([]);
-    this.layer.batchDraw()
+    this.layer.batchDraw();
   }
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
     this.slide.components.push(node);
-    this.selectComponent(node.node);
+    this.selectComponent(node);
   }
 
   destroy() {
@@ -158,8 +171,6 @@ export default class SlideController {
   async getStageSnapShot() {
     const maxAttempts = 1000;
     let attempt = 10;
-    console.log("he");
-    
     while (maxAttempts > attempt) {
       if (!this.resizeInProgress) {
         return this.stage?.toDataURL();

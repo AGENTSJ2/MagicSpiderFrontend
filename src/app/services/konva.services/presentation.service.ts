@@ -75,8 +75,6 @@ export class PresentationService {
   addPresentation(ppt: Presentation) {
     const key = this.getPresentationKey(ppt.id);
     const pttJsonString = this.pptToJsonString(ppt);
-    console.log(pttJsonString);
-
     localStorage.setItem(key, pttJsonString);
     const pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
