@@ -171,35 +171,95 @@
   border: 1px solid transparent;
   background-color: transparent;
   padding: 10px;
+
   i {
     font-size: 30px;
   }
-  &:hover
 
-  {
+  &:hover {
     border: 1px solid white;
   }
 }
-.empty
-{
+
+.empty {
   justify-content: center;
   align-items: center;
-  .empty-card
-  {
+
+  .empty-card {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     background-color: var(--background-secondary);
     padding: 30px;
-    p
-    {
+
+    p {
       font-size: 17px;
       font-weight: 600;
     }
   }
-  img{
+
+  img {
     width: 100px;
     height: auto;
+  }
+}
+
+.empty-slide-state {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+
+  .empty-icon-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background-color: white;
+    border: 1px solid var(--border-color-primary);
+
+    i {
+      font-size: 28px;
+      color: var(--primary-color);
+      opacity: 0.6;
+    }
+  }
+
+  .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    margin: 0;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: #888;
+
+    strong {
+      color: #555;
+      font-weight: 600;
+    }
+  }
+
+  .empty-cta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    i {
+      font-size: 18px;
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
   }
 }
