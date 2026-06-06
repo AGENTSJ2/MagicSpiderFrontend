@@ -77,7 +77,7 @@
       </div>
 
       <div class="d-flex w-100 justify-content-between bottom">
-        <div class="bottom-list w-100">
+        <div class="bottom-list w-100" #pptList>
           @for (item of presentation.slides; track $index) {
           <div class="slide-prev" (click)="selectSlide(item)">
             <ng-container *ngIf="slideImages.get(item.slideId) as image">

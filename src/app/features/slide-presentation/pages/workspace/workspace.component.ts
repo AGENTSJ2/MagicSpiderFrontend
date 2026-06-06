@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
@@ -23,6 +23,9 @@ export class WorkspaceComponent {
   ShapeType = ShapeType;
   name: string = '';
   slideImages: Map<string, string> = new Map();
+  @ViewChild('pptList')
+  pptList!: ElementRef;
+
   constructor(
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
@@ -61,6 +64,12 @@ export class WorkspaceComponent {
   addSlide() {
     const slide = this.presentation.addSlide();
     this.selectSlide(slide);
+    setTimeout(()=>{
+      this.pptList?.nativeElement.scrollTo({
+        left: this.pptList.nativeElement.scrollWidth,
+        behavior: 'smooth',
+      });
+    })
   }
 
   addShape(shapeType: ShapeType) {
@@ -129,7 +138,6 @@ export class WorkspaceComponent {
     this.selectedComponent = undefined;
     setTimeout(() => {
       this.selectedComponent = component;
-      this.toggleShowProperties(true);
     });
   }
 

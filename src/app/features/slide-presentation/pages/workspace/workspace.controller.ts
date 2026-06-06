@@ -29,11 +29,9 @@ export class WorkspaceController {
     this.showMagicSpiderAssistant = true;
     this.showSlideDescription = false;
   }
-
-  toggleToolBox(show:boolean)
-  {
-    if(show)
-    {
+  userHasClosedPreviously: boolean = false;
+  toggleToolBox(show: boolean) {
+    if (show) {
       this.showMagicSpiderAssistant = false;
       this.showSlideDescription = false;
     }
