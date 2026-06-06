@@ -24,8 +24,8 @@ export class TextComponent implements ICanvasComponent {
     this.slide = init.slide!;
     this.node = new Konva.Text({
       ...(this.config?.attrs ? this.config.attrs : {}),
-      x: init.config?.attrs.x ?? 10,
-      y: init.config?.attrs.y ?? 10,
+      x: init.config?.attrs.x ?? 0,
+      y: init.config?.attrs.y ?? 0,
       text: init.config?.attrs.text ?? 'New Text',
       fontSize: init.config?.attrs.fontSize ?? 50,
       draggable: true,

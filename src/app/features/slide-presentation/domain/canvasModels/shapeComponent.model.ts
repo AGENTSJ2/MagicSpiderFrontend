@@ -28,8 +28,8 @@ export default class ShapeComponent implements ICanvasComponent {
     // ✅ Proper config object
     const config = {
       ...(this.config?.attrs ? this.config.attrs : {}),
-      x: init.config?.attrs.x ?? 10,
-      y: init.config?.attrs.y ?? 10,
+      x: init.config?.attrs.x ?? 0,
+      y: init.config?.attrs.y ?? 0,
       width: init.config?.attrs.width ?? 100,
       height: init.config?.attrs.height ?? 100,
       fill: init.config?.attrs.fill ?? 'white',

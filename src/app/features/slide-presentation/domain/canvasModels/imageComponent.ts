@@ -28,8 +28,8 @@ export class ImageComponent implements ICanvasComponent {
     this.node = new KonvaImage({
       ...attrs,
       image: imageElement,
-      x: attrs.x ?? 10,
-      y: attrs.y ?? 10,
+      x: attrs.x ?? 0,
+      y: attrs.y ?? 0,
       width: attrs.width ?? 300,
       height: attrs.height ?? 180,
       draggable: true,

@@ -24,7 +24,7 @@ import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 export class TextToolBoxComponent implements OnChanges {
   @Input() presentation!: Presentation;
   @Input() component!: ICanvasComponent;
-  localConfig!: ComponentConfig<TextConfig>;
+  localConfig!: ComponentConfig<TextToolboxConfig>;
   form!: FormGroup;
   private sub?: Subscription;
   private updateTimeOut: any;
@@ -40,14 +40,14 @@ export class TextToolBoxComponent implements OnChanges {
       attrs: nodeClone.attrs,
       zIndex: this.component.node.zIndex(),
     };
-    const attrs = this.localConfig.attrs as any;
-    console.log(attrs.rawText);
-    
+    const attrs = this.localConfig.attrs;
     const isGradientEnabled = attrs.fill == undefined;
     this.sub?.unsubscribe();
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
+        x:[attrs.x],
+        y:[attrs.y],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
@@ -81,6 +81,7 @@ export class TextToolBoxComponent implements OnChanges {
         },
       );
     }
+    this.listenToChanges()
   }
 
   listenToChanges() {
@@ -117,19 +118,13 @@ export class TextToolBoxComponent implements OnChanges {
         this.form.value.gradientOffset,
         this.form.value.gradientEnd,
       ];
-
       this.localConfig.attrs.fill = undefined; // important
     } else {
       this.localConfig.attrs.fill = this.form.value.fill;
     }
-    throw Error('Not implemented');
-    // const updateEvent = new UpdateTextEvent({
-    //   ...this.event,
-    //   previousConfig: this.event.currentConfig,
-    //   currentConfig: this.localConfig,
-    //   trackHistory: true
-    // });
-    // this.presentation.publishEvent(updateEvent);
+    this.component.updateComponent({
+      newConfig:this.localConfig, 
+    })
   }
 
   private getFormattedText(
