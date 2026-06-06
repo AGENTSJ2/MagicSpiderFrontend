@@ -107,18 +107,19 @@
 .bottom {
   border-top: 1px solid var(--border-color-primary);
   padding: 0px 10px;
+  min-width: 0;
 }
 
 .bottom-list {
   display: flex;
-  justify-content: center;
+  // justify-content: center;
   gap: 10px;
   max-width: 100%;
   overflow: auto;
   height: fit-content;
   padding: 10px;
   background-color: whitesmoke;
-
+  min-width: 0;
   &::-webkit-scrollbar {
     width: 1px !important;
     height: 1px !important;
