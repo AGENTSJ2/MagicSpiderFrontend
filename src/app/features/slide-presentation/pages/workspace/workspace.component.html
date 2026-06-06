@@ -1,17 +1,16 @@
 <div class="workspace d-flex flex-column">
-  <div class="nav d-flex justify-content-between align-items-center px-2">
+  <div class="nav d-flex justify-content-between align-items-center">
     <div class="d-flex gap-3">
-      <div class="home-btn">
-        <i class="fi fi-rs-home"></i>
+      <div class="home-btn d-flex justify-content-center align-items-center">
+        <i class="fi fi-sr-house-chimney"></i>
       </div>
-      <!-- {{this.presentation.name}} -->
-      <span contentEditableModel [ngModel]="this.presentation.name" contenteditable="true">
+      <span contentEditableModel [(ngModel)]="name" contenteditable="true" (ngModelChange)="handleTest()" class="ppt-name">
       </span>
     </div>
     <div>
-      <button class="share-btn" (click)="savePpt()">
-        <i class="fi fi-rr-upload"></i>
-        Share
+      <button class="save-btn" (click)="savePpt()">
+        <i class="fi fi-sr-folder-download d-flex justify-content-center align-items-center"></i>
+        Save
       </button>
     </div>
   </div>

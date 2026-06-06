@@ -6,7 +6,7 @@ import { PresentationEvent } from '../../domain/EventModels/presentationEvents.m
 import { LLM_Agents } from '../../../../services/agents';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-workspace',
@@ -14,37 +14,36 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './workspace.component.scss',
 })
 export class WorkspaceComponent implements OnInit {
-  presentation!: Presentation;
+  readonly presentation!: Presentation;
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
+  name:string = "";
   constructor(
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
     if(id)
     {
       this.presentation = presentationService.getPresentation(id);
-      const firstSlide = this.presentation.slides.at(0);
-      console.log(firstSlide);
-      if(firstSlide)
-      {
-        this.selectSlide(firstSlide)
-      }
+      this.name = this.presentation.name;
     }
+    if (id === 'new') {
+      this.router.navigate(['/workspace/ppt', this.presentation.id], { replaceUrl: true });
+      return;
+    }
+    const firstSlide = this.presentation.slides.at(0);
+    if (firstSlide) {
+      this.selectSlide(firstSlide);
+    }
+    console.log(this.presentation.id);
   }
 
   ngOnInit(): void {
-    if(!this.presentation)
-    {
-      this.presentation = new Presentation();
-      for (let index = 0; index < 1; index++) {
-        this.addSlide(); // TODO REMOVE
-      }
-    }
     this.listenPresentationEvents();
   }
 
@@ -110,7 +109,12 @@ export class WorkspaceComponent implements OnInit {
     this.workSpaceController.showMagicSpiderAssistant = state;
   }
   savePpt() {
+    this.presentation.name = this.name;
     this.presentationService.savePresentation(this.presentation);
+  }
+  handleTest()
+  {
+    this.presentation.name
   }
 }
 enum ToolBoxType {

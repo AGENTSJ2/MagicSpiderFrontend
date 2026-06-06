@@ -9,7 +9,7 @@ import { PresentationMetaData, PresentationService } from '../../services/konva.
 export class HomeComponent  implements OnInit{
   constructor(private presentationService:PresentationService)
   {
-
+    
   }
   presentations:PresentationMetaData[] = []
   ngOnInit(): void {

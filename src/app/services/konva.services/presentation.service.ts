@@ -25,10 +25,17 @@ export class PresentationService {
 
   getPresentation(id: string) {
     const key = this.getPresentationKey(id);
-    const pptJson = JSON.parse(localStorage.getItem(key)!);
-    console.log(pptJson);
-    
-    const ppt = new Presentation();
+    const savedPPT = localStorage.getItem(key);
+    if (!savedPPT) {
+      const pptCounts = this.getPresentations().length;
+      const newPPT = new Presentation({
+        name: `Untitled Presentation ${pptCounts}`,
+      });
+      newPPT.addSlide();
+      return newPPT;
+    }
+    const pptJson = JSON.parse(savedPPT);
+    const ppt = new Presentation({ id: pptJson.id, name: pptJson.name });
     const slides = pptJson.slides as Slide[];
     for (let slideObj of slides) {
       const slide = ppt.addSlide();
@@ -68,11 +75,11 @@ export class PresentationService {
   }
   addPresentation(ppt: Presentation) {
     console.log(ppt.name);
-    
+
     const key = this.getPresentationKey(ppt.id);
     const pttJsonString = this.pptToJsonString(ppt);
     console.log(pttJsonString);
-    
+
     localStorage.setItem(key, pttJsonString);
     const pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
@@ -84,12 +91,12 @@ export class PresentationService {
     );
   }
 
-  removePresentation(pptId:string) {
+  removePresentation(pptId: string) {
     const key = this.getPresentationKey(pptId);
-    let test = localStorage.getItem(key)
+    let test = localStorage.getItem(key);
     localStorage.removeItem(key);
-    test = localStorage.getItem(key)
-    
+    test = localStorage.getItem(key);
+
     let pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
     );
@@ -107,7 +114,7 @@ export class PresentationService {
 
   pptToJsonString(ppt: Presentation) {
     const pptJson = {
-      name:ppt.name,
+      name: ppt.name,
       id: ppt.id,
       slides: ppt.slides.map((sl) => sl.toJson()),
       config: ppt.config,
@@ -116,7 +123,7 @@ export class PresentationService {
   }
 }
 export interface PresentationMetaData {
-  name: string;
+  name?: string;
   id: string;
   slideCount: number;
 }

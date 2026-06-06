@@ -11,39 +11,42 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }
   ]
 })
-export class ContentEditableSpanDirective implements ControlValueAccessor, OnInit {
-  private onChange: (value: string) => void = () => {};
-  private onTouched: () => void = () => {};
+export class ContentEditableSpanDirective implements ControlValueAccessor {
+  private onChange = (v: string) => {};
+  private onTouched = () => {};
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef<HTMLElement>) {}
 
-  ngOnInit() {
-    this.el.nativeElement.contentEditable = 'true';
+  writeValue(value: string): void {
+    const text = value ?? '';
+    if (this.el.nativeElement.innerText !== text) {
+      this.el.nativeElement.innerText = text; // use text, not HTML
+    }
+  }
+
+  registerOnChange(fn: (v: string) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.el.nativeElement.contentEditable = (!isDisabled).toString();
   }
 
   @HostListener('input')
-  onInput() {
+  handleInput() {
+    console.log("input");
     this.onChange(this.el.nativeElement.innerText);
   }
 
   @HostListener('blur')
-  onBlur() {
+  handleBlur() {
     this.onTouched();
   }
 
-  writeValue(value: string) {
-    this.el.nativeElement.innerText = value ?? '';
-  }
-
-  registerOnChange(fn: (value: string) => void) {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void) {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean) {
-    this.el.nativeElement.contentEditable = String(!isDisabled);
+  @HostListener('paste', ['$event'])
+  handlePaste(e: ClipboardEvent) {
+    // optional: force plain text
+    e.preventDefault();
+    const text = e.clipboardData?.getData('text/plain') ?? '';
+    document.execCommand('insertText', false, text);
   }
 }
