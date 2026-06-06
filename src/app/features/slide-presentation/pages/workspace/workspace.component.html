@@ -76,10 +76,10 @@
           <app-text-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-text-tool-box>
         }
         @case (TooBoxType.ShapeTooLBox) {
-          <app-shape-tool-box [presentation]="presentation"></app-shape-tool-box>
+          <app-shape-tool-box [presentation]="presentation" [component]="selectedComponent!" ></app-shape-tool-box>
         }
         @case (TooBoxType.ImageToolBox) {
-          <app-image-tool-box [presentation]="presentation"></app-image-tool-box>
+          <!-- <app-image-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-image-tool-box> -->
         }
         }
       </div>

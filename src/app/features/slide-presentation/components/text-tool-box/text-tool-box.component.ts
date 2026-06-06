@@ -46,8 +46,8 @@ export class TextToolBoxComponent implements OnChanges {
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
-        x:[attrs.x],
-        y:[attrs.y],
+        x:[attrs.x?.toFixed(1)],
+        y:[attrs.y?.toFixed(1)],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
