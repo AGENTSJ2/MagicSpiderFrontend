@@ -18,7 +18,7 @@ export class WorkspaceComponent implements OnInit {
   activeSlide?: Slide;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
-  name:string = "";
+  name: string = '';
   constructor(
     private agentsService: LLM_Agents,
     public workSpaceController: WorkspaceController,
@@ -27,20 +27,20 @@ export class WorkspaceComponent implements OnInit {
     private router: Router,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
-    if(id)
-    {
+    if (id) {
       this.presentation = presentationService.getPresentation(id);
       this.name = this.presentation.name;
     }
     if (id === 'new') {
-      this.router.navigate(['/workspace/ppt', this.presentation.id], { replaceUrl: true });
+      this.router.navigate(['/workspace/ppt', this.presentation.id], {
+        replaceUrl: true,
+      });
       return;
     }
     const firstSlide = this.presentation.slides.at(0);
     if (firstSlide) {
       this.selectSlide(firstSlide);
     }
-    console.log(this.presentation.id);
   }
 
   ngOnInit(): void {
@@ -112,9 +112,13 @@ export class WorkspaceComponent implements OnInit {
     this.presentation.name = this.name;
     this.presentationService.savePresentation(this.presentation);
   }
-  handleTest()
-  {
-    this.presentation.name
+  pptTimeOutTracker: any;
+  handleNameBlur() {
+    if (this.name.trim().length == 0) {
+      setTimeout(() => {
+        this.name = this.presentation.name;
+      });
+    }
   }
 }
 enum ToolBoxType {

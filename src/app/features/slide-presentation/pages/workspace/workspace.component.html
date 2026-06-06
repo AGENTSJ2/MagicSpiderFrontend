@@ -4,7 +4,7 @@
       <div class="home-btn d-flex justify-content-center align-items-center">
         <i class="fi fi-sr-house-chimney"></i>
       </div>
-      <span contentEditableModel [(ngModel)]="name" contenteditable="true" (ngModelChange)="handleTest()" class="ppt-name">
+      <span contentEditableModel [(ngModel)]="name" contenteditable="true"  class="ppt-name" (blur)="handleNameBlur()">
       </span>
     </div>
     <div>

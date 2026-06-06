@@ -1,4 +1,4 @@
-import { Shape, ShapeConfig } from 'konva/lib/Shape';
+import { Shape,} from 'konva/lib/Shape';
 import { Layer } from 'konva/lib/Layer';
 import { Rect } from 'konva/lib/shapes/Rect';
 import { Transformer } from 'konva/lib/shapes/Transformer';
@@ -6,13 +6,9 @@ import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
-  ComponentConfig,
-  PresentationEvent,
   PresentationEventStream,
-  PresentationEventType,
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
-import { Subscription } from 'rxjs';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -21,8 +17,6 @@ export default class SlideController {
   stage!: Stage;
   private slide: Slide;
   private readonly DESIRED_SLIDE_HEIGHT = 750;
-  private eventBus: PresentationEventStream;
-  private eventBusSubscription!: Subscription;
   private readonly Anchors = [
     'top-left',
     'top-center',
@@ -35,7 +29,6 @@ export default class SlideController {
   ];
 
   constructor(init: { eventBus: PresentationEventStream; slide: Slide }) {
-    this.eventBus = init.eventBus;
     this.slide = init.slide;
     this.setUp();
     this.registerEvents();
@@ -151,7 +144,6 @@ export default class SlideController {
   }
 
   destroy() {
-    this.eventBusSubscription.unsubscribe();
     this.transformer.destroy();
   }
 }

@@ -33,7 +33,6 @@ export class ContentEditableSpanDirective implements ControlValueAccessor {
 
   @HostListener('input')
   handleInput() {
-    console.log("input");
     this.onChange(this.el.nativeElement.innerText);
   }
 

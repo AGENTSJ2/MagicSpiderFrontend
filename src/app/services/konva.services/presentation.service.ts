@@ -9,7 +9,6 @@ import { ShapeType } from '../../features/slide-presentation/domain/canvasModels
 export class PresentationService {
   private readonly presentationCollectionKey = 'presentations';
   constructor() {
-    console.log(this.getPresentations());
   }
   private getPresentationKey(id: string) {
     return `PPT-${id}`;
@@ -74,8 +73,6 @@ export class PresentationService {
     };
   }
   addPresentation(ppt: Presentation) {
-    console.log(ppt.name);
-
     const key = this.getPresentationKey(ppt.id);
     const pttJsonString = this.pptToJsonString(ppt);
     console.log(pttJsonString);
