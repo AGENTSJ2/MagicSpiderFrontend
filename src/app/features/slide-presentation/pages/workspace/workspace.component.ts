@@ -94,8 +94,10 @@ export class WorkspaceComponent implements OnInit {
 
   selectSlide(slide: Slide) {
     this.activeSlide = undefined;
-    setTimeout(() => {
+    setTimeout(async () => {
       this.activeSlide = slide;
+      const image = await slide.getLatestSlideImage();
+      this.slideImages.set(slide.slideId, image);
     });
   }
 

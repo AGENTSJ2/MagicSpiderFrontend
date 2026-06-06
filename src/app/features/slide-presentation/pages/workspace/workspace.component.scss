@@ -126,10 +126,9 @@
 
   .slide-prev {
     width: 200px;
-    height: 100px;
+    height: 112px;
     flex-shrink: 0;
     background-color: white;
-    border-radius: 0.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,7 +136,7 @@
     position: relative;
     img
     {
-      max-height: 100px;
+      max-height: 100%;
       width: auto;
       object-fit: contain;
     }
@@ -150,7 +149,6 @@
       color: var(--bs-danger);
       width: 25px;
       height: 25px;
-      border-top-right-radius: 0.5rem;
     }
   }
 }

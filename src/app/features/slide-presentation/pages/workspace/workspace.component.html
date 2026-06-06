@@ -88,8 +88,16 @@
         <div class="bottom-list w-100">
           @for (item of presentation.slides; track $index) {
             <div class="slide-prev" (click)="selectSlide(item)">
+              <ng-container *ngIf="slideImages.get(item.slideId) as image">
+                <img [src]="image" [alt]="$index" >
+              </ng-container>
+              <ng-container *ngIf="!slideImages.get(item.slideId) as image">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                  <h6 class="mb-1">Slide {{$index}}</h6>
+                  <small>Click to preview</small>
+                </div>
+              </ng-container>
               <!-- {{$index}} -->
-               <img [src]="slideImages.get(item.slideId)" [alt]="$index" >
               <button (click)="handleRemoveSlide(item,$event)" class="del-btn"><i class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i></button>
             </div>
           }

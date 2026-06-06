@@ -154,6 +154,8 @@ export default class SlideController {
   async getStageSnapShot() {
     const maxAttempts = 1000;
     let attempt = 10;
+    console.log("he");
+    
     while (maxAttempts > attempt) {
       if (!this.resizeInProgress) {
         return this.stage?.toDataURL();
