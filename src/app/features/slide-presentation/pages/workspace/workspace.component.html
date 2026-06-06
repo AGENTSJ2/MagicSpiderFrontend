@@ -1,7 +1,7 @@
 <div class="workspace d-flex flex-column">
   <div class="nav d-flex justify-content-between align-items-center">
     <div class="d-flex gap-3">
-      <div class="home-btn d-flex justify-content-center align-items-center">
+      <div class="home-btn d-flex justify-content-center align-items-center" [routerLink]="'/'">
         <i class="fi fi-sr-house-chimney"></i>
       </div>
       <span contentEditableModel [(ngModel)]="name" contenteditable="true"  class="ppt-name" (blur)="handleNameBlur()">
