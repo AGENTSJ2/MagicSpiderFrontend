@@ -20,7 +20,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MagicSpiderAssistantComponent } from './components/magic-spider-assistant/magic-spider-assistant.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { ContentEditableSpanDirective } from '../.././directives/content-editable-span.directive';
-
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,9 @@ import { ContentEditableSpanDirective } from '../.././directives/content-editabl
     NzSpinModule,
     NzTagModule,
     NzButtonModule,
-    NzDrawerModule
+    NzDrawerModule,
+    NzDropDownModule,
+    NzMessageModule
   ]
 })
 export class SlidePresentationModule { }

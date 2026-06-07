@@ -10,6 +10,7 @@ import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'app-workspace',
@@ -29,6 +30,7 @@ export class WorkspaceComponent {
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
     private route: ActivatedRoute,
+    private message: NzMessageService,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
     this.setUpPresentation(id!);
@@ -50,7 +52,7 @@ export class WorkspaceComponent {
   activeEvent?: PresentationEvent;
   handleAddText() {
     this.presentation.getActiveSlide?.addText({});
-    this.toggleShowProperties(true);
+    this.workSpaceController.toggleToolBox(true);
   }
 
   addSlide() {
@@ -66,7 +68,7 @@ export class WorkspaceComponent {
 
   addShape(shapeType: ShapeType) {
     this.presentation.getActiveSlide?.addShape({ shapeType: shapeType });
-    this.toggleShowProperties(true);
+    this.workSpaceController.toggleToolBox(true);
   }
 
   handleImageUpload(event: Event) {
@@ -85,7 +87,7 @@ export class WorkspaceComponent {
           zIndex: 0,
         },
       });
-      this.toggleShowProperties(true);
+      this.workSpaceController.toggleToolBox(true);
 
       input.value = '';
     };
@@ -129,6 +131,7 @@ export class WorkspaceComponent {
       this.setSelectedComponent(comp);
     });
   }
+
   setSelectedComponent(component: ICanvasComponent | undefined) {
     this.selectedComponent = undefined;
     setTimeout(() => {
@@ -167,12 +170,10 @@ export class WorkspaceComponent {
       this.workSpaceController.showMagicSpiderAssistant = false;
     }
   }
-  toggleShowProperties(show: boolean) {
-    this.workSpaceController.toggleToolBox(show);
-  }
   savePpt() {
     this.presentation.name = this.name;
     this.presentationService.savePresentation(this.presentation);
+    this.message.success("Presentation Saved")
   }
 
   pptTimeOutTracker: any;

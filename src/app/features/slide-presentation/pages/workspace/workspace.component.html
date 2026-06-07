@@ -8,9 +8,10 @@
       </span>
     </div>
     <div class=" d-flex gap-3 px-2">
-      <button class="nav-btn d-flex justify-content-center align-items-center gap-2" (click)="savePpt()">
-        <i class="fi fi-sr-folder-download d-flex justify-content-center align-items-center"></i>
-        <P class=" mb-0">Save</P>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
+        (click)="workSpaceController.toggleToolBox(true)">
+        <i class="fi fi-rr-settings d-flex justify-content-center align-items-center"></i>
+        <P class="mb-0">Properties</P>
       </button>
       <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
         (click)="toggleMagicAssistant(true)">
@@ -22,10 +23,26 @@
         <i class="fi fi-rr-sparkles d-flex justify-content-center align-items-center"></i>
         <P class="mb-0">Spider</P>
       </button>
-      <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
-        (click)="toggleShowProperties(true)">
-        <i class="fi fi-rr-settings d-flex justify-content-center align-items-center"></i>
-        <P class="mb-0">Properties</P>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2" nz-dropdown nzTrigger="click"
+        [nzDropdownMenu]="saveMenu">
+        <i class="fi fi-sr-folder-download d-flex justify-content-center align-items-center"></i>
+        <P class=" mb-0">Save</P>
+        <nz-dropdown-menu #saveMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <div class="d-flex gap-2 fs-7" (click)="savePpt()">
+                <i class="fi fi-rr-cloud-upload d-flex justify-content-center align-items-center"></i>
+                <p class=" mb-0">Save</p>
+              </div>
+            </li>
+            <li nz-menu-item>
+              <div class="d-flex gap-2 fs-7" (click)="this.workSpaceController.exportPPT(this.presentation)">
+                <i class="fi fi-rr-upload d-flex justify-content-center align-items-center"></i>
+                <p class=" mb-0">Export PPT</p>
+              </div>
+            </li>
+          </ul>
+        </nz-dropdown-menu>
       </button>
     </div>
   </div>
@@ -116,7 +133,7 @@
     <app-magic-spider-assistant></app-magic-spider-assistant>
   </ng-container>
 </nz-drawer>
-<nz-drawer [nzVisible]="workSpaceController.showToolBox" nzTitle="Properties" (nzOnClose)="toggleShowProperties(false)"
+<nz-drawer [nzVisible]="workSpaceController.showToolBox" nzTitle="Properties" (nzOnClose)="workSpaceController.toggleToolBox(false)"
   [nzMask]="false">
   <ng-container *nzDrawerContent>
     @switch (selectedToolBox) {
