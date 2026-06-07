@@ -1,9 +1,8 @@
 .parent
 {
-    overflow: auto;
+  overflow: auto;
 }
 .thinking-section {
-  border-radius: 5px;
   background: #fffbe6;
   border: 1px solid #ffe58f;
   padding: 12px 14px;
@@ -29,7 +28,6 @@
   overflow-y: auto;
   scrollbar-width: thin;
   background-color: var(--background-secondary);
-  border-radius: 5px;
   margin-bottom: 10px;
 }
 .thinking-box {
@@ -56,18 +54,36 @@ textarea
 {
   border: 1px solid lightgray;
   padding: 5px;
-  textarea
+  .promt-control
   {
-    border: none;
-    resize: none;
-    &:focus
+    position: relative;
+    width: 100%;
+    .prmpt-place
     {
-      outline: none;
+      position: absolute;
+      color: lightgray;
+    }
+    span
+    {
+      border: none;
+      resize: none;
+      width: 100%;
+      &:focus
+      {
+        outline: none;
+      }
     }
   }
   button
   {
-    border: none;
+    border: 2px solid var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     background: transparent;
+    &:hover
+    {
+      color: var(--primary-color);
+    }
   }
 }
