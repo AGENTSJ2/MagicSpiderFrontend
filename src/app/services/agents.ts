@@ -21,7 +21,8 @@ export class LLM_Agents {
   ) {}
 
   private readonly ContentCreatorPrompt = [
-    'You are an slide content creator your output should be a markdown of slide content ',
+    'You are an slide content creator your output should be a html format that support quill',
+    'Add breaks <br></br> between slides and headlines and add line height enough such that content wont look Congested but dont overdo',
     'Your Response should not contain any user addressing or other junk just slide data',
     'An small summary of slides generated with side number topics are preferred so people can get an summary before going through the whole slide',
   ].join(' ');
@@ -300,13 +301,13 @@ export class LLM_Agents {
 }
 
 export enum AgentState {
-  invoked = "invoked",
-  thinking = "thinking",
-  content = "content",
-  function = "function",
-  done = "done",
-  error = "error",
-  idle = "idle",
+  invoked = 'invoked',
+  thinking = 'thinking',
+  content = 'content',
+  function = 'function',
+  done = 'done',
+  error = 'error',
+  idle = 'idle',
 }
 export interface AgentStreamEvent {
   action: AgentState;

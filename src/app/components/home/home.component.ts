@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
   presentations: PresentationMetaData[] = [];
   ngOnInit(): void {
     this.presentations = this.presentationService.getPresentations();
-  }
+}
 
   handleRemovePPT(ppt: PresentationMetaData, event: Event) {
     event.stopImmediatePropagation();

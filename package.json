@@ -27,6 +27,7 @@
     "konva": "^10.2.0",
     "ng-zorro-antd": "^18.2.1",
     "ngx-markdown": "^18.1.0",
+    "ngx-quill": "^26.0.10",
     "ollama": "^0.6.3",
     "pptxgenjs": "^4.0.1",
     "rxjs": "~7.8.0",

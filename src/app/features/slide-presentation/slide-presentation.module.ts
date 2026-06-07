@@ -22,6 +22,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { ContentEditableSpanDirective } from '../.././directives/content-editable-span.directive';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { QuillModule } from 'ngx-quill'
 
 @NgModule({
   declarations: [
@@ -48,7 +49,8 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzButtonModule,
     NzDrawerModule,
     NzDropDownModule,
-    NzMessageModule
+    NzMessageModule,
+    QuillModule.forRoot()
   ]
 })
 export class SlidePresentationModule { }

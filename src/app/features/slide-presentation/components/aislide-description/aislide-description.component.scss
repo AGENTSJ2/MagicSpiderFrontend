@@ -102,8 +102,8 @@
 /* ── Content Section ─────────────────────────────────────────────────── */
 .content-section {
   // border-radius: 10px;
-  border: 1px solid #d9d9d9;
-  overflow: hidden;
+  // border: 1px solid #d9d9d9;
+  // overflow: hidden;
 }
 .idle {
   min-height: 180px;
@@ -165,7 +165,7 @@
 }
 
 .markdown-output {
-  padding: 16px 18px;
+  // padding: 16px 18px;
   max-height: 360px;
   overflow-y: auto;
   font-size: 14px;
@@ -259,4 +259,16 @@
   border-radius: 50%;
   display: flex;
   justify-content: center;
+}
+.ql-editor
+{
+  padding: 20px;
+  min-height: 360px;
+
+}
+::ng-deep .ql-editor
+{
+  padding: 20px;
+  min-height: 360px;
+
 }

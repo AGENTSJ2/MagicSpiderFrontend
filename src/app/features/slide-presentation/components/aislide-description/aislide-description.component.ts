@@ -48,7 +48,24 @@ export class AISlideDescriptionComponent {
     public workspaceController: WorkspaceController,
   ) {}
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  editorModules = {
+  toolbar: [
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ header: [1, 2, 3, false] }],
+
+    // REMOVE THIS if you don't want size dropdown:
+    // [{ size: [] }],
+
+    // REMOVE superscript/subscript (x² / x₂):
+    // [{ script: 'sub' }, { script: 'super' }],
+
+    [{ list: 'ordered' }, { list: 'bullet' }],
+
+    ['blockquote', 'code-block'],
+
+    ['link', 'image']
+  ]
+};
 
   get phaseTagColor(): string {
     const map: Record<StreamPhase, string> = {
@@ -168,6 +185,15 @@ export class AISlideDescriptionComponent {
     });
     this.close.emit(true);
   }
+  modules = {
+    formula: true,
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline'],
+      ['formula'],
+      ['image', 'code-block'],
+    ],
+  };
 }
 
 // const content = `## ☀️ Solar Power: Harnessing the Ultimate Clean Energy
