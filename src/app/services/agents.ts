@@ -220,7 +220,7 @@ export class LLM_Agents {
   }
 
   private async pipeResponseToStream(
-    responseEvent: Subject<any>,
+    responseEvent: Subject<AgentStreamEvent>,
     stream:
       | AbortableAsyncIterator<ChatResponse>
       | AsyncGenerator<GenerateContentResponse, any, any>,
@@ -231,14 +231,14 @@ export class LLM_Agents {
         for await (const chunk of stream as AbortableAsyncIterator<ChatResponse>) {
           if (chunk.message.thinking) {
             responseEvent.next({
-              action: 'thinking',
+              action: AgentState.thinking,
               message: chunk.message.thinking,
             });
           }
 
           if (chunk.message.content) {
             responseEvent.next({
-              action: 'content',
+              action: AgentState.content,
               message: chunk.message.content,
             });
           }
@@ -253,21 +253,22 @@ export class LLM_Agents {
           for (const part of parts) {
             if (part.thought) {
               responseEvent.next({
-                action: 'thinking',
-                message: part.text,
+                action: AgentState.thinking,
+                message: part.text ?? '',
               });
               continue;
             }
             if (part.functionCall) {
               responseEvent.next({
-                action: 'functionCall',
+                action: AgentState.function,
+                message:"",
                 functionCall: part.functionCall,
               });
               continue;
             }
             responseEvent.next({
-              action: 'content',
-              message: part.text,
+              action: AgentState.content,
+              message: part.text!,
             });
           }
         }

@@ -13,8 +13,8 @@ import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 })
 export class GeminiService {
   private readonly API_KEY: string = 'AIzaSyCYPombOhSAqcDQMDm_LfPbu8YYrjHcYkU';
-  private readonly ModelName: string = 'gemini-3.5-flash';
-  // private readonly ModelName: string = 'gemma-4-31b-it';
+  // private readonly ModelName: string = 'gemini-3.5-flash';
+  private readonly ModelName: string = 'gemma-4-31b-it';
   private gemini: GoogleGenAI;
 
   constructor() {

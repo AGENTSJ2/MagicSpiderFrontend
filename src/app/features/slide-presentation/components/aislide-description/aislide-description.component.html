@@ -5,11 +5,18 @@
   <!-- Title Template -->
   <ng-template #modalTitle>
     <div class="modal-title">
-      <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
-      Scratch Book
-      <nz-tag [nzColor]="phaseTagColor" class="phase-tag">
-        {{ phase }}
-      </nz-tag>
+      <div>
+        <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
+        Scratch Book
+        <nz-tag [nzColor]="phaseTagColor" class="phase-tag">
+          {{ phase }}
+        </nz-tag>
+      </div>
+      <div>
+        <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
+          Start Magic Spider
+        </button>
+      </div>
     </div>
   </ng-template>
 

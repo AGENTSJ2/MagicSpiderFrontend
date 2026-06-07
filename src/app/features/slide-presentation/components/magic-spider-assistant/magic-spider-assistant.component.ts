@@ -22,22 +22,26 @@ export class MagicSpiderAssistantComponent {
       this.state = ev.action;
       console.log(ev.action);
       switch (ev.action) {
-        case 'thinking':
+        case AgentState.thinking:
           this.thinkingText += ev.message;
           this.thinkingBoxElement?.nativeElement.scrollTo({
             top: this.thinkingBoxElement.nativeElement.scrollHeight,
             behavior: 'smooth',
           });
           break;
-        case 'function':
+        case AgentState.function:
+          this.thinkingText = "";
           this.calls.push(ev.functionCall);
           break;
-        case 'content':
+        case AgentState.content:
+          this.thinkingText = "";
           this.contentText = ev.message;
           break;
-        case 'done' :
+        case AgentState.done :
+          this.thinkingText = "";
           break
-        case 'error':
+        case AgentState.error:
+          this.thinkingText = "";
           this.error = ev.message;
           break
       }
