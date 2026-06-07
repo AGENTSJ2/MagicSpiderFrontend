@@ -1,16 +1,18 @@
-<div class="parent h-100">
-  <div class="slide-content-prev">
-    @if (workspaceController.latestSlideMarkdown.length == 0) {
-      <div class="d-flex justify-content-center align-items-center p-5">
-        No Slide content to generate
-      </div>
-    }
-    @else
-    {
-      <pre>
-        {{workspaceController.latestSlideMarkdown}}
-      </pre>
-    }
+<div class="parent h-100 d-flex flex-column">
+  <div class="flex-fill">
+    <div class="slide-content-prev">
+      @if (workspaceController.latestSlideMarkdown.length == 0) {
+        <div class="d-flex justify-content-center align-items-center p-5">
+          No Slide content to generate
+        </div>
+      }
+      @else
+      {
+        <pre>
+          {{workspaceController.latestSlideMarkdown}}
+        </pre>
+      }
+    </div>
   </div>
   @if (state == AgentState.thinking) {
     <div class="thinking-section">
@@ -28,9 +30,11 @@
     {{calls.length}}
   }
   <div class="d-flex gap-2">
-    <textarea [(ngModel)]="userComment"></textarea>
-    <button (click)="startMagicSpider()">
-      Start
-    </button>
+    <div class="prompt-area w-100">
+      <textarea [(ngModel)]="userComment" placeholder="Ask me to edit slides for you.." ></textarea>
+      <button (click)="startMagicSpider()">
+        Start
+      </button>
+    </div>
   </div>
 </div>

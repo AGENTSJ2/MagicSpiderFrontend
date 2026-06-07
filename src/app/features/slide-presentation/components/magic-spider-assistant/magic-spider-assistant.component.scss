@@ -52,3 +52,22 @@ textarea
 {
   width: 100%;
 }
+.prompt-area
+{
+  border: 1px solid lightgray;
+  padding: 5px;
+  textarea
+  {
+    border: none;
+    resize: none;
+    &:focus
+    {
+      outline: none;
+    }
+  }
+  button
+  {
+    border: none;
+    background: transparent;
+  }
+}
