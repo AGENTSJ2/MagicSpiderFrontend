@@ -35,7 +35,8 @@ export class TextToolBoxComponent implements OnChanges {
   }
 
   initForm() {
-    const attrs = (this.component?.node as Text)?.toObject().attrs as TextToolboxConfig;
+    const attrs = (this.component?.node as Text)?.toObject()
+      .attrs as TextToolboxConfig;
     if (!attrs) {
       return;
     }
@@ -48,8 +49,8 @@ export class TextToolBoxComponent implements OnChanges {
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
-        x: [attrs.x?.toFixed(1)],
-        y: [attrs.y?.toFixed(1)],
+        x: [Number(attrs.x?.toFixed(1))],
+        y: [Number(attrs.x?.toFixed(1))],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
@@ -72,6 +73,8 @@ export class TextToolBoxComponent implements OnChanges {
       this.form.patchValue(
         {
           ...this.localConfig.attrs,
+          x: Number(this.localConfig.attrs.x?.toFixed(1)),
+          y: Number(this.localConfig.attrs.y?.toFixed(1)),
           text: attrs.rawText ?? attrs.text,
           rotation: attrs.rotation ?? 0,
           listType: attrs.listType || 'none',

@@ -1,7 +1,7 @@
-<nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="modalFooter"
+<nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="null"
   [nzMaskClosable]="phase === StreamPhase.idle"
   [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
-  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'30px'}" nzWidth="70vw">
+  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'0px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
     <div class="modal-title">
@@ -34,7 +34,8 @@
       <!-- <ngx-quill #editor [modules]="modules" (contentChanged)="logChange($event);"></ngx-quill> -->
       <div class="content-section">
         <div class="markdown-output" #genContent>
-          <quill-editor [(ngModel)]="contentText" format="html" [modules]="this.editorModules" class="w-100"></quill-editor>
+          <quill-editor [(ngModel)]="contentText" format="html" [modules]="this.editorModules"
+            class="w-100 h-100"></quill-editor>
           <span class="cursor" *ngIf="phase === StreamPhase.content">▌</span>
         </div>
       </div>
@@ -63,13 +64,3 @@
 
     </div>
   </ng-container>
-
-  <!-- Footer Template -->
-  <ng-template #modalFooter>
-    <div class="modal-footer">
-      <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
-        Start Magic Spider
-      </button>
-    </div>
-  </ng-template>
-</nz-modal>
