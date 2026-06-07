@@ -3,7 +3,6 @@
   height: 100vh;
 
   .nav {
-    // height: 10vh;
     min-height: 70px;
     width: 100%;
     background-color: var(--primary-color);
@@ -26,7 +25,6 @@
     position: relative;
     min-height: 0;
     min-width: 0;
-
   }
 }
 
@@ -57,7 +55,6 @@
   .menu-item {
     position: relative;
     cursor: pointer;
-
     .shape-types {
       position: absolute;
       display: flex;
@@ -90,10 +87,7 @@
 
 .side-wrap {
   position: relative;
-
 }
-
-
 
 .bottom {
   border-top: 1px solid var(--border-color-primary);
@@ -103,7 +97,6 @@
 
 .bottom-list {
   display: flex;
-  // justify-content: center;
   gap: 10px;
   max-width: 100%;
   overflow: auto;

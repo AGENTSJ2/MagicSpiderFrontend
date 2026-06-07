@@ -172,7 +172,9 @@ export class WorkspaceComponent {
   }
   savePpt() {
     this.presentation.name = this.name;
-    this.presentationService.savePresentation(this.presentation);
+    const firstslide = this.presentation.slides.at(0);
+    const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
+    this.presentationService.savePresentation(this.presentation,thumbnail);
     this.message.success("Presentation Saved")
   }
 

@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
 
   handleNewPPT() {
     const presentation = this.presentationService.getPresentation('new');
-    this.presentationService.addPresentation(presentation);
+    this.presentationService.addPresentation(presentation, '');
     this.router.navigate(['/workspace/ppt'], {
       queryParams: { id: presentation.id },
     });
