@@ -49,8 +49,8 @@ export class TextToolBoxComponent implements OnChanges {
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
-        x: [Number(attrs.x?.toFixed(1))],
-        y: [Number(attrs.x?.toFixed(1))],
+        x: [attrs.x ?? 0],
+        y: [attrs.y ?? 0],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
@@ -73,8 +73,8 @@ export class TextToolBoxComponent implements OnChanges {
       this.form.patchValue(
         {
           ...this.localConfig.attrs,
-          x: Number(this.localConfig.attrs.x?.toFixed(1)),
-          y: Number(this.localConfig.attrs.y?.toFixed(1)),
+          x: this.localConfig.attrs.x ?? 0,
+          y: this.localConfig.attrs.y ?? 0,
           text: attrs.rawText ?? attrs.text,
           rotation: attrs.rotation ?? 0,
           listType: attrs.listType || 'none',
@@ -107,7 +107,12 @@ export class TextToolBoxComponent implements OnChanges {
   }
   ZIndexActions = ZIndexActions;
   move(action: ZIndexActions) {
-    throw Error('Not implemented');
+    console.log(this.localConfig);
+    
+    this.component.updateComponent({
+      newConfig: this.localConfig,
+      zIndexActions: action,
+    });
   }
 
   applyChanges() {

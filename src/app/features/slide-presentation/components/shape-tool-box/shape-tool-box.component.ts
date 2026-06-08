@@ -103,15 +103,7 @@ export class ShapeToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
 
   move(action: ZIndexActions) {
-    throw Error('Not implemented');
-    // const updateEvent = new UpdateShapeEvent({
-    //   ...this.event,
-    //   previousConfig: this.event.currentConfig,
-    //   currentConfig: this.localConfig,
-    //   trackHistory: true,
-    //   zIndexActions: action
-    // });
-    // this.presentation.publishEvent(updateEvent);
+    this.component.updateComponent({newConfig:this.localConfig,zIndexActions:action})
   }
 
   applyChanges() {

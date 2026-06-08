@@ -36,6 +36,7 @@ export class ShapeNodeService {
     config: ComponentConfig<ShapeConfig>;
   }):Shape | undefined {
     params.node.setAttrs(params.config.attrs);
+    params.node.zIndex(params.config.zIndex);
     if (params?.zIndexActions != undefined) {
       switch (params.zIndexActions) {
         case ZIndexActions.moveToFront:
@@ -52,7 +53,6 @@ export class ShapeNodeService {
           break;
       }
     }
-    params.node.zIndex(params.config.zIndex);
     return params.node;
   }
 }

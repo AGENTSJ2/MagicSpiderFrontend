@@ -6,7 +6,6 @@ import ShapeComponent, {
 } from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
 import pptxgen  from 'pptxgenjs';
 import { Image } from 'konva/lib/shapes/Image';
-import { Rect } from 'konva/lib/shapes/Rect';
 import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
 
@@ -173,8 +172,6 @@ export class PresentationService {
     shapeType: pptxgen.ShapeType;
     options: pptxgen.ShapeProps;
   } {
-    
-    
     // const radius = (component.node as Rect).cornerRadius();
     // const hasRoundedCorners = Array.isArray(radius)
     //   ? radius.some((r) => r > 0)
