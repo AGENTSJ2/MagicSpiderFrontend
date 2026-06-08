@@ -13,7 +13,7 @@ import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 @Component({
   selector: 'app-shape-tool-box',
   templateUrl: './shape-tool-box.component.html',
-  styleUrls: ['./shape-tool-box.component.scss'],
+  styleUrls: ['./shape-tool-box.component.scss','../text-tool-box/text-tool-box.component.scss'],
 })
 export class ShapeToolBoxComponent implements OnChanges {
   @Input() presentation!: Presentation;

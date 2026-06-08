@@ -52,7 +52,7 @@ export class Presentation {
     trackHistory?:boolean;
   }) {
     const trackHistory = params.trackHistory == undefined || params.trackHistory;
-    const newConfig = structuredClone(params.newConfig);
+    const newConfig =  structuredClone(params.newConfig);
     const oldConfig = structuredClone(params.oldConfig);
     const event: PresentationEvent = new PresentationEvent({
       eventType: params.eventType,

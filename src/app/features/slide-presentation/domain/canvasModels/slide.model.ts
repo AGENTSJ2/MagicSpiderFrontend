@@ -103,10 +103,7 @@ export class Slide {
         component: component,
         eventType: PresentationEventType.ADD,
         oldConfig: undefined,
-        newConfig: {
-          attrs: component.node.attrs,
-          zIndex: component.node.zIndex(),
-        },
+        newConfig: component.getSerializableConfig(),
       });
     }
     return component;

@@ -56,7 +56,7 @@ export class ImageComponent implements ICanvasComponent {
     });
   }
 
-  private getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
+  getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
     const attrs = { ...this.node.getAttrs() };
     delete attrs['image'];
     return {

@@ -8,7 +8,6 @@ import {
   ZIndexActions,
 } from '../../domain/EventModels/presentationEvents.model';
 import {
-  ImageComponent,
   SerializableImageConfig,
 } from '../../domain/canvasModels/imageComponent';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
@@ -17,7 +16,7 @@ import { Image } from 'konva/lib/shapes/Image';
 @Component({
   selector: 'app-image-tool-box',
   templateUrl: './image-tool-box.component.html',
-  styleUrls: ['./image-tool-box.component.scss'],
+  styleUrls: ['./image-tool-box.component.scss','../text-tool-box/text-tool-box.component.scss'],
 })
 export class ImageToolBoxComponent implements OnChanges {
   @Input() presentation!: Presentation;
