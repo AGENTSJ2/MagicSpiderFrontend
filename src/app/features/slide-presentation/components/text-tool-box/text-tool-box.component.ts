@@ -1,53 +1,56 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-
 import {
-  SelectTextEvent,
-  UpdateTextEvent
-} from '../../domain/EventModels/textEvent.model';
-import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
+  ComponentConfig,
+  ZIndexActions,
+} from '../../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { BulletStyle, ListType, NumberStyle, TextToolboxConfig } from '../../domain/canvasModels/textComponent.model';
-
-
+import {
+  BulletStyle,
+  ListType,
+  NumberStyle,
+  TextComponent,
+  TextToolboxConfig,
+} from '../../domain/canvasModels/textComponent.model';
+import { Text, TextConfig } from 'konva/lib/shapes/Text';
+import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 
 @Component({
   selector: 'app-text-tool-box',
   templateUrl: './text-tool-box.component.html',
-  styleUrls: ['./text-tool-box.component.scss']
+  styleUrls: ['./text-tool-box.component.scss'],
 })
 export class TextToolBoxComponent implements OnChanges {
-
-  @Input() event!: SelectTextEvent;
   @Input() presentation!: Presentation;
-
-  form!: FormGroup;
+  @Input() component!: ICanvasComponent;
   localConfig!: ComponentConfig<TextToolboxConfig>;
+  form!: FormGroup;
   private sub?: Subscription;
   private updateTimeOut: any;
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['event'] && this.event?.currentConfig) {
-      this.localConfig = structuredClone(this.event.currentConfig);
-      this.initForm();
-      this.listenToChanges();
-    }
+    this.initForm();
   }
 
   initForm() {
-    const attrs = this.localConfig.attrs;
-    const isGradientEnabled = attrs.fill == undefined;   
+    const attrs = (this.component?.node as Text)?.toObject()
+      .attrs as TextToolboxConfig;
+    if (!attrs) {
+      return;
+    }
+    this.localConfig = {
+      attrs: attrs,
+      zIndex: this.component.node.zIndex(),
+    };
+    const isGradientEnabled = attrs.fill == undefined;
     this.sub?.unsubscribe();
     if (!this.form) {
       this.form = this.fb.group({
         text: [attrs.rawText ?? attrs.text],
+        x: [attrs.x ?? 0],
+        y: [attrs.y ?? 0],
         fontFamily: [attrs.fontFamily],
         fontStyle: [attrs.fontStyle],
         fontSize: [attrs.fontSize],
@@ -66,92 +69,100 @@ export class TextToolBoxComponent implements OnChanges {
         gradientOffset: [attrs.fillLinearGradientColorStops?.at(2) ?? 1],
         gradientWidth: attrs.fillLinearGradientEndPointX,
       });
+    } else {
+      this.form.patchValue(
+        {
+          ...this.localConfig.attrs,
+          x: this.localConfig.attrs.x ?? 0,
+          y: this.localConfig.attrs.y ?? 0,
+          text: attrs.rawText ?? attrs.text,
+          rotation: attrs.rotation ?? 0,
+          listType: attrs.listType || 'none',
+          bulletStyle: attrs.bulletStyle || 'disc',
+          numberStyle: attrs.numberStyle || 'decimal',
+        },
+        {
+          emitEvent: false,
+        },
+      );
     }
-    else {
-      this.form.patchValue({
-        ...this.localConfig.attrs,
-        text: attrs.rawText ?? attrs.text,
-        rotation: attrs.rotation ?? 0,
-        listType: attrs.listType || 'none',
-        bulletStyle: attrs.bulletStyle || 'disc',
-        numberStyle: attrs.numberStyle || 'decimal',
-      }, {
-        emitEvent: false
-      })
-    }
+    this.listenToChanges();
   }
 
   listenToChanges() {
-    this.sub = this.form.valueChanges.subscribe(values => {
+    this.sub = this.form.valueChanges.subscribe((values) => {
       Object.assign(this.localConfig.attrs, values);
-      this.localConfig.attrs.rawText = values.text;
-      this.localConfig.attrs.text = this.getFormattedText(values.text, values.listType, values.bulletStyle, values.numberStyle);
+      (this.localConfig.attrs as any).rawText = values.text;
+      this.localConfig.attrs.text = this.getFormattedText(
+        values.text,
+        values.listType,
+        values.bulletStyle,
+        values.numberStyle,
+      );
       clearTimeout(this.updateTimeOut);
       this.updateTimeOut = setTimeout(() => {
-        this.applyChanges()
-      }, 200)
+        this.applyChanges();
+      }, 200);
     });
   }
   ZIndexActions = ZIndexActions;
-  move(action:ZIndexActions)
-  {
-    const updateEvent = new UpdateTextEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true,
-      zIndexActions:action
+  move(action: ZIndexActions) {
+    console.log(this.localConfig);
+    
+    this.component.updateComponent({
+      newConfig: this.localConfig,
+      zIndexActions: action,
     });
-    this.presentation.publishEvent(updateEvent);
   }
 
   applyChanges() {
     if (this.form.value.gradientEnabled) {
       this.localConfig.attrs.fillLinearGradientStartPoint = { x: 0, y: 0 };
-      this.localConfig.attrs.fillLinearGradientEndPoint = { x: this.form.value.gradientWidth || 200, y: 0 };
+      this.localConfig.attrs.fillLinearGradientEndPoint = {
+        x: this.form.value.gradientWidth || 200,
+        y: 0,
+      };
       this.localConfig.attrs.fillLinearGradientColorStops = [
         0,
         this.form.value.gradientStart,
         this.form.value.gradientOffset,
-        this.form.value.gradientEnd
+        this.form.value.gradientEnd,
       ];
-
       this.localConfig.attrs.fill = undefined; // important
     } else {
       this.localConfig.attrs.fill = this.form.value.fill;
     }
-    const updateEvent = new UpdateTextEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true
+    this.component.updateComponent({
+      newConfig: this.localConfig,
     });
-    this.presentation.publishEvent(updateEvent);
   }
 
   private getFormattedText(
     text = '',
     listType: ListType = 'none',
     bulletStyle: BulletStyle = 'disc',
-    numberStyle: NumberStyle = 'decimal'
+    numberStyle: NumberStyle = 'decimal',
   ): string {
     if (listType === 'none') {
       return text;
     }
 
     let itemNumber = 0;
-    return text.split('\n').map(line => {
-      if (!line.trim()) {
-        return line;
-      }
+    return text
+      .split('\n')
+      .map((line) => {
+        if (!line.trim()) {
+          return line;
+        }
 
-      itemNumber += 1;
-      if (listType === 'bullet') {
-        return `${this.getBulletMarker(bulletStyle)} ${line}`;
-      }
+        itemNumber += 1;
+        if (listType === 'bullet') {
+          return `${this.getBulletMarker(bulletStyle)} ${line}`;
+        }
 
-      return `${this.getNumberMarker(itemNumber, numberStyle)} ${line}`;
-    }).join('\n');
+        return `${this.getNumberMarker(itemNumber, numberStyle)} ${line}`;
+      })
+      .join('\n');
   }
 
   private getBulletMarker(style: BulletStyle): string {
@@ -193,9 +204,19 @@ export class TextToolBoxComponent implements OnChanges {
 
   private getRomanMarker(value: number): string {
     const numerals: Array<[number, string]> = [
-      [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
-      [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
-      [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I'],
+      [1000, 'M'],
+      [900, 'CM'],
+      [500, 'D'],
+      [400, 'CD'],
+      [100, 'C'],
+      [90, 'XC'],
+      [50, 'L'],
+      [40, 'XL'],
+      [10, 'X'],
+      [9, 'IX'],
+      [5, 'V'],
+      [4, 'IV'],
+      [1, 'I'],
     ];
     let current = value;
     let result = '';

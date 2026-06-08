@@ -1,12 +1,21 @@
 <div class="toolbox-panel" *ngIf="form">
     <form action="" [formGroup]="form">
-
-        <div class="toolbox-title">Text properties</div>
-
         <!-- Content -->
         <div class="mb-3">
             <label class="form-label">Content</label>
             <textarea class="form-control" rows="3" formControlName="text"></textarea>
+        </div>
+        <!-- Position -->
+        <div class="row-half mb-3">
+            <div>
+                <label class="form-label">X</label>
+                <input type="number" class="form-control" formControlName="x" />
+            </div>
+
+            <div>
+                <label class="form-label">Y</label>
+                <input type="number" step="0.1" class="form-control" formControlName="y" />
+            </div>
         </div>
 
         <div class="row-half mb-3">
@@ -122,10 +131,10 @@
             <label class="form-label">Position</label>
         </div>
         <div class="row-half mb-3">
-            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
-            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
-            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
-            <button type="button" class="btn z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
+            <button type="button" class=" z-btn" (click)="move(ZIndexActions.moveUp)">Move Up</button>
+            <button type="button" class=" z-btn" (click)="move(ZIndexActions.moveDown)">Move Down</button>
+            <button type="button" class=" z-btn" (click)="move(ZIndexActions.moveToBack)">Move Back</button>
+            <button type="button" class=" z-btn" (click)="move(ZIndexActions.moveToFront)">Move Front</button>
         </div>
 
         <div class="mb-3">

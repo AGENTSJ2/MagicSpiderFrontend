@@ -1,45 +1,45 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { ComponentConfig, ZIndexActions } from '../../domain/EventModels/presentationEvents.model';
-import { SelectImageEvent, SerializableImageConfig, UpdateImageEvent } from '../../domain/EventModels/imageEvent.model';
+import {
+  ComponentConfig,
+  ZIndexActions,
+} from '../../domain/EventModels/presentationEvents.model';
+import {
+  SerializableImageConfig,
+} from '../../domain/canvasModels/imageComponent';
+import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
+import { Image } from 'konva/lib/shapes/Image';
 
 @Component({
   selector: 'app-image-tool-box',
   templateUrl: './image-tool-box.component.html',
-  styleUrls: ['./image-tool-box.component.scss']
+  styleUrls: ['./image-tool-box.component.scss','../text-tool-box/text-tool-box.component.scss'],
 })
 export class ImageToolBoxComponent implements OnChanges {
-
-  @Input() event!: SelectImageEvent;
   @Input() presentation!: Presentation;
+  @Input() component!: ICanvasComponent;
 
   form!: FormGroup;
   localConfig!: ComponentConfig<SerializableImageConfig>;
   private sub?: Subscription;
   private updateTimeOut: any;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['event'] && this.event?.currentConfig) {
-      this.localConfig = structuredClone(this.event.currentConfig);
-      this.initForm();
-      this.listenToChanges();
-    }
+    this.initForm();
   }
 
   initForm() {
-    const attrs = this.localConfig.attrs;
-    this.sub?.unsubscribe();
-
+    const attrs = (this.component?.node as Image)?.toObject().attrs;
+    if(!attrs)
+    {
+      return
+    }
+    this.localConfig = { attrs, zIndex: this.component.node.zIndex() };
     if (!this.form) {
       this.form = this.fb.group({
         x: [attrs.x ?? 10],
@@ -52,26 +52,31 @@ export class ImageToolBoxComponent implements OnChanges {
         strokeWidth: [attrs.strokeWidth || 0],
         cornerRadius: [attrs.cornerRadius || 0],
       });
+    } else {
+      this.form.patchValue(
+        {
+          x: attrs.x ?? 10,
+          y: attrs.y ?? 10,
+          width: attrs.width ?? 300,
+          height: attrs.height ?? 180,
+          rotation: attrs.rotation ?? 0,
+          opacity: attrs.opacity ?? 1,
+          stroke: attrs.stroke || '#000000',
+          strokeWidth: attrs.strokeWidth || 0,
+          cornerRadius: attrs.cornerRadius || 0,
+        },
+        {
+          emitEvent: false,
+        },
+      );
     }
-    else {
-      this.form.patchValue({
-        x: attrs.x ?? 10,
-        y: attrs.y ?? 10,
-        width: attrs.width ?? 300,
-        height: attrs.height ?? 180,
-        rotation: attrs.rotation ?? 0,
-        opacity: attrs.opacity ?? 1,
-        stroke: attrs.stroke || '#000000',
-        strokeWidth: attrs.strokeWidth || 0,
-        cornerRadius: attrs.cornerRadius || 0,
-      }, {
-        emitEvent: false
-      });
-    }
+    this.listenToChanges();
+
   }
 
   listenToChanges() {
-    this.sub = this.form.valueChanges.subscribe(values => {
+    this.sub?.unsubscribe();
+    this.sub = this.form.valueChanges.subscribe((values) => {
       Object.assign(this.localConfig.attrs, values);
       clearTimeout(this.updateTimeOut);
       this.updateTimeOut = setTimeout(() => {
@@ -83,14 +88,14 @@ export class ImageToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
 
   move(action: ZIndexActions) {
-    const updateEvent = new UpdateImageEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true,
-      zIndexActions: action
-    });
-    this.presentation.publishEvent(updateEvent);
+    // const updateEvent = new UpdateImageEvent({
+    //   ...this.event,
+    //   previousConfig: this.event.currentConfig,
+    //   currentConfig: this.localConfig,
+    //   trackHistory: true,
+    //   zIndexActions: action
+    // });
+    // this.presentation.publishEvent(updateEvent);
   }
 
   replaceImage(event: Event) {
@@ -110,12 +115,6 @@ export class ImageToolBoxComponent implements OnChanges {
   }
 
   applyChanges() {
-    const updateEvent = new UpdateImageEvent({
-      ...this.event,
-      previousConfig: this.event.currentConfig,
-      currentConfig: this.localConfig,
-      trackHistory: true
-    });
-    this.presentation.publishEvent(updateEvent);
+    this.component.updateComponent({ newConfig: this.localConfig });
   }
 }

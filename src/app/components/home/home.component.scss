@@ -1,0 +1,46 @@
+.ppt-prev-list {
+    overflow: auto;
+    flex-wrap: wrap;
+    .add-new-ppt {
+        cursor: pointer;
+    }
+    .ppt-wrap {
+        width: 200px;
+        cursor: pointer;
+    }
+    .ppt-prev {
+        width: 200px;
+        height: 112px;
+        background-color: white;
+        border: 1px solid var(--border-color-primary);
+        position: relative;
+        flex-shrink: 0;
+        img {
+            width: 99%;
+            height: auto;
+        }
+
+        .del-btn {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            background-color: transparent;
+            border: 1px solid var(--bs-danger);
+            color: var(--bs-danger);
+            width: 25px;
+            height: 25px;
+        }
+    }
+    .ppt-name {
+        font-weight: 500;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 80%;
+    }
+    .pptpng
+    {
+        height: auto !important;
+        width: 70px !important;
+    }
+}

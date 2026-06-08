@@ -1,33 +1,25 @@
 import { Subject } from "rxjs";
 import { ShapeConfig } from "konva/lib/Shape";
+import type { Presentation } from "../canvasModels/presenatation.model";
+import type { Slide } from "../canvasModels/slide.model";
 
 export class PresentationEvent {
-    nodeId: string;
-    presentationId: string;
-    slideId: string;
-    currentConfig?: ComponentConfig<ShapeConfig>;
-    previousConfig?: ComponentConfig<ShapeConfig>;
-    trackHistory: boolean;
+    readonly nodeId: string;
+    readonly presentationId: string;
+    readonly slideId?: string;
+    readonly currentConfig?: ComponentConfig<ShapeConfig>;
+    readonly previousConfig?: ComponentConfig<ShapeConfig>;
+    readonly trackHistory: boolean;
+    readonly eventType:PresentationEventType;
+
     constructor(init: PresentationEvent) {
         this.nodeId = init.nodeId;
-        this.presentationId = init.presentationId ?? '';
+        this.presentationId = init.presentationId;
         this.slideId = init.slideId;
         this.currentConfig = init.currentConfig;
         this.previousConfig = init.previousConfig;
         this.trackHistory = init.trackHistory;
-    }
-}
-
-export class ClearSelectionEvent extends PresentationEvent {
-    constructor(init: { slideId: string, presentationId: string }) {
-        super({
-            nodeId: '',
-            slideId: init.slideId,
-            presentationId: init.presentationId,
-            currentConfig: undefined,
-            previousConfig: undefined,
-            trackHistory: false,
-        });
+        this.eventType = init.eventType;
     }
 }
 
@@ -50,6 +42,11 @@ export enum PresentationEventType {
     UPDATE,
     REMOVE,
     SELECT,
-    RESTORE
+    RESTORE,
+    CLEAR_SELECT,
+    ADD_SLIDE,
+    REMOVE_SLIDE,
+    UNDO,
+    REDO
 }
 

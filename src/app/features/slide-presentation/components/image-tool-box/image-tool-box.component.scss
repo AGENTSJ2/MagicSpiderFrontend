@@ -1,41 +1,3 @@
-.toolbox-panel {
-    background: #fff;
-    border: 0.5px solid rgba(0, 0, 0, 0.12);
-    border-radius: 12px;
-    padding: 1.25rem;
-    max-width: 380px;
-}
-
-.toolbox-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-}
-
-.form-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.row-half {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.section-divider {
-    border: none;
-    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
-    margin: 1rem 0;
-}
-
 .upload-row {
     display: flex;
     align-items: center;
@@ -52,43 +14,4 @@
     input {
         display: none;
     }
-}
-
-.color-row {
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-}
-
-.color-preview {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    border: 0.5px solid rgba(0, 0, 0, 0.15);
-    flex-shrink: 0;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-
-    input[type='color'] {
-        opacity: 0;
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-        border: none;
-        padding: 0;
-    }
-}
-
-.color-hex {
-    font-size: 13px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #666;
-}
-
-.z-btn {
-    background-color: oklch(15.3% 0.006 107.1);
-    color: oklch(88% 0.011 106.6);
 }

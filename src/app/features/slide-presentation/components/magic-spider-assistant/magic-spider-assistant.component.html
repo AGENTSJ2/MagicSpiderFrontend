@@ -1,0 +1,48 @@
+<div class="parent h-100 d-flex flex-column">
+  <div class="flex-fill">
+    <div class="slide-content-prev">
+      @if (workspaceController.latestSlideMarkdown.length == 0) {
+        <div class="d-flex justify-content-center align-items-center p-5">
+          No Slide content to generate
+        </div>
+      }
+      @else
+      {
+        <pre>
+          {{workspaceController.latestSlideMarkdown}}
+        </pre>
+      }
+    </div>
+  </div>
+  @if (state == AgentState.thinking) {
+    <div class="thinking-section">
+      <div class="thinking-header">
+        <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+        <span class="thinking-label">Thinking process</span>
+      </div>
+      <div class="thinking-box" #thinkingBox>
+        <pre class="thinking-text">{{ thinkingText }}<span class="cursor">▌</span></pre>
+      </div>
+    </div>
+  }
+  @if(state == AgentState.function)
+  {
+    {{calls.length}}
+  }
+  <div class="d-flex gap-2">
+    <div class="prompt-area w-100">
+      <div class="promt-control">
+        @if(userComment.trim().length == 0)
+        {
+          <span  (click)="promptspan.focus()" class="prmpt-place">Ask me to edit slides for you..</span>
+        }
+        <span [(ngModel)]="userComment" contentEditableModel contenteditable="true" placeholder="Ask me to edit slides for you.." #promptspan></span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button (click)="startMagicSpider()">
+          <i class="fi fi-sr-paper-plane-top d-flex justify-content-center align-items-center"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

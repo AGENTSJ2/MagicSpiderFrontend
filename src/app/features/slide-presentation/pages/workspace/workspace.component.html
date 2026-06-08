@@ -1,24 +1,61 @@
 <div class="workspace d-flex flex-column">
-  <div class="nav d-flex justify-content-between align-items-center px-2">
+  <div class="nav d-flex justify-content-between align-items-center">
     <div class="d-flex gap-3">
-      <div class="home-btn">
-        <i class="fi fi-rs-home"></i>
+      <div class="home-btn d-flex justify-content-center align-items-center" [routerLink]="'/'">
+        <i class="fi fi-sr-house-chimney"></i>
       </div>
-      <p class="mb-0">File Name</p>
+      <span contentEditableModel [(ngModel)]="name" contenteditable="true" class="ppt-name" (blur)="handleNameBlur()">
+      </span>
     </div>
-    <div>
-      <div class="share-btn">
-        <i class="fi fi-rr-upload"></i>
-        Share
-      </div>
+    <div class=" d-flex gap-3 px-2">
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
+        (click)="workSpaceController.toggleToolBox(true)">
+        <i class="fi fi-rr-settings d-flex justify-content-center align-items-center"></i>
+        <P class="mb-0">Properties</P>
+      </button>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
+        (click)="toggleMagicAssistant(true)">
+        <i class="fi fi-rr-brain-circuit d-flex justify-content-center align-items-center"></i>
+        <P class=" mb-0">AI</P>
+      </button>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
+        (click)="handleOpenAiDescription()">
+        <i class="fi fi-rr-diary-bookmark-down d-flex justify-content-center align-items-center"></i>
+        <P class="mb-0">Scratch Book</P>
+      </button>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2" nz-dropdown nzTrigger="click"
+        [nzDropdownMenu]="saveMenu">
+        <i class="fi fi-sr-folder-download d-flex justify-content-center align-items-center"></i>
+        <P class=" mb-0">Save</P>
+        <nz-dropdown-menu #saveMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <div class="d-flex gap-2 fs-7" (click)="savePpt()">
+                <i class="fi fi-rr-cloud-upload d-flex justify-content-center align-items-center"></i>
+                <p class=" mb-0">Save</p>
+              </div>
+            </li>
+            <li nz-menu-item>
+              <div class="d-flex gap-2 fs-7" (click)="this.workSpaceController.exportPPT(this.presentation)">
+                <i class="fi fi-rr-upload d-flex justify-content-center align-items-center"></i>
+                <p class=" mb-0">Export PPT</p>
+              </div>
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+      </button>
     </div>
   </div>
   <div class="d-flex flex-1">
     <div class="side-wrap">
       <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
+        <div class="menu-item d-flex gap-1 flex-column " (click)="addSlide()">
+          <i class="fi fi-rr-rectangle-vertical-history d-flex justify-content-center align-items-center fs-4"></i>
+          <p class="mb-0 text-center">Slide</p>
+        </div>
         <div class="menu-item d-flex gap-1 flex-column " (click)="handleAddText()">
           <i class="fi fi-rr-text d-flex justify-content-center align-items-center fs-4"></i>
-          <p class="mb-0 text-center" >Text</p>
+          <p class="mb-0 text-center">Text</p>
         </div>
         <div class="menu-item d-flex gap-1 flex-column">
           <i class="fi fi-rr-resources d-flex justify-content-center align-items-center fs-4"></i>
@@ -40,65 +77,85 @@
           <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" />
         </label>
       </div>
-      <!-- @if(selectedToolBox!=TooBoxType.None)
-      {
-        <div class="tool-display">
-            @switch (selectedToolBox) {
-              @case (TooBoxType.TextToolBox) {
-                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
-              }
-              @case (TooBoxType.ShapeTooLBox) {
-                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
-              }
-              @case (TooBoxType.ImageToolBox) {
-                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
-              }
-            }
-        </div>
-      } -->
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       <div class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center">
         <div class="parent-slide-wrapper">
           @if(presentation.slides.length == 0)
           {
-            <div class="d-flex justify-content-center align-items-center">
-              add some slides
+          <div class="empty-slide-state d-flex flex-column justify-content-center align-items-center gap-3">
+            <div class="empty-icon-wrap d-flex justify-content-center align-items-center">
+              <i class="fi fi-rr-rectangle-vertical-history"></i>
             </div>
+            <div class="text-center">
+              <p class="empty-title mb-1">No slides yet</p>
+              <p class="empty-sub mb-0">Click <strong>Slide</strong> in the sidebar to get started</p>
+            </div>
+            <button class="empty-cta" (click)="addSlide()">
+              <i class="fi fi-rr-plus-small d-flex justify-content-center align-items-center"></i>
+              Add first slide
+            </button>
+          </div>
           }
           @else {
-
-            <app-slide *ngIf="activeSlide?.slideId" [slide]="activeSlide!"></app-slide>
+          <app-slide *ngIf="presentation.getActiveSlide" [slide]="presentation.getActiveSlide!"></app-slide>
           }
         </div>
       </div>
-      @if(selectedToolBox!=TooBoxType.None)
-      {
-        <div class="tool-display">
-            @switch (selectedToolBox) {
-              @case (TooBoxType.TextToolBox) {
-                <app-text-tool-box [event]="activeEvent!" [presentation]="presentation"></app-text-tool-box>
-              }
-              @case (TooBoxType.ShapeTooLBox) {
-                <app-shape-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-shape-tool-box>
-              }
-              @case (TooBoxType.ImageToolBox) {
-                <app-image-tool-box [event]="$any(activeEvent!)" [presentation]="presentation"></app-image-tool-box>
-              }
-            }
-        </div>
-      }
-      <div class="ppt-list d-flex justify-content-center align-items-center gap-3">
-        @for (item of presentation.slides; track $index) {
 
-          <div class="slide-preview-wrapper" (click)="selectSlide(item)">
-            slide {{$index}}
+      <div class="d-flex w-100 justify-content-between bottom">
+        <div class="bottom-list w-100" #pptList *ngIf="presentation.slides.length!=0">
+          @for (item of presentation.slides; track $index) {
+          <div class="slide-prev" (click)="selectSlide(item)">
+            <ng-container *ngIf="slideImages.get(item.slideId) as image">
+              <img [src]="image" [alt]="$index">
+            </ng-container>
+            <ng-container *ngIf="!slideImages.get(item.slideId) as image">
+              <div class="d-flex justify-content-center align-items-center flex-column">
+                <h6 class="mb-1">Slide {{$index}}</h6>
+                <small>Click to preview</small>
+              </div>
+            </ng-container>
+            <button (click)="handleRemoveSlide(item,$event)" class="del-btn"><i
+                class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i></button>
           </div>
-        }
-        <button class="add-slide" (click)="addSlide()">
-          <i class="fi fi-ss-add" ></i>
-        </button>
+          }
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<app-aislide-description [presentation]="presentation"></app-aislide-description>
+<nz-drawer [nzVisible]="workSpaceController.showMagicSpiderAssistant" nzTitle="Magic Spider"
+  (nzOnClose)="toggleMagicAssistant(false)" [nzMask]="false">
+  <ng-container *nzDrawerContent>
+    <app-magic-spider-assistant></app-magic-spider-assistant>
+  </ng-container>
+</nz-drawer>
+<nz-drawer [nzVisible]="workSpaceController.showToolBox" nzTitle="Properties" (nzOnClose)="workSpaceController.toggleToolBox(false)"
+  [nzMask]="false">
+  <ng-container *nzDrawerContent>
+    @switch (selectedToolBox) {
+    @case (TooBoxType.TextToolBox) {
+    <app-text-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-text-tool-box>
+    }
+    @case (TooBoxType.ShapeTooLBox) {
+    <app-shape-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-shape-tool-box>
+    }
+    @case (TooBoxType.ImageToolBox) {
+    <app-image-tool-box [presentation]="presentation" [component]="selectedComponent!"></app-image-tool-box>
+    }
+    @case (TooBoxType.None) {
+    <div class="empty d-flex flex-column justify-content-center align-items-center h-100">
+      <div class="empty-card">
+        <img src="/images/building.png">
+        <p>
+          No Component selected
+        </p>
+      </div>
+    </div>
+    }
+    }
+  </ng-container>
+</nz-drawer>

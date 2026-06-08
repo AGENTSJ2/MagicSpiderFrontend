@@ -1,2 +1,32 @@
 <p>home works!</p>
-<a routerLink="/workspace/ppt">to ppt</a>
+<div class="presentations">
+    <h5>Presentations</h5>
+    <div class="d-flex gap-3 p-2 ppt-prev-list ">
+        <div (click)="handleNewPPT()"
+            class="ppt-prev p-2 add-new-ppt d-flex justify-content-center align-items-center flex-column ">
+            <i class="fi fi-rr-multiple d-flex justify-content-center align-items-center fs-4 fw-semibold"></i>
+            <p class="mb-0 fw-semibold mt-2">Add New</p>
+        </div>
+        @for (item of presentations; track $index) {
+        <div class="ppt-wrap" routerLink="/workspace/ppt" [queryParams]="{ id: item.id }">
+            <div class="ppt-prev d-flex justify-content-center align-items-center">
+                <ng-container *ngIf="item.thumbnail as image">
+                    <img [src]="image" alt="" >
+                </ng-container>
+                <ng-container *ngIf="!item.thumbnail">
+                    <img [src]="'images/ppt.png'" alt="ppt" class="pptpng">
+                </ng-container>
+                <button (click)="handleRemovePPT(item,$event)" class="del-btn">
+                    <i class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i>
+                </button>
+            </div>
+            <div class="mt-2 d-flex justify-content-between ">
+                <p class="mb-0 ppt-name">{{item.name}}</p>
+                <p class="mb-0">
+                    {{item.slideCount}}
+                </p>
+            </div>
+        </div>
+        }
+    </div>
+</div>

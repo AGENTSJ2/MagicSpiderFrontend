@@ -6,38 +6,11 @@ import { Stage } from 'konva/lib/Stage';
 import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
-  ClearSelectionEvent,
-  PresentationEvent,
   PresentationEventStream,
+  PresentationEventType,
 } from '../domain/EventModels/presentationEvents.model';
-import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
-import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { Slide } from '../domain/canvasModels/slide.model';
-import { Subscription } from 'rxjs';
-import {
-  AddTextEvent,
-  RemoveTextEvent,
-  RestoreTextEvent,
-  SelectTextEvent,
-  TextEvent,
-} from '../domain/EventModels/textEvent.model';
-import {
-  AddShapeEvent,
-  RemoveShapeEvent,
-  RestoreShapeEvent,
-  SelectShapeEvent,
-  ShapeEvent,
-} from '../domain/EventModels/shapeEvent.models';
-import {
-  AddImageEvent,
-  ImageEvent,
-  RemoveImageEvent,
-  RestoreImageEvent,
-  SelectImageEvent,
-} from '../domain/EventModels/imageEvent.model';
-import { SlideEvent } from '../domain/EventModels/slideEvent.model';
-import { AddTrashEvents, RemoveFromTrashEvents } from '../domain/EventModels/trashEvents.model';
+import { waitForMilliseconds } from '../../../core/utilities';
 
 export default class SlideController {
   transformer!: Transformer;
@@ -46,8 +19,6 @@ export default class SlideController {
   stage!: Stage;
   private slide: Slide;
   private readonly DESIRED_SLIDE_HEIGHT = 750;
-  private eventBus: PresentationEventStream;
-  private eventBusSubscription!: Subscription;
   private readonly Anchors = [
     'top-left',
     'top-center',
@@ -60,11 +31,9 @@ export default class SlideController {
   ];
 
   constructor(init: { eventBus: PresentationEventStream; slide: Slide }) {
-    this.eventBus = init.eventBus;
     this.slide = init.slide;
     this.setUp();
     this.registerEvents();
-    this.ListenPresentationEvents();
   }
 
   private setUp() {
@@ -119,145 +88,64 @@ export default class SlideController {
       if (e.target === this.mainCover) {
         this.transformer?.nodes([]); // clears selection
         this.layer?.batchDraw();
-        const clearSelection = new ClearSelectionEvent({
-          slideId: this.slide.slideId,
-          presentationId: this.slide.presentationId
-        });
-        this.eventBus.next(clearSelection)
         return;
       }
     });
   }
-
-  private ListenPresentationEvents() {
-    this.eventBusSubscription = this.eventBus.subscribe(
-      (event: PresentationEvent) => {
-        if (event.slideId != this.slide.slideId) {
-          return;
-        }
-        this.transformer.moveToTop(); // always move to top
-        if (event instanceof TextEvent) {
-          this.handleTextEvents(event);
-        }
-        if (event instanceof ShapeEvent) {
-          this.handleShapeEvents(event);
-        }
-        if (event instanceof ImageEvent) {
-          this.handleImageEvents(event);
-        }
-        if (event instanceof SlideEvent) {
-          this.handleSlideEvents(event);
-        }
-      },
-    );
-  }
-
-  protected handleTextEvents(event: TextEvent) {
-    if (event instanceof SelectTextEvent) {
-      const nodeId = event.nodeId;
-      let targetNode = this.slide.components.find(
-        (nd) => nd.node._id.toString() == nodeId,
-      );
-      this.selectComponent(targetNode!.node);
-      return;
-    }
-    if (event instanceof AddTextEvent) {
-      this.handleAddNode(event);
-      return;
-    }
-    if (event instanceof RemoveTextEvent) {
-      this.handleRemoveNode(event);
-      return;
-    }
-    if (event instanceof RestoreTextEvent) {
-      this.handleRestoreNode(event);
-      return;
-    }
-  }
-
-  protected handleShapeEvents(event: ShapeEvent) {
-    if (event instanceof SelectShapeEvent) {
-      const nodeId = event.nodeId;
-      let targetNode = this.slide.components.find(
-        (nd) => nd.node._id.toString() == nodeId,
-      );
-      this.selectComponent(targetNode!.node);
-      return;
-    }
-    if (event instanceof AddShapeEvent) {
-      this.handleAddNode(event);
-      return;
-    }
-    if (event instanceof RemoveShapeEvent) {
-      this.handleRemoveNode(event);
-      return;
-    }
-    if (event instanceof RestoreShapeEvent) {
-      this.handleRestoreNode(event);
-      return;
-    }
-  }
-
-  protected handleImageEvents(event: ImageEvent) {
-    if (event instanceof SelectImageEvent) {
-      const nodeId = event.nodeId;
-      let targetNode = this.slide.components.find(
-        (nd) => nd.node._id.toString() == nodeId,
-      );
-      this.selectComponent(targetNode!.node);
-      return;
-    }
-    if (event instanceof AddImageEvent) {
-      this.handleAddNode(event);
-      return;
-    }
-    if (event instanceof RemoveImageEvent) {
-      this.handleRemoveNode(event);
-      return;
-    }
-    if (event instanceof RestoreImageEvent) {
-      this.handleRestoreNode(event);
-      return;
-    }
-  }
-
-  protected handleSlideEvents(event: SlideEvent) { }
+  resizeInProgress: boolean = true;
   triggerResize(options: {
     divElm: HTMLDivElement;
     config: DocumentConfiguration;
   }) {
-    this.slide.containerDiv = options.divElm;
-    const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
-    const desiredWidth = desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+    try {
+      this.resizeInProgress = true;
+      this.slide.containerDiv = options.divElm;
+      const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
+      const desiredWidth =
+        desiredHeight * (options.config.ratio.num / options.config.ratio.den);
+      const containerWidth = options.divElm.offsetWidth;
+      const containerHeight =
+        containerWidth * (options.config.ratio.den / options.config.ratio.num);
+      const xScaleFactor = containerWidth / desiredWidth;
+      const yScaleFactor = containerHeight / desiredHeight;
 
-    const containerWidth = options.divElm.offsetWidth;
-    const containerHeight =
-      containerWidth *
-      (options.config.ratio.den / options.config.ratio.num);
-    const xScaleFactor = containerWidth / desiredWidth;
-    const yScaleFactor = containerHeight / desiredHeight;
+      this.stage.container(options.divElm);
+      this.stage.height(containerHeight);
+      this.stage.width(containerWidth);
+      this.mainCover.height(desiredHeight);
+      this.mainCover.width(desiredWidth);
 
-    this.stage.container(options.divElm);
-    this.stage.height(containerHeight);
-    this.stage.width(containerWidth);
-    this.mainCover.height(desiredHeight);
-    this.mainCover.width(desiredWidth);
-
-    this.stage.scale({
-      x: xScaleFactor,
-      y: yScaleFactor
-    });
-    this.layer.batchDraw();
+      this.stage.scale({
+        x: xScaleFactor,
+        y: yScaleFactor,
+      });
+      this.layer.batchDraw();
+    } catch (error) {
+    } finally {
+      this.resizeInProgress = false;
+    }
   }
 
   isNodeSelected(node: Shape): boolean {
     return this.transformer.nodes().some((nd) => nd == node);
   }
 
-  selectComponent(node: Shape, options?: { anchors: string[] }) {
-    this.transformer.nodes([node]);
+  selectComponent(
+    canvasComponent: ICanvasComponent,
+    options?: { anchors: string[] },
+  ) {
+    this.transformer.moveToTop(); // always move to top
+    this.transformer.nodes([canvasComponent.node]);
     this.transformer.enabledAnchors(options?.anchors ?? this.Anchors);
     this.layer.batchDraw();
+    this.slide.presentation.emitEvent({
+      slide: this.slide,
+      newConfig: undefined,
+      trackHistory: false,
+      component: canvasComponent,
+      oldConfig: undefined,
+      eventType: PresentationEventType.SELECT,
+    });
   }
 
   removeSelectionOfComponent(node: Shape) {
@@ -266,76 +154,30 @@ export default class SlideController {
     this.transformer.nodes(selected);
     this.layer.batchDraw();
   }
-
+  clearSelections() {
+    this.transformer.nodes([]);
+    this.layer.batchDraw();
+  }
   addComponent(node: ICanvasComponent) {
     this.layer.add(node.node);
     this.slide.components.push(node);
+    this.selectComponent(node);
   }
 
   destroy() {
-    this.eventBusSubscription.unsubscribe();
+    this.transformer.destroy();
   }
 
-  private handleAddNode(event: PresentationEvent) {
-    let node: ICanvasComponent | undefined;
-    if (event instanceof AddTextEvent) {
-      node = new TextComponent({
-        config: event.currentConfig,
-        slide: this.slide,
-        eventBus: this.eventBus,
-      });
+  async getStageSnapShot() {
+    const maxAttempts = 1000;
+    let attempt = 10;
+    while (maxAttempts > attempt) {
+      if (!this.resizeInProgress) {
+        return this.stage?.toDataURL();
+      }
+      attempt++;
+      await waitForMilliseconds(100);
     }
-    if (event instanceof ShapeEvent) {
-      node = new ShapeComponent({
-        slide: this.slide,
-        config: event.currentConfig,
-        shapeType: event.shapeType,
-        eventBus: this.eventBus,
-      });
-    }
-    if (event instanceof ImageEvent) {
-      node = new ImageComponent({
-        slide: this.slide,
-        config: event.currentConfig,
-        eventBus: this.eventBus,
-      });
-    }
-    this.addComponent(node!);
-    event.nodeId = node!.node!._id.toString();
-    event.currentConfig = event instanceof ImageEvent
-      ? structuredClone((node as ImageComponent).getSerializableConfig())
-      : structuredClone({
-        attrs: node!.node!.getAttrs(),
-        zIndex: node!.node!.getZIndex(),
-      });
-    event.previousConfig = structuredClone(event.previousConfig);
-  }
-
-  private handleRemoveNode(event: PresentationEvent) {
-    const index = this.slide.components.findIndex(x => x.node._id.toString() === event.nodeId);
-    if (index == -1) {
-      return;
-    }
-    const removed = this.slide.components.splice(index, 1)[0];
-    removed.node.remove();
-    this.removeSelectionOfComponent(removed.node);
-    const trashEvent = new AddTrashEvents({
-      nodeId: removed.node._id.toString(),
-      presentationId: this.slide.presentationId,
-      slideId: this.slide.slideId,
-      trackHistory: false,
-      node: removed
-    });
-    this.eventBus.next(trashEvent);
-  }
-  private handleRestoreNode(event: PresentationEvent & { nodeToRestore: ICanvasComponent }) {
-    this.slide.components.push(event.nodeToRestore);
-    this.layer.add(event.nodeToRestore.node);
-    this.layer.batchDraw();
-    const unTrashEvent = new RemoveFromTrashEvents({
-      ...event,
-      node: event.nodeToRestore
-    });
-    this.eventBus.next(unTrashEvent);
+    return this.stage?.toDataURL();
   }
 }
