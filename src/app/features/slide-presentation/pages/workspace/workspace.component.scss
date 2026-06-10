@@ -3,17 +3,18 @@
   height: 100vh;
 
   .nav {
-    min-height: 70px;
+    height: 62px;
+    padding: 0px 32px;
     width: 100%;
-    background-color: var(--primary-color);
+    background-color: white;
     color: white;
     flex-shrink: 0;
-
+    border-bottom: 1px solid var(--border-color-primary);
     .home-btn {
       width: 100px;
 
       i {
-        font-size: 20px;
+        font-size: 2px;
       }
 
       cursor: pointer;
@@ -39,7 +40,7 @@
   border-radius: 5px;
   padding: 0px 10px;
   font-weight: 600;
-  font-size: clamp(11px, 20px, 20px);
+  font-size: clamp(11px, 18px, 18px);
 
   &:focus {
     outline: none;
@@ -164,13 +165,15 @@
   border: 1px solid transparent;
   background-color: transparent;
   padding: 10px;
-
+  color: black;
+  font-weight: 500;
   i {
     font-size: 20px;
   }
 
   &:hover {
-    border: 1px solid white;
+    // border: 1px solid var(--primary-color);
+    background: var(--background-secondary);
   }
 }
 

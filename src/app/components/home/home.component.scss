@@ -1,46 +1,672 @@
-.ppt-prev-list {
-    overflow: auto;
-    flex-wrap: wrap;
-    .add-new-ppt {
-        cursor: pointer;
-    }
-    .ppt-wrap {
-        width: 200px;
-        cursor: pointer;
-    }
-    .ppt-prev {
-        width: 200px;
-        height: 112px;
-        background-color: white;
-        border: 1px solid var(--border-color-primary);
-        position: relative;
-        flex-shrink: 0;
-        img {
-            width: 99%;
-            height: auto;
-        }
+// ─── Tokens ───────────────────────────────────────────────────────────────────
+$bg:          #090a14;
+$bg-section:  #0c0d1d;
+$card:        #13142a;
+$border:      rgba(255, 255, 255, 0.07);
+$border-h:    rgba(147, 51, 234, 0.55);
+$accent:      #9333ea;
+$accent-alt:  #6d28d9;
+$accent-soft: #a78bfa;
+$blue:        #4A90E2;
+$text:        #f1f5f9;
+$text-sub:    #94a3b8;
+$text-muted:  #475569;
+$danger:      #f87171;
+$thumb-h:     126px;
+$card-w:      210px;
+$radius:      14px;
+$nav-h:       62px;
 
-        .del-btn {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            background-color: transparent;
-            border: 1px solid var(--bs-danger);
-            color: var(--bs-danger);
-            width: 25px;
-            height: 25px;
-        }
+// ─── Wrapper ──────────────────────────────────────────────────────────────────
+.ms-home {
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+}
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+.ms-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: $nav-h;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(9, 10, 20, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+
+.ms-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  background: linear-gradient(135deg, $accent, $accent-alt);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  // border-radius: 8px;
+  cursor: pointer;
+  // box-shadow: 0 4px 16px rgba(147, 51, 234, 0.35);
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.9;
+    // transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(147, 51, 234, 0.5);
+  }
+  &:active { transform: translateY(0); }
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.ms-hero {
+  position: relative;
+  padding: 88px 36px 80px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(147, 51, 234, 0.16) 0%, transparent 68%),
+    $bg;
+}
+
+// Spinning web
+.ms-web-deco {
+  position: absolute;
+  right: -80px;
+  top: -80px;
+  width: 480px;
+  height: 480px;
+  color: $accent-soft;
+  opacity: 0.09;
+  pointer-events: none;
+  animation: web-spin 80s linear infinite;
+
+  svg { width: 100%; height: 100%; }
+}
+
+@keyframes web-spin {
+  to { transform: rotate(360deg); }
+}
+
+// Ambient orbs
+.ms-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.ms-orb-1 {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.55) 0%, transparent 70%);
+  top: -120px;
+  left: -100px;
+  opacity: 0.3;
+}
+
+.ms-orb-2 {
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(74, 144, 226, 0.5) 0%, transparent 70%);
+  bottom: -40px;
+  right: 260px;
+  opacity: 0.25;
+}
+
+.ms-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+}
+
+.ms-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: $accent-soft;
+  background: rgba(167, 139, 250, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  // border-radius: 20px;
+  padding: 5px 14px;
+  margin-bottom: 22px;
+}
+
+.ms-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1.2px;
+  color: $text;
+  margin: 0 0 18px;
+}
+
+.ms-gradient-text {
+  background: linear-gradient(135deg, $accent-soft 0%, $blue 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ms-hero-sub {
+  font-size: 1rem;
+  color: $text-sub;
+  line-height: 1.7;
+  margin: 0 0 36px;
+}
+
+.ms-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 14px 30px;
+  background: linear-gradient(135deg, $accent, $accent-alt);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  // border-radius: 10px;
+  cursor: pointer;
+  // box-shadow: 0 4px 28px rgba(147, 51, 234, 0.45);
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    // transform: translateY(-2px);
+    box-shadow: 0 8px 36px rgba(147, 51, 234, 0.6);
+  }
+  &:active { transform: translateY(0); }
+}
+
+// ─── Presentations section ────────────────────────────────────────────────────
+.ms-section {
+  padding: 32px 36px 48px;
+  background: $bg-section;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: 280px;
+}
+
+.ms-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.ms-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.ms-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: $accent-soft;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  // border-radius: 20px;
+  padding: 2px 9px;
+  line-height: 1.6;
+}
+
+// ─── Card grid ────────────────────────────────────────────────────────────────
+.ms-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+// ─── Card base ────────────────────────────────────────────────────────────────
+.ms-card {
+  width: $card-w;
+  // border-radius: $radius;
+  background: $card;
+  border: 1px solid $border;
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    // transform: translateY(-5px);
+    border-color: $border-h;
+    box-shadow: 0 10px 36px rgba(147, 51, 234, 0.22);
+  }
+}
+
+// ─── Add card ─────────────────────────────────────────────────────────────────
+.ms-add-card {
+  border: 1.5px dashed rgba(255, 255, 255, 0.1);
+  background: transparent;
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(147, 51, 234, 0.06);
+    box-shadow: 0 10px 36px rgba(147, 51, 234, 0.14);
+
+    .ms-add-ring {
+      background: $accent;
+      border-color: $accent;
+      color: #fff;
     }
-    .ppt-name {
-        font-weight: 500;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: 80%;
+
+    span { color: $accent-soft; }
+  }
+
+  .ms-add-inner {
+    height: $thumb-h + 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ms-add-ring {
+    width: 44px;
+    height: 44px;
+    // border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: $text-sub;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+  }
+
+  span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: $text-muted;
+    transition: color 0.18s;
+  }
+}
+
+// ─── Thumbnail ────────────────────────────────────────────────────────────────
+.ms-thumb {
+  position: relative;
+  width: 100%;
+  height: $thumb-h;
+  background: #0e0f21;
+  overflow: hidden;
+
+  > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ms-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #181930, #0e0f21);
+
+    img {
+      width: 52px !important;
+      height: auto !important;
+      object-fit: contain;
+      opacity: 0.3;
+      filter: grayscale(1);
     }
-    .pptpng
-    {
-        height: auto !important;
-        width: 70px !important;
+  }
+
+  .ms-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 10, 20, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    backdrop-filter: blur(2px);
+  }
+
+  .ms-open-label {
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ms-del-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 27px;
+    height: 27px;
+    // border-radius: 7px;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+    font-size: 0.72rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    &:hover {
+      background: $danger;
+      color: #fff;
+      border-color: $danger;
     }
+  }
+}
+
+.ms-card:hover .ms-thumb-overlay {
+  opacity: 1;
+}
+
+// ─── Card footer ──────────────────────────────────────────────────────────────
+.ms-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 9px 11px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ms-card-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.ms-slide-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: $text-muted;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  // border-radius: 20px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+.ms-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 20px;
+  text-align: center;
+
+  .ms-empty-icon {
+    width: 68px;
+    height: 68px;
+    // border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $accent-soft;
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    margin-bottom: 18px;
+  }
+
+  .ms-empty-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 6px;
+  }
+
+  .ms-empty-sub {
+    font-size: 0.85rem;
+    color: $text-sub;
+    margin: 0;
+
+    strong { color: $accent-soft; }
+  }
+}
+/* ==========================================================================
+   LIGHT THEME OVERRIDES
+   ========================================================================== */
+
+.ms-home {
+  background: #fff;
+  color: #0f172a;
+}
+
+.ms-nav {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border-color-primary);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.ms-brand-name {
+  color: #0f172a;
+}
+
+.ms-brand-accent {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    #6ea8e8
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ms-logo,
+.ms-nav-btn,
+.ms-hero-cta {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    #3578c7
+  );
+}
+
+.ms-nav-btn:hover,
+.ms-hero-cta:hover {
+  box-shadow:
+    0 8px 24px rgba(74, 144, 226, 0.25);
+}
+
+.ms-hero {
+  background:
+    radial-gradient(
+      ellipse 80% 55% at 50% 0%,
+      rgba(74, 144, 226, 0.12) 0%,
+      transparent 68%
+    ),
+    #fff;
+}
+
+.ms-web-deco {
+  color: var(--border-color-primary);
+  opacity: 1;
+}
+
+.ms-orb-1 {
+  background: radial-gradient(
+    circle,
+    rgba(74, 144, 226, 0.18) 0%,
+    transparent 70%
+  );
+}
+
+.ms-orb-2 {
+  background: radial-gradient(
+    circle,
+    rgba(74, 144, 226, 0.12) 0%,
+    transparent 70%
+  );
+}
+
+.ms-hero-tag {
+  color: var(--primary-color);
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+}
+
+.ms-hero-title {
+  color: #0f172a;
+}
+
+.ms-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    #6ea8e8
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ms-hero-sub {
+  color: #64748b;
+}
+
+.ms-section {
+  background: var(--background-secondary);
+  border-top: 1px solid var(--border-color-primary);
+}
+
+.ms-section-title {
+  color: #0f172a;
+}
+
+.ms-count {
+  color: var(--primary-color);
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+}
+
+.ms-card {
+  background: #fff;
+  border: 1px solid var(--border-color-primary);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.ms-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--box-shadow-1);
+}
+
+.ms-add-card {
+  border: 1.5px dashed var(--border-color-primary);
+}
+
+.ms-add-card:hover {
+  border-color: var(--primary-color);
+  background: rgba(74, 144, 226, 0.04);
+}
+
+.ms-add-card:hover .ms-add-ring {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.ms-add-card:hover span {
+  color: var(--primary-color);
+}
+
+.ms-add-ring {
+  border: 1px solid var(--border-color-primary);
+  color: #64748b;
+}
+
+.ms-add-card span {
+  color: #64748b;
+}
+
+.ms-thumb {
+  background: #f8fafc;
+}
+
+.ms-thumb-placeholder {
+  background: linear-gradient(
+    145deg,
+    #f8fafc,
+    #eef2f7
+  ) !important;
+}
+
+.ms-thumb-placeholder img {
+  opacity: 0.35;
+}
+
+.ms-thumb-overlay {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(3px);
+}
+
+.ms-open-label {
+  color: #0f172a !important;
+}
+
+.ms-del-btn {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+.ms-del-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.ms-card-footer {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.ms-card-name {
+  color: #0f172a;
+}
+
+.ms-slide-count {
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid var(--border-color-primary);
+}
+
+.ms-empty-icon {
+  color: var(--primary-color);
+  background: rgba(74, 144, 226, 0.08);
+  border: 1px solid rgba(74, 144, 226, 0.15);
+}
+
+.ms-empty-title {
+  color: #0f172a;
+}
+
+.ms-empty-sub {
+  color: #64748b;
+}
+
+.ms-empty-sub strong {
+  color: var(--primary-color);
 }

@@ -1,4 +1,9 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ViewChild,
+} from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
@@ -25,7 +30,14 @@ export class WorkspaceComponent {
   slideImages: Map<string, string> = new Map();
   @ViewChild('pptList')
   pptList!: ElementRef;
-
+  hasUnSavedChanges: boolean = false;
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnSavedChanges) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
@@ -46,6 +58,7 @@ export class WorkspaceComponent {
     if (firstSlide) {
       this.selectSlide(firstSlide);
     }
+    this.hasUnSavedChanges = false;
   }
 
   selectedToolBox: ToolBoxType = ToolBoxType.None;
@@ -112,7 +125,14 @@ export class WorkspaceComponent {
       const targetSlide = this.presentation.slides.find(
         (sl) => sl.slideId == slideId,
       );
-      if (targetSlide) {
+      if (!targetSlide) {
+        return;
+      }
+      const targetComponent = targetSlide?.components.find(
+        (cm) => event.nodeId == cm.node._id.toString(),
+      );
+      if (event.trackHistory) {
+        this.hasUnSavedChanges = true;
         let timeOutTracker = this.slideTimeOutMap.get(slideId!);
         clearTimeout(timeOutTracker);
         timeOutTracker = setTimeout(async () => {
@@ -121,14 +141,10 @@ export class WorkspaceComponent {
         }, 1000);
         this.slideTimeOutMap.set(slideId!, timeOutTracker);
       }
-      const comp = targetSlide?.components.find(
-        (cm) => event.nodeId == cm.node._id.toString(),
-      );
-
       if (event.eventType == PresentationEventType.SELECT) {
-        this.selectedToolBox = this.getToolBoxType(comp!);
+        this.selectedToolBox = this.getToolBoxType(targetComponent!);
       }
-      this.setSelectedComponent(comp);
+      this.setSelectedComponent(targetComponent);
     });
   }
 
@@ -170,12 +186,13 @@ export class WorkspaceComponent {
       this.workSpaceController.showMagicSpiderAssistant = false;
     }
   }
+
   savePpt() {
     this.presentation.name = this.name;
     const firstslide = this.presentation.slides.at(0);
     const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
-    this.presentationService.savePresentation(this.presentation,thumbnail);
-    this.message.success("Presentation Saved")
+    this.presentationService.savePresentation(this.presentation, thumbnail);
+    this.message.success('Presentation Saved');
   }
 
   pptTimeOutTracker: any;
@@ -186,6 +203,14 @@ export class WorkspaceComponent {
       });
     }
   }
+
+  canDeactivate() {
+    if (this.hasUnSavedChanges) {
+      confirm('There are unsaved changes');
+      return false;
+    }
+    return true;
+  }
 }
 enum ToolBoxType {
   TextToolBox = 'Text',
@@ -193,3 +218,4 @@ enum ToolBoxType {
   ShapeTooLBox = 'Shape',
   None = 'None',
 }
+let hasUnsavedChanges = true;

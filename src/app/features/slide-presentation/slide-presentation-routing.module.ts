@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { WorkspaceComponent } from './pages/workspace/workspace.component';
+import { UnsavedChangesGuard } from './guards/canDeactive.guard';
 
 const routes: Routes = [
   {
     path:'ppt',
-    component:WorkspaceComponent
+    component:WorkspaceComponent,
+    canDeactivate:[UnsavedChangesGuard]
   }
 ];
 
