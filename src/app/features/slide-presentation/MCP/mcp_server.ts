@@ -1,380 +1,123 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
 import { McpActions } from './mcp.actions';
-import { InternalMcpError } from './mcp.erros';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import {
+  AddTextSchema,
+  AddShapeSchema,
+  updateSchema,
+  deleteSchema,
+  RemoveSlideSchema,
+  AddImageSchema,
+} from './McpSchemas';
+import z from 'zod';
 
 type ToolHandler = {
   toolDesc: Tool;
   execute: (args: any) => Promise<unknown>;
 };
 
-export class MCP {
+export class MCP extends McpServer {
   readonly mcpActions!: McpActions;
   constructor(private presentation: Presentation) {
+    super({ name: 'MagicSpiderServer', version: '1.0.0' });
     this.mcpActions = new McpActions(presentation);
   }
 
-  private handlers = new Map<string, ToolHandler>([
-    [
-      addShapeTool.name,
+  registerTools() {
+    this.registerTool(
+      'addShape',
       {
-        toolDesc: addShapeTool,
-        execute: async (args) => this.mcpActions.addShape(args),
+        title: 'addShape',
+        description:
+          'Add a new shape component to a slide. Creates a shape of the specified type and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
+        inputSchema: AddShapeSchema,
       },
-    ],
-    [
-      updateShapeTool.name,
+      this.mcpActions.addShape,
+    );
+    this.registerTool(
+      'updateShape',
       {
-        toolDesc: updateShapeTool,
-        execute: async (args) => this.mcpActions.updateShape(args),
+        title: 'updateShape',
+        description:
+          'Update an existing shape on a slide. Use this tool whenever a user wants to move, resize, rotate, recolor, reorder, or otherwise modify a shape. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
+        inputSchema: updateSchema,
       },
-    ],
-    [
-      deleteShapeTool.name,
+      this.mcpActions.updateShape,
+    );
+    this.registerTool(
+      'deleteComponent',
       {
-        toolDesc: deleteShapeTool,
-        execute: async (args) => this.mcpActions.deleteShape(args),
+        title: 'deleteComponent',
+        description: 'Remove a shape component from a slide.',
+        inputSchema: deleteSchema,
       },
-    ],
-    [
-      addTextTool.name,
+      this.mcpActions.deleteComponent,
+    );
+    this.registerTool(
+      'addText',
       {
-        toolDesc: addTextTool,
-        execute: async (args) => this.mcpActions.addText(args),
+        title: 'addText',
+        description:
+          'Add a new text component to a slide. Creates a text node and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
+        inputSchema: AddTextSchema,
       },
-    ],
-    [
-      updateTextTool.name,
+      this.mcpActions.addText,
+    );
+    this.registerTool(
+      'updateText',
       {
-        toolDesc: updateTextTool,
-        execute: async (args) => this.mcpActions.updateText(args),
+        title: 'updateText',
+        description:
+          'Update an existing text node on a slide. Use this tool whenever a user wants to move, resize, recolor, reorder, change font, or otherwise modify a text component. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
+        inputSchema: updateSchema,
       },
-    ],
-    [
-      deleteTextTool.name,
+      this.mcpActions.updateText,
+    );
+    this.registerTool(
+      'addImage',
       {
-        toolDesc: deleteTextTool,
-        execute: async (args) => this.mcpActions.deleteText(args),
+        title: 'addImage',
+        description:
+          'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
+        inputSchema: AddImageSchema,
       },
-    ],
-    [
-      addImageTool.name,
+      this.mcpActions.addImage,
+    );
+    this.registerTool(
+      'updateImage',
       {
-        toolDesc: addImageTool,
-        execute: async (args) => this.mcpActions.addImage(args),
+        title: 'updateImage',
+        description:
+          'Update an existing image node on a slide. Use this tool whenever a user wants to move, resize, reorder, or otherwise modify an image component. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
+        inputSchema: updateSchema,
       },
-    ],
-    [
-      updateImageTool.name,
+      this.mcpActions.updateImage,
+    );
+    this.registerTool(
+      'addSlide',
       {
-        toolDesc: updateImageTool,
-        execute: async (args) => this.mcpActions.updateImage(args),
+        title: 'addSlide',
+        description: 'Add a new empty slide to the presentation.',
+        inputSchema: z.object({}),
       },
-    ],
-    [
-      deleteImageTool.name,
+      this.mcpActions.addSlide,
+    );
+    this.registerTool(
+      'removeSlide',
       {
-        toolDesc: deleteImageTool,
-        execute: async (args) => this.mcpActions.deleteImage(args),
+        title: 'removeSlide',
+        description:
+          'Remove a slide from the presentation by its ID. This will also delete all components on that slide.',
+        inputSchema: RemoveSlideSchema,
       },
-    ],
-    [
-      addSlideTool.name,
-      {
-        toolDesc: addSlideTool,
-        execute: async () => this.mcpActions.addSlide(),
-      },
-    ],
-    [
-      removeSlideTool.name,
-      {
-        toolDesc: removeSlideTool,
-        execute: async (args) => this.mcpActions.removeSlide(args),
-      },
-    ],
-  ]);
+      this.mcpActions.removeSlide,
+    );
+  }
 
   listTools(): Tool[] {
-    const toolHandlers = [...this.handlers.values()];
-    const tools = toolHandlers.map((val) => val.toolDesc);
-    return tools;
+    return [];
   }
 
-  async callTool(params: { toolName: string; args: any }) {
-    const tool = this.handlers.get(params.toolName);
-    if (!tool) {
-      throw new InternalMcpError(`No tool of name ${params.toolName} is available`);
-    }
-    const toolResponse = await tool.execute(params.args!);
-    return toolResponse;
-  }
+  async callTool(params: { toolName: string; args: any }) {}
 }
-// Tool Descriptions bellow
-const addShapeTool: Tool = {
-  name: 'addShape',
-  description:
-    'Add a new shape component to a slide. Creates a shape of the specified type and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-        description:
-          'The identifier of the slide where the shape should be added.',
-      },
-      shapeType: {
-        type: 'number',
-        description:
-          'The type of shape to create (rectangle = 2, circle = 1,).',
-      },
-      initialConfig: {
-        type: 'object',
-        description:
-          'Optional initial configuration for the new shape. Use this to set position, size, color, rotation, opacity, or layer order at creation time.',
-        properties: {
-          attrs: {
-            type: 'object',
-            description:
-              'Initial Konva Shape attributes. Examples include x, y, width, height, fill, stroke, strokeWidth, rotation, opacity, scaleX, and scaleY.',
-          },
-          zIndex: {
-            type: 'number',
-            description:
-              'Initial Konva z index of the shape. Defaults to 0 when omitted.',
-          },
-        },
-      },
-    },
-    required: ['slideId', 'shapeType'],
-  },
-};
-
-const updateShapeTool: Tool = {
-  name: 'updateShape',
-  description:
-    'Update an existing shape on a slide. Use this tool whenever a user wants to move, resize, rotate, recolor, reorder, or otherwise modify a shape. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-        description: 'The identifier of the slide containing the shape.',
-      },
-      nodeId: {
-        type: 'string',
-        description: 'The identifier of the shape to update.',
-      },
-      newConfig: {
-        type: 'object',
-        properties: {
-          attrs: {
-            type: 'object',
-            description:
-              'Partial configuration containing only the Konva Shape attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
-          },
-          zIndex: {
-            type: 'number',
-            description: 'Konva z index of the component',
-          },
-        },
-        required: ['attrs', 'zIndex'],
-      },
-      zIndexActions: {
-        type: 'string',
-        description:
-          'Optional layer ordering operation. Use when the user asks to bring a shape forward, send it backward, move it to the front, or move it to the back.',
-      },
-    },
-    required: ['slideId', 'nodeId', 'newConfig'],
-  },
-};
-const deleteShapeTool: Tool = {
-  name: 'deleteShape',
-  description: 'Remove a shape component from a slide.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-        description: 'The slide containing the shape.',
-      },
-      nodeId: {
-        type: 'string',
-        description: 'The identifier of the shape to remove.',
-      },
-    },
-    required: ['slideId', 'nodeId'],
-  },
-};
-const addTextTool: Tool = {
-  name: 'addText',
-  description:
-    'Add a new text component to a slide. Optionally accepts initial Konva text attributes and z index.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-        description: 'The slide where the text component should be created.',
-      },
-      initialConfig: {
-        type: 'object',
-        description:
-          'Optional initial configuration for the new text component. Use this to set content, font, position, dimensions, styling, rotation, opacity, or layer order at creation time.',
-        properties: {
-          attrs: {
-            type: 'object',
-            description:
-              'Initial Konva Text attributes. Examples include text, x, y, width, height, fontSize, fontFamily, fill, align, rotation, opacity, scaleX, and scaleY.',
-          },
-          zIndex: {
-            type: 'number',
-            description:
-              'Initial Konva z index of the text component. Defaults to 0 when omitted.',
-          },
-        },
-      },
-    },
-    required: ['slideId'],
-  },
-};
-const updateTextTool: Tool = {
-  name: 'updateText',
-  description:
-    'Update a text component. Supports changing content, fonts, styling, alignment, position, dimensions, rotation, opacity, and layer ordering.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-      },
-      nodeId: {
-        type: 'string',
-      },
-      newConfig: {
-        type: 'object',
-        properties: {
-          attrs: {
-            type: 'object',
-            description:
-              'Partial configuration containing only the Konva Text attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
-          },
-          zIndex: {
-            type: 'number',
-            description: 'Konva z index of the component',
-          },
-        },
-        required: ['attrs', 'zIndex'],
-      },
-      zIndexActions: {
-        type: 'string',
-        description: 'Optional layer ordering action.',
-      },
-    },
-    required: ['slideId', 'nodeId', 'newConfig'],
-  },
-};
-const deleteTextTool: Tool = {
-  name: 'deleteText',
-  description: 'Remove a text component from a slide.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-      },
-      nodeId: {
-        type: 'string',
-      },
-    },
-    required: ['slideId', 'nodeId'],
-  },
-};
-const addImageTool: Tool = {
-  name: 'addImage',
-  description: 'Add a new image component to a slide.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-      },
-    },
-    required: ['slideId'],
-  },
-};
-const updateImageTool: Tool = {
-  name: 'updateImage',
-  description:
-    'Update an image component. Supports changing image source, position, dimensions, scaling, cropping, rotation, opacity, and layer ordering.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-      },
-      nodeId: {
-        type: 'string',
-      },
-      newConfig: {
-        type: 'object',
-        properties: {
-          attrs: {
-            type: 'object',
-            description:
-              'Partial configuration containing only the Konva Image attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, etc.',
-          },
-          zIndex: {
-            type: 'number',
-            description: 'Konva z index of the component',
-          },
-        },
-        required: ['attrs', 'zIndex'],
-      },
-      zIndexActions: {
-        type: 'string',
-        description: 'Optional layer ordering action.',
-      },
-    },
-    required: ['slideId', 'nodeId', 'newConfig'],
-  },
-};
-const deleteImageTool: Tool = {
-  name: 'deleteImage',
-  description: 'Remove an image component from a slide.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-      },
-      nodeId: {
-        type: 'string',
-      },
-    },
-    required: ['slideId', 'nodeId'],
-  },
-};
-const addSlideTool: Tool = {
-  name: 'addSlide',
-  description: 'Create a new empty slide and append it to the presentation.',
-  inputSchema: {
-    type: 'object',
-    properties: {},
-    required: [],
-  },
-};
-const removeSlideTool: Tool = {
-  name: 'removeSlide',
-  description: 'Delete a slide from the presentation.',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      slideId: {
-        type: 'string',
-        description: 'The identifier of the slide to remove.',
-      },
-    },
-    required: ['slideId'],
-  },
-};

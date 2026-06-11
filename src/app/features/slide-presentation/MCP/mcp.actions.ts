@@ -10,13 +10,26 @@ import ShapeComponent, {
 import { InternalMcpError } from './mcp.erros';
 import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
+import {
+  ImageComponent,
+  SerializableImageConfig,
+} from '../domain/canvasModels/imageComponent';
 import { imageNodeService } from '../../../services/konva.services/image.service';
 import { textNodeService } from '../../../services/konva.services/textNode.service';
 import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
 import { slideService } from '../../../services/konva.services/slide.service';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
+import {
+  AddTextSchema,
+  AddShapeSchema,
+  updateSchema,
+  deleteSchema,
+  AddImageSchema,
+  RemoveSlideSchema,
+} from './McpSchemas';
+import { z } from 'zod';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 
 export class McpActions {
   constructor(private presentation: Presentation) {}
@@ -59,6 +72,7 @@ export class McpActions {
     slide.controller.removeSelectionOfComponent(component.node);
     component.destroy();
     slide.controller.layer.batchDraw();
+    return component;
   }
 
   private normalizeInitialConfig<T>(config?: {
@@ -71,26 +85,25 @@ export class McpActions {
     };
   }
 
-  addShape(args: {
-    slideId: string;
-    shapeType: ShapeType;
-    initialConfig?: { attrs?: ShapeConfig; zIndex?: number };
-  }) {
+  async addShape(
+    args: z.infer<typeof AddShapeSchema>,
+  ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
-    shapeNodeService.addShapeNode({
+    const shape = shapeNodeService.addShapeNode({
       eventBus: this.presentation.eventBus,
       slide: slide,
       shapeType: args.shapeType,
       config: this.normalizeInitialConfig(args.initialConfig),
     });
+    const result: CallToolResult = {
+      content: [{ type: 'text', text: `Added shape ${shape.node._id}` }],
+    };
+    return result;
   }
 
-  updateShape(args: {
-    slideId: string;
-    nodeId: string;
-    newConfig: ComponentConfig<ShapeConfig>;
-    zIndexActions?: ZIndexActions;
-  }) {
+  async updateShape(
+    args: z.infer<typeof updateSchema>,
+  ): Promise<CallToolResult> {
     const node = this.getComponentOrThrow<ShapeComponent>(args);
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
@@ -99,107 +112,105 @@ export class McpActions {
       },
     });
 
-    shapeNodeService.updateShapeNode({
+    const shape = shapeNodeService.updateShapeNode({
       node: node.node,
       config: configs.currentConfig,
       zIndexActions: args.zIndexActions,
     });
+    const result: CallToolResult = {
+      content: [{ type: 'text', text: `Updated shape ${shape?._id}` }],
+    };
+    return result;
   }
 
-  deleteShape(args: { slideId: string; nodeId: string }) {
-    this.removeComponent(args);
+  async deleteComponent(args: z.infer<typeof deleteSchema>) :Promise<CallToolResult>{
+    const removed  = this.removeComponent(args);
+    return {
+      content: [{ type: 'text', text: `Removed component of id ${removed.node._id}` }],
+    };
   }
   // Text
 
-  addText(args: {
-    slideId: string;
-    initialConfig?: { attrs?: TextConfig; zIndex?: number };
-  }) {
+  async addText(args: z.infer<typeof AddTextSchema>): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
-    textNodeService.addTextNode({
+    const text = textNodeService.addTextNode({
       eventBus: this.presentation.eventBus,
       slide,
       config: this.normalizeInitialConfig(args.initialConfig),
     });
+    return {
+      content: [{ type: 'text', text: `Added text ${text?.node._id}` }],
+    };
   }
 
-  updateText(args: {
-    slideId: string;
-    nodeId: string;
-    newConfig: ComponentConfig<TextConfig>;
-    zIndexActions?: ZIndexActions;
-  }) {
+  async updateText(
+    args: z.infer<typeof updateSchema>,
+  ): Promise<CallToolResult> {
     const node = this.getComponentOrThrow<TextComponent>(args);
-
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
         ...args.newConfig,
         zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
-
-    textNodeService.updateTextNode({
+    const text = textNodeService.updateTextNode({
       node: node.node,
       config: configs.currentConfig,
       zIndexActions: args.zIndexActions,
     });
-  }
-
-  deleteText(args: { slideId: string; nodeId: string }) {
-    this.removeComponent(args);
+    return {
+      content: [{ type: 'text', text: `Updated text ${text?._id}` }],
+    };
   }
 
   // Image
 
-  addImage(args: { slideId: string }) {
+  async addImage(
+    args: z.infer<typeof AddImageSchema>,
+  ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
-    imageNodeService.addImageNode({
+    const image = imageNodeService.addImageNode({
       eventBus: this.presentation.eventBus,
       slide,
       config: { attrs: {}, zIndex: 0 },
     });
+    return {
+      content: [{ type: 'text', text: `Added image ${image.node._id}` }],
+    };
   }
 
-  updateImage(args: {
-    slideId: string;
-    nodeId: string;
-    newConfig: ComponentConfig<SerializableImageConfig>;
-    zIndexActions?: ZIndexActions;
-  }) {
+  updateImage(args: z.infer<typeof updateSchema>): CallToolResult {
     const node = this.getComponentOrThrow<ImageComponent>(args);
-
     const configs = node.controller.getConfigsOfNode({
       newConfig: {
         ...args.newConfig,
         zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
-
-    imageNodeService.updateImageNode({
+    const image = imageNodeService.updateImageNode({
       node: node.node,
       currentConfig: configs.currentConfig,
       zIndexActions: args.zIndexActions,
     });
+    return {
+      content: [{ type: 'text', text: `Updated image ${image?._id}` }],
+    };
   }
 
-  deleteImage(args: { slideId: string; nodeId: string }) {
-    this.removeComponent(args);
+  addSlide(): CallToolResult {
+    const slide = slideService.addSlide({ presentation: this.presentation });
+    return {
+      content: [{ type: 'text', text: `Added slide ${slide?.slideId}` }],
+    };
   }
 
-  getSlides() {
-    return this.presentation.slides.map((slide) => slide.toJson());
-  }
-
-  getSlide() {}
-
-  addSlide() {
-    slideService.addSlide({ presentation: this.presentation });
-  }
-
-  removeSlide(args: { slideId: string }) {
+  removeSlide(args: z.infer<typeof RemoveSlideSchema>): CallToolResult {
     slideService.removeSlide({
       presentation: this.presentation,
       slideId: args.slideId,
     });
+    return {
+      content: [{ type: 'text', text: `Removed slide ${args.slideId}` }],
+    };
   }
 }

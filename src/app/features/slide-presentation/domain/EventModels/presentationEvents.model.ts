@@ -1,7 +1,5 @@
 import { Subject } from "rxjs";
 import { ShapeConfig } from "konva/lib/Shape";
-import type { Presentation } from "../canvasModels/presenatation.model";
-import type { Slide } from "../canvasModels/slide.model";
 
 export class PresentationEvent {
     readonly nodeId: string;
