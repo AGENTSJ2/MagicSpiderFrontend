@@ -3,13 +3,13 @@ import { OllamaChatService } from './Ollama.service';
 import { Subject } from 'rxjs';
 import { ChatResponse, Message, Tool } from 'ollama';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
-import { McpService } from './mcp.service';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
 import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { GeminiService } from './gemini.service';
 import { FunctionCall, GenerateContentResponse } from '@google/genai';
 import type { AbortableAsyncIterator, ToolCall } from 'ollama';
-import { MCP } from '../features/slide-presentation/MCP/mcp_server';
+import { MagicSpiderServer } from '../features/slide-presentation/MCP/mcp_server';
+import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
 @Injectable({
   providedIn: 'root',
 })
@@ -17,7 +17,7 @@ export class LLM_Agents {
   private chatService = new GeminiService();
   constructor(
     // private chatService: OllamaChatService,
-    private mcpService: McpService,
+    private mcpService: McpHub,
   ) {}
 
   private readonly ContentCreatorPrompt = [
@@ -72,8 +72,7 @@ export class LLM_Agents {
     slideContent: string;
     presentation: Presentation;
   }) {
-    const mcp = this.mcpService.getPresentationMcp(params.presentation);
-    const tools = mcp.listTools();
+    const tools = this.mcpService.listTools();
     const messages = [
       {
         role: 'system',
@@ -113,7 +112,7 @@ export class LLM_Agents {
       console.log(response.message.tool_calls);
       for (let tool of toolCalls) {
         try {
-          await mcp.callTool({
+          await this.mcpService.callTool({
             toolName: tool.function.name,
             args: tool.function.arguments,
           });
@@ -143,8 +142,7 @@ export class LLM_Agents {
         action: AgentState.invoked,
         message: 'Magic Spider has been called',
       });
-      const mcp = this.mcpService.getPresentationMcp(params.presentation);
-      const tools = mcp.listTools();
+      const tools = this.mcpService.listTools();
       const messages = [
         {
           role: 'system',
@@ -204,7 +202,7 @@ export class LLM_Agents {
           console.log('stopped gracefully');
           break;
         }
-        const ackMessage = await this.invokeTools(toolCalls, mcp);
+        const ackMessage = await this.invokeTools(toolCalls);
         messages.push(ackMessage);
       }
       params.responseStream.next({
@@ -280,14 +278,14 @@ export class LLM_Agents {
     }
   }
 
-  private async invokeTools(toolCalls: ToolCall[], mcp: MCP): Promise<Message> {
+  private async invokeTools(toolCalls: ToolCall[]): Promise<Message> {
     const ackMessage: Message = {
       role: 'system',
       content: '',
     };
     for (let tool of toolCalls) {
       try {
-        await mcp.callTool({
+        await this.mcpService.callTool({
           toolName: tool.function.name,
           args: tool.function.arguments,
         });

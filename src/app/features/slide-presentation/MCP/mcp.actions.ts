@@ -30,14 +30,27 @@ import {
 } from './McpSchemas';
 import { z } from 'zod';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
+import { Injectable } from '@angular/core';
+import { WorkspaceController } from '../pages/workspace/workspace.controller';
 
+@Injectable({
+  providedIn: 'root',
+})
 export class McpActions {
-  constructor(private presentation: Presentation) {}
+  constructor(private workSpaceController: WorkspaceController) {}
+
+  private getPresentationOrThrow(): Presentation {
+    const presentation = this.workSpaceController.activePresentation;
+    if (!presentation) {
+      throw new InternalMcpError('User has no active presentation');
+    }
+    return presentation;
+  }
 
   private getSlideOrThrow(slideId: string): Slide {
     const slide = slideService.getSlideById({
       slideId,
-      presentation: this.presentation,
+      presentation: this.getPresentationOrThrow(),
     });
     if (!slide) {
       throw new InternalMcpError(`No slide of ${slideId} is found`);
@@ -90,7 +103,7 @@ export class McpActions {
   ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
     const shape = shapeNodeService.addShapeNode({
-      eventBus: this.presentation.eventBus,
+      eventBus: this.getPresentationOrThrow().eventBus,
       slide: slide,
       shapeType: args.shapeType,
       config: this.normalizeInitialConfig(args.initialConfig),
@@ -123,10 +136,14 @@ export class McpActions {
     return result;
   }
 
-  async deleteComponent(args: z.infer<typeof deleteSchema>) :Promise<CallToolResult>{
-    const removed  = this.removeComponent(args);
+  async deleteComponent(
+    args: z.infer<typeof deleteSchema>,
+  ): Promise<CallToolResult> {
+    const removed = this.removeComponent(args);
     return {
-      content: [{ type: 'text', text: `Removed component of id ${removed.node._id}` }],
+      content: [
+        { type: 'text', text: `Removed component of id ${removed.node._id}` },
+      ],
     };
   }
   // Text
@@ -134,7 +151,7 @@ export class McpActions {
   async addText(args: z.infer<typeof AddTextSchema>): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
     const text = textNodeService.addTextNode({
-      eventBus: this.presentation.eventBus,
+      eventBus: this.getPresentationOrThrow().eventBus,
       slide,
       config: this.normalizeInitialConfig(args.initialConfig),
     });
@@ -170,7 +187,7 @@ export class McpActions {
   ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
     const image = imageNodeService.addImageNode({
-      eventBus: this.presentation.eventBus,
+      eventBus: this.getPresentationOrThrow().eventBus,
       slide,
       config: { attrs: {}, zIndex: 0 },
     });
@@ -198,7 +215,7 @@ export class McpActions {
   }
 
   addSlide(): CallToolResult {
-    const slide = slideService.addSlide({ presentation: this.presentation });
+    const slide = slideService.addSlide({ presentation: this.getPresentationOrThrow() });
     return {
       content: [{ type: 'text', text: `Added slide ${slide?.slideId}` }],
     };
@@ -206,7 +223,7 @@ export class McpActions {
 
   removeSlide(args: z.infer<typeof RemoveSlideSchema>): CallToolResult {
     slideService.removeSlide({
-      presentation: this.presentation,
+      presentation: this.getPresentationOrThrow(),
       slideId: args.slideId,
     });
     return {

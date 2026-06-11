@@ -69,6 +69,7 @@ export class PresentationService {
     }
     return ppt;
   }
+
   getPresentationMetaData(id: string): PresentationMetaData {
     const key = this.getPresentationKey(id);
     const pptJson = JSON.parse(localStorage.getItem(key)!);
@@ -79,6 +80,7 @@ export class PresentationService {
       thumbnail:pptJson.thumbnail
     };
   }
+  
   addPresentation(ppt: Presentation,thumbnail:string) {
     const key = this.getPresentationKey(ppt.id);
     const pttJsonString = this.pptToJsonString(ppt,thumbnail);

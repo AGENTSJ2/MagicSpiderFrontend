@@ -1,5 +1,3 @@
-import type { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { Presentation } from '../domain/canvasModels/presenatation.model';
 import { McpActions } from './mcp.actions';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
@@ -11,17 +9,13 @@ import {
   AddImageSchema,
 } from './McpSchemas';
 import z from 'zod';
-
-type ToolHandler = {
-  toolDesc: Tool;
-  execute: (args: any) => Promise<unknown>;
-};
-
-export class MCP extends McpServer {
-  readonly mcpActions!: McpActions;
-  constructor(private presentation: Presentation) {
+import { Injectable } from '@angular/core';
+@Injectable({
+  providedIn:'root'
+})
+export class MagicSpiderServer extends McpServer {
+  constructor(private mcpActions :McpActions) {
     super({ name: 'MagicSpiderServer', version: '1.0.0' });
-    this.mcpActions = new McpActions(presentation);
   }
 
   registerTools() {
@@ -114,10 +108,4 @@ export class MCP extends McpServer {
       this.mcpActions.removeSlide,
     );
   }
-
-  listTools(): Tool[] {
-    return [];
-  }
-
-  async callTool(params: { toolName: string; args: any }) {}
 }
