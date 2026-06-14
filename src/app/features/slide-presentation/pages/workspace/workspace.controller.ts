@@ -4,6 +4,7 @@ import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Subject } from 'rxjs';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { ActivePresentationContext } from '../../services/active-presentation.context';
 
 @Injectable({
   providedIn: 'root',
@@ -17,15 +18,15 @@ export class WorkspaceController {
     private agentService: LLM_Agents,
     private presentationService: PresentationService,
     private message: NzMessageService,
+    private presentationContext: ActivePresentationContext,
   ) {}
 
-  _activePresentation?: Presentation;
   public get activePresentation(): Presentation | undefined {
-    return this._activePresentation;
+    return this.presentationContext.activePresentation;
   }
 
   public set setActivePresentation(v: Presentation | undefined) {
-    this._activePresentation = v;
+    this.presentationContext.activePresentation = v;
   }
 
   magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();

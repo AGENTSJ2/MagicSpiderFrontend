@@ -31,16 +31,16 @@ import {
 import { z } from 'zod';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { Injectable } from '@angular/core';
-import { WorkspaceController } from '../pages/workspace/workspace.controller';
+import { ActivePresentationContext } from '../services/active-presentation.context';
 
 @Injectable({
   providedIn: 'root',
 })
 export class McpActions {
-  constructor(private workSpaceController: WorkspaceController) {}
+  constructor(private presentationContext: ActivePresentationContext) {}
 
   private getPresentationOrThrow(): Presentation {
-    const presentation = this.workSpaceController.activePresentation;
+    const presentation = this.presentationContext.activePresentation;
     if (!presentation) {
       throw new InternalMcpError('User has no active presentation');
     }

@@ -16,6 +16,7 @@ import { Injectable } from '@angular/core';
 export class MagicSpiderServer extends McpServer {
   constructor(private mcpActions :McpActions) {
     super({ name: 'MagicSpiderServer', version: '1.0.0' });
+    this.registerTools()
   }
 
   registerTools() {

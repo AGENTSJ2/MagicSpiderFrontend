@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
-import { OllamaChatService } from './Ollama.service';
 import { Subject } from 'rxjs';
 import { ChatResponse, Message, Tool } from 'ollama';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
 import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { GeminiService } from './gemini.service';
-import { FunctionCall, GenerateContentResponse } from '@google/genai';
+import { GenerateContentResponse } from '@google/genai';
 import type { AbortableAsyncIterator, ToolCall } from 'ollama';
-import { MagicSpiderServer } from '../features/slide-presentation/MCP/mcp_server';
 import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
 @Injectable({
   providedIn: 'root',
@@ -72,7 +70,7 @@ export class LLM_Agents {
     slideContent: string;
     presentation: Presentation;
   }) {
-    const tools = this.mcpService.listTools();
+    const tools = await this.mcpService.listTools();
     const messages = [
       {
         role: 'system',
@@ -142,7 +140,7 @@ export class LLM_Agents {
         action: AgentState.invoked,
         message: 'Magic Spider has been called',
       });
-      const tools = this.mcpService.listTools();
+      const tools = await this.mcpService.listTools();
       const messages = [
         {
           role: 'system',
@@ -167,6 +165,7 @@ export class LLM_Agents {
         );
         const response = await this.chatService.streamChat(
           {
+            model:"gemma-4-26b-a4b-it",
             messages: [
               ...messages,
               {
@@ -314,6 +313,8 @@ export interface AgentStreamEvent {
   functionCall?: any;
 }
 export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {
+  console.log(mcpTool);
+  
   return {
     type: 'function',
     function: {
