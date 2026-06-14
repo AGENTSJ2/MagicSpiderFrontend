@@ -211,6 +211,10 @@ export class WorkspaceComponent {
     }
     return true;
   }
+  handleOpenSettings()
+  {
+    
+  }
 }
 enum ToolBoxType {
   TextToolBox = 'Text',

@@ -24,6 +24,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { QuillModule } from 'ngx-quill'
 import { SharedModule } from '../shared/shared.module';
+import { SettingsComponent } from './pages/settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { SharedModule } from '../shared/shared.module';
     ImageToolBoxComponent,
     AISlideDescriptionComponent,
     MagicSpiderAssistantComponent,
-    ContentEditableSpanDirective
+    ContentEditableSpanDirective,
+    SettingsComponent
   ],
   imports: [
     CommonModule,

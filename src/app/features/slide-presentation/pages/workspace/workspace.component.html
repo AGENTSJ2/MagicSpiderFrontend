@@ -8,7 +8,7 @@
     <div class=" d-flex gap-3 px-2">
       <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
         (click)="workSpaceController.toggleToolBox(true)">
-        <i class="fi fi-rr-settings d-flex justify-content-center align-items-center"></i>
+        <i class="fi fi-rr-tools d-flex justify-content-center align-items-center"></i>
         <P class="mb-0">Properties</P>
       </button>
       <button class="nav-btn d-flex justify-content-center align-items-center gap-2"
@@ -41,6 +41,10 @@
             </li>
           </ul>
         </nz-dropdown-menu>
+      </button>
+      <button class="nav-btn d-flex justify-content-center align-items-center gap-2" (click)="handleOpenSettings()">
+        <i class="fi fi-rr-user-gear d-flex justify-content-center align-items-center"></i>
+        <P class="mb-0">Settings</P>
       </button>
     </div>
   </div>

@@ -41,10 +41,10 @@
   padding: 0px 10px;
   font-weight: 600;
   font-size: clamp(11px, 18px, 18px);
-
+  color: #000;
   &:focus {
     outline: none;
-    border: 1px solid white;
+    border: 1px solid var(--border-color-primary);
   }
 }
 
