@@ -25,40 +25,9 @@ export const ComponentConfigSchema = z.object({
   zIndex: z.number(),
 });
 
-// UNIQUE TO TEXT START
-const KonvaTextAttrValueSchema: z.ZodType<unknown> = z.lazy(() =>
-  z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.null(),
-    z.array(KonvaAttrValueSchema),
-    z.record(z.string(), KonvaAttrValueSchema),
-  ])
-);
-
-export const TextCoponentConfigSchema = z.object({
-  attrs: KonvaAttrsSchema,
-  zIndex: z.number(),
-});
-
 export const addComponentSchema = z.object({
   slideId: z.string(),
   initialConfig: InitialComponentConfigSchema.optional(),
-});
-
-export const AddShapeSchema = addComponentSchema.extend({
-  shapeType: z
-    .number()
-    .min(1)
-    .max(2)
-    .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
-});
-export const AddTextSchema = addComponentSchema.extend({
-  // TODO override the initial config to toolbox config to support formating
-});
-export const AddImageSchema = addComponentSchema.extend({
-  // TODO override the initial config to serialisable image config to support formating
 });
 
 export const updateSchema = z.object({
@@ -72,6 +41,60 @@ export const deleteSchema = z.object({
   slideId: z.string(),
   nodeId: z.string(),
 });
+
+
+// UNIQUE TO TEXT START
+export const KonvaTextAttrsSchema = z
+  .record(z.string(), KonvaAttrValueSchema)
+  .describe(`
+    Partial configuration containing only the Konva Text attributes that should be updated.
+
+    Standard Konva Text attributes include:
+    x, y, width, height, fill, stroke, rotation, opacity,
+    scaleX, scaleY, fontSize, fontFamily, fontStyle,
+    align, verticalAlign, lineHeight, padding, wrap, ellipsis, etc.
+
+    This schema may also contain custom text editor attributes:
+    - listType: 'none' | 'bullet' | 'number' 
+    - bulletStyle: 'disc' | 'circle' | 'square' | 'dash' | 'check'
+    - numberStyle: 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
+    Note : 
+    - text should be line break separated in order to apply list
+    - In order to apply list listType should not be none or undefined
+
+  `);
+
+export const TextComponentConfigSchema = z.object({
+  attrs: KonvaTextAttrsSchema,
+  zIndex: z.number(),
+});
+
+export const AddTextSchema = addComponentSchema.extend({
+  initialConfig:TextComponentConfigSchema.optional()
+});
+
+export const updateTextSchema = z.object({
+  slideId: z.string(),
+  nodeId: z.string(),
+  newConfig: TextComponentConfigSchema,
+  zIndexActions: z.enum(ZIndexActions).optional(),
+});
+
+// TEXT UNIQUE ENDED
+
+export const AddShapeSchema = addComponentSchema.extend({
+  shapeType: z
+    .number()
+    .min(1)
+    .max(2)
+    .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
+});
+
+export const AddImageSchema = addComponentSchema.extend({
+  // TODO override the initial config to serialisable image config to support formating
+});
+
+
 export const RemoveSlideSchema = z.object({
   slideId: z.string(),
 });

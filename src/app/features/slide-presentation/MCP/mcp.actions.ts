@@ -8,7 +8,6 @@ import ShapeComponent, {
   ShapeType,
 } from '../domain/canvasModels/shapeComponent.model';
 import { InternalMcpError } from './mcp.erros';
-import { TextConfig } from 'konva/lib/shapes/Text';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import {
   ImageComponent,
@@ -27,11 +26,13 @@ import {
   deleteSchema,
   AddImageSchema,
   RemoveSlideSchema,
+  updateTextSchema,
 } from './McpSchemas';
 import { z } from 'zod';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { Injectable } from '@angular/core';
 import { ActivePresentationContext } from '../services/active-presentation.context';
+import { getFormattedText } from '../../../core/utilities';
 
 @Injectable({
   providedIn: 'root',
@@ -151,10 +152,21 @@ export class McpActions {
 
   async addText(args: z.infer<typeof AddTextSchema>): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
+    const initialConfig = this.normalizeInitialConfig(
+      args.initialConfig,
+    ) as any;
+    if (initialConfig.attrs.text) {
+      initialConfig.attrs.text = getFormattedText(
+        initialConfig.attrs.text,
+        initialConfig.attrs.listType,
+        initialConfig.attrs.bulletStyle,
+        initialConfig.attrs.numberStyle,
+      );
+    }
     const text = textNodeService.addTextNode({
       eventBus: this.getPresentationOrThrow().eventBus,
       slide,
-      config: this.normalizeInitialConfig(args.initialConfig),
+      config: initialConfig,
     });
     return {
       content: [{ type: 'text', text: `Added text ${text?.node._id}` }],
@@ -162,7 +174,7 @@ export class McpActions {
   }
 
   async updateText(
-    args: z.infer<typeof updateSchema>,
+    args: z.infer<typeof updateTextSchema>,
   ): Promise<CallToolResult> {
     const node = this.getComponentOrThrow<TextComponent>(args);
     const configs = node.controller.getConfigsOfNode({
@@ -171,6 +183,14 @@ export class McpActions {
         zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
       },
     });
+    if (configs.currentConfig.text) {
+      configs.currentConfig.text =getFormattedText(
+        configs.currentConfig.attrs.text,
+        configs.currentConfig.attrs.listType,
+        configs.currentConfig.attrs.bulletStyle,
+        configs.currentConfig.attrs.numberStyle,
+      );
+    }
     const text = textNodeService.updateTextNode({
       node: node.node,
       config: configs.currentConfig,
@@ -216,7 +236,9 @@ export class McpActions {
   }
 
   addSlide(): CallToolResult {
-    const slide = slideService.addSlide({ presentation: this.getPresentationOrThrow() });
+    const slide = slideService.addSlide({
+      presentation: this.getPresentationOrThrow(),
+    });
     return {
       content: [{ type: 'text', text: `Added slide ${slide?.slideId}` }],
     };
