@@ -9,7 +9,7 @@ import {
   ZIndexActions,
 } from '../EventModels/presentationEvents.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
-import { ShapeConfig } from 'konva/lib/Shape';
+import { BulletStyle, getFormattedText, ListType, NumberStyle } from '../../../../core/utilities';
 
 export class TextComponent implements ICanvasComponent {
   node: Konva.Text;
@@ -22,11 +22,12 @@ export class TextComponent implements ICanvasComponent {
   ) {
     this.config = init.config!;
     this.slide = init.slide!;
+    let text = getFormattedText(init.config?.attrs.text ?? 'New Text');
     this.node = new Konva.Text({
       ...(this.config?.attrs ? this.config.attrs : {}),
       x: init.config?.attrs.x ?? 0,
       y: init.config?.attrs.y ?? 0,
-      text: init.config?.attrs.text ?? 'New Text',
+      text: text,
       fontSize: init.config?.attrs.fontSize ?? 50,
       draggable: true,
     });
@@ -53,6 +54,9 @@ export class TextComponent implements ICanvasComponent {
           attrs: this.node.toObject().attrs,
           zIndex: zIndex,
         };
+      console.log("he");
+      
+    params.newConfig.attrs.text = getFormattedText(params.newConfig.attrs.text ?? this.node.text() ?? "");
     const updatedComp = this.controller.applyConfigurations({
       currentConfig: params.newConfig,
       zIndexActions: params.zIndexActions,
@@ -73,14 +77,7 @@ export class TextComponent implements ICanvasComponent {
     return updatedComp;
   }
 }
-export type ListType = 'none' | 'bullet' | 'number';
-export type BulletStyle = 'disc' | 'circle' | 'square' | 'dash' | 'check';
-export type NumberStyle =
-  | 'decimal'
-  | 'lower-alpha'
-  | 'upper-alpha'
-  | 'lower-roman'
-  | 'upper-roman';
+
 export interface TextToolboxConfig extends TextConfig {
   rawText?: string;
   listType?: ListType;

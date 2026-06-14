@@ -48,9 +48,10 @@ export class McpActions {
   }
 
   private getSlideOrThrow(slideId: string): Slide {
+    const presentation = this.getPresentationOrThrow();
     const slide = slideService.getSlideById({
       slideId,
-      presentation: this.getPresentationOrThrow(),
+      presentation: presentation,
     });
     if (!slide) {
       throw new InternalMcpError(`No slide of ${slideId} is found`);

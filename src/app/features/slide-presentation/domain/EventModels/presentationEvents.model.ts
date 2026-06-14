@@ -29,10 +29,10 @@ export interface ComponentConfig<T> {
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
 export enum ZIndexActions {
-    moveToFront,
-    moveToBack,
-    moveUp,
-    moveDown
+    moveToFront = "moveToFront",
+    moveToBack = "moveToBack",
+    moveUp = "moveUp",
+    moveDown = "moveDown"
 }
 
 export enum PresentationEventType {

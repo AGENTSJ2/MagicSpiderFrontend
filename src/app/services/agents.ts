@@ -32,7 +32,7 @@ export class LLM_Agents {
     const interrupt = new Subject<boolean>();
 
     const { stream, provider } = await this.chatService.streamChat({
-      model: 'gemma-4-26b-a4b-it',
+      model: 'gemma-4-31b-it',
       messages: [
         {
           role: 'system',
@@ -312,9 +312,7 @@ export interface AgentStreamEvent {
   message: string;
   functionCall?: any;
 }
-export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {
-  console.log(mcpTool);
-  
+export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {  
   return {
     type: 'function',
     function: {

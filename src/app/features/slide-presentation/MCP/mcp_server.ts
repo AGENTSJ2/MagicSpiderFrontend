@@ -28,7 +28,7 @@ export class MagicSpiderServer extends McpServer {
           'Add a new shape component to a slide. Creates a shape of the specified type and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
         inputSchema: AddShapeSchema,
       },
-      this.mcpActions.addShape,
+      async (args)=>this.mcpActions.addShape(args)
     );
     this.registerTool(
       'updateShape',
@@ -38,7 +38,7 @@ export class MagicSpiderServer extends McpServer {
           'Update an existing shape on a slide. Use this tool whenever a user wants to move, resize, rotate, recolor, reorder, or otherwise modify a shape. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
         inputSchema: updateSchema,
       },
-      this.mcpActions.updateShape,
+      async (args)=>this.mcpActions.updateShape(args)
     );
     this.registerTool(
       'deleteComponent',
@@ -47,7 +47,7 @@ export class MagicSpiderServer extends McpServer {
         description: 'Remove a shape component from a slide.',
         inputSchema: deleteSchema,
       },
-      this.mcpActions.deleteComponent,
+      async (args)=>this.mcpActions.deleteComponent(args)
     );
     this.registerTool(
       'addText',
@@ -57,7 +57,7 @@ export class MagicSpiderServer extends McpServer {
           'Add a new text component to a slide. Creates a text node and inserts it onto the target slide. Optionally accepts initial Konva attributes and z index.',
         inputSchema: AddTextSchema,
       },
-      this.mcpActions.addText,
+      async (args)=>this.mcpActions.addText(args)
     );
     this.registerTool(
       'updateText',
@@ -67,7 +67,7 @@ export class MagicSpiderServer extends McpServer {
           'Update an existing text node on a slide. Use this tool whenever a user wants to move, resize, recolor, reorder, change font, or otherwise modify a text component. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
         inputSchema: updateSchema,
       },
-      this.mcpActions.updateText,
+      async (args)=>this.mcpActions.updateText(args)
     );
     this.registerTool(
       'addImage',
@@ -77,7 +77,7 @@ export class MagicSpiderServer extends McpServer {
           'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
         inputSchema: AddImageSchema,
       },
-      this.mcpActions.addImage,
+      async (args)=>this.mcpActions.addImage(args)
     );
     this.registerTool(
       'updateImage',
@@ -87,7 +87,7 @@ export class MagicSpiderServer extends McpServer {
           'Update an existing image node on a slide. Use this tool whenever a user wants to move, resize, reorder, or otherwise modify an image component. Only provide the Konva attributes that need to be changed; unspecified attributes will remain unchanged.',
         inputSchema: updateSchema,
       },
-      this.mcpActions.updateImage,
+      async (args)=>this.mcpActions.updateImage(args)
     );
     this.registerTool(
       'addSlide',
@@ -96,7 +96,7 @@ export class MagicSpiderServer extends McpServer {
         description: 'Add a new empty slide to the presentation.',
         inputSchema: z.object({}),
       },
-      this.mcpActions.addSlide,
+      async ()=>this.mcpActions.addSlide()
     );
     this.registerTool(
       'removeSlide',
@@ -106,7 +106,7 @@ export class MagicSpiderServer extends McpServer {
           'Remove a slide from the presentation by its ID. This will also delete all components on that slide.',
         inputSchema: RemoveSlideSchema,
       },
-      this.mcpActions.removeSlide,
+      async (args)=>this.mcpActions.removeSlide(args)
     );
   }
 }

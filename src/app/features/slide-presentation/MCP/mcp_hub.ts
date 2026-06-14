@@ -46,7 +46,10 @@ export class McpHub {
     {
       throw new InternalMcpError(`Tool of name ${params.toolName} is not found`);
     }
-    const result = client.callTool(params.args);
+    const result = await client.callTool({
+      name:params.toolName,
+      arguments:params.args
+    });
     return result;
   }
 }
