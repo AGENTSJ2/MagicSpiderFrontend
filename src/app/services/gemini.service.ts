@@ -3,6 +3,7 @@ import {
   GenerateContentParameters,
   GenerateContentResponse,
   GoogleGenAI,
+  Model,
   Part,
 } from '@google/genai';
 import { ChatRequest, ChatResponse } from 'ollama';
@@ -16,12 +17,53 @@ export class GeminiService {
   // private readonly ModelName: string = 'gemini-3.5-flash';
   private readonly ModelName: string = 'gemma-4-31b-it';
   private gemini: GoogleGenAI;
+  readonly availableModels: Model[] = [];
+  private _defaultModel?: Model;
+  private readonly defModelKey = 'DEF-MODEL';
+
+  public get defaultModel(): Model | undefined {
+    return this._defaultModel;
+  }
 
   constructor() {
     this.gemini = new GoogleGenAI({
       apiKey: this.API_KEY,
     });
+    this.setModelsList();
+    this.setDefaultModel();
   }
+
+  private async setModelsList() {
+    const models = await this.gemini.models.list();
+    for await (const model of models) {
+      this.availableModels.push(model);
+    }
+  }
+  
+  private setDefaultModel() {
+    const modelString = localStorage.getItem(this.defModelKey);
+    if (!modelString) {
+      return;
+    }
+    this._defaultModel = JSON.parse(modelString);
+  }
+  
+  private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
+    const functionDeclarations = tools.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      parameters: toGeminiSchema(tool.inputSchema),
+    }));
+
+    return functionDeclarations.length > 0 ? [{ functionDeclarations }] : [];
+  }
+
+  updateDefaultModel(model?: Model) {
+    const modelJsonString = JSON.stringify(model);
+    localStorage.setItem(this.defModelKey, modelJsonString);
+    this._defaultModel = model;
+  }
+
   async chat(
     request: Partial<ChatRequest>,
     tools?: McpTool[],
@@ -61,10 +103,11 @@ export class GeminiService {
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
-  async streamChat(request: Partial<ChatRequest>,tools?: McpTool[],) {
+
+  async streamChat(request: Partial<ChatRequest>, tools?: McpTool[]) {
     const gemTools = this.getGeminiTools(tools ?? []);
     const stream = await this.gemini.models.generateContentStream({
-      model: request.model ?? this.ModelName,
+      model: request.model ?? this._defaultModel?.name ?? this.ModelName,
       contents: (request.messages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,
         parts: [{ text: msg.content }],
@@ -74,20 +117,10 @@ export class GeminiService {
           ?.filter((m) => m.role === 'system')
           .map((m) => m.content)
           .join('\n'),
-        tools:gemTools
+        tools: gemTools,
       },
     });
     return { stream: stream, provider: 'google' };
-  }
-
-  private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
-    const functionDeclarations = tools.map((tool) => ({
-      name: tool.name,
-      description: tool.description,
-      parameters: toGeminiSchema(tool.inputSchema),
-    }));
-
-    return functionDeclarations.length > 0 ? [{ functionDeclarations }] : [];
   }
 }
 

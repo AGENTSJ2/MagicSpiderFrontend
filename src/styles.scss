@@ -35,46 +35,4 @@
   scrollbar-width: thin;
   scrollbar-color: #888 transparent;
 }
-.ms-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
-.ms-logo {
-  width: 34px;
-  height: 34px;
-  padding: 6px;
-  border-radius: 9px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    #3578c7
-  );
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg { width: 100%; height: 100%; }
-}
-
-.ms-brand-name {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  color: #0f172a;
-  white-space: nowrap;
-}
-
-.ms-brand-accent {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    #6ea8e8
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}

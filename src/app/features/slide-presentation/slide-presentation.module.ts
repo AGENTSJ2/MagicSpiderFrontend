@@ -23,6 +23,7 @@ import { ContentEditableSpanDirective } from '../.././directives/content-editabl
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { QuillModule } from 'ngx-quill'
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { QuillModule } from 'ngx-quill'
     NzDrawerModule,
     NzDropDownModule,
     NzMessageModule,
-    QuillModule.forRoot()
+    QuillModule.forRoot(),
+    SharedModule
   ]
 })
 export class SlidePresentationModule { }

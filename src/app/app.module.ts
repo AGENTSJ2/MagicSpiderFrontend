@@ -7,6 +7,7 @@ import { HomeComponent } from './components/home/home.component';
 import { SlidePresentationModule } from './features/slide-presentation/slide-presentation.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { SharedModule } from './features/shared/shared.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +18,8 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
     BrowserAnimationsModule,
     AppRoutingModule,
     SlidePresentationModule,
-    NzModalModule
+    NzModalModule,
+    SharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
