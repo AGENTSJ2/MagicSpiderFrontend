@@ -1,1 +1,84 @@
-<p>settings works!</p>
+<div class="settings">
+  <aside class="settings__sidebar p-3">
+    <button
+      *ngFor="let item of navItems"
+      type="button"
+      class="settings__nav-item"
+      [class.settings__nav-item--active]="activeSection === item.key"
+      (click)="selectSection(item.key)"
+    >
+      {{ item.label }}
+    </button>
+  </aside>
+
+  <section class="settings__content p-3">
+    <!-- User Settings -->
+    <ng-container *ngIf="activeSection === 'user'">
+      <h2 class="settings__title">User Settings</h2>
+
+      <div class="settings__field">
+        <label for="user-name">Name</label>
+        <input
+          id="user-name"
+          nz-input
+          placeholder="Your name"
+          [(ngModel)]="name"
+        />
+      </div>
+
+      <div class="settings__field">
+        <label for="user-email">Email <span class="settings__optional">(optional)</span></label>
+        <input
+          id="user-email"
+          nz-input
+          type="email"
+          placeholder="you@example.com"
+          [(ngModel)]="email"
+        />
+      </div>
+
+      <button
+        nz-button
+        nzType="primary"
+        [disabled]="!name.trim()"
+        (click)="saveUserSettings()"
+      >
+        Save
+      </button>
+    </ng-container>
+
+    <!-- AI Settings -->
+    <ng-container *ngIf="activeSection === 'ai'">
+      <h2 class="settings__title">AI Settings</h2>
+
+      <div class="settings__field">
+        <label>Provider</label>
+        <nz-select [(ngModel)]="provider" class="settings__select">
+          <nz-option
+            *ngFor="let p of providers"
+            [nzValue]="p.value"
+            [nzLabel]="p.label"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="settings__field">
+        <label>Default model</label>
+        <nz-select
+          [(ngModel)]="selectedModelName"
+          (ngModelChange)="onDefaultModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzPlaceHolder="Select a default model"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
+    </ng-container>
+  </section>
+</div>

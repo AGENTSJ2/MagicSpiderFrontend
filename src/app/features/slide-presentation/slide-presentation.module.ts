@@ -22,6 +22,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { ContentEditableSpanDirective } from '../.././directives/content-editable-span.directive';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { QuillModule } from 'ngx-quill'
 import { SharedModule } from '../shared/shared.module';
 import { SettingsComponent } from './pages/settings/settings.component';
@@ -53,6 +54,7 @@ import { SettingsComponent } from './pages/settings/settings.component';
     NzDrawerModule,
     NzDropDownModule,
     NzMessageModule,
+    NzSelectModule,
     QuillModule.forRoot(),
     SharedModule
   ]

@@ -16,6 +16,8 @@ import { PresentationService } from '../../../../services/konva.services/present
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
   selector: 'app-workspace',
@@ -43,6 +45,7 @@ export class WorkspaceComponent {
     private presentationService: PresentationService,
     private route: ActivatedRoute,
     private message: NzMessageService,
+    private modal: NzModalService,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
     this.setUpPresentation(id!);
@@ -211,9 +214,16 @@ export class WorkspaceComponent {
     }
     return true;
   }
-  handleOpenSettings()
-  {
-    
+  handleOpenSettings() {
+    this.modal.create({
+      nzTitle: 'Settings',
+      nzContent: SettingsComponent,
+      nzFooter: null,
+      nzWidth: 720,
+      nzBodyStyle: {
+        padding: '0',
+      },
+    });
   }
 }
 enum ToolBoxType {
@@ -222,4 +232,3 @@ enum ToolBoxType {
   ShapeTooLBox = 'Shape',
   None = 'None',
 }
-let hasUnsavedChanges = true;

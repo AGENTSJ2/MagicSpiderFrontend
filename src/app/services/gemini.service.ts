@@ -18,6 +18,7 @@ export class GeminiService {
   private readonly ModelName: string = 'gemma-4-31b-it';
   private gemini: GoogleGenAI;
   readonly availableModels: Model[] = [];
+  private modelsPromise?: Promise<Model[]>;
   private _defaultModel?: Model;
   private readonly defModelKey = 'DEF-MODEL';
 
@@ -29,15 +30,21 @@ export class GeminiService {
     this.gemini = new GoogleGenAI({
       apiKey: this.API_KEY,
     });
-    this.setModelsList();
+    this.loadModels();
     this.setDefaultModel();
   }
 
-  private async setModelsList() {
-    const models = await this.gemini.models.list();
-    for await (const model of models) {
-      this.availableModels.push(model);
+  loadModels(): Promise<Model[]> {
+    if (!this.modelsPromise) {
+      this.modelsPromise = (async () => {
+        const models = await this.gemini.models.list();
+        for await (const model of models) {
+          this.availableModels.push(model);
+        }
+        return this.availableModels;
+      })();
     }
+    return this.modelsPromise;
   }
   
   private setDefaultModel() {
