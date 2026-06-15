@@ -28,7 +28,7 @@ enum StreamPhase {
 export class AISlideDescriptionComponent {
   @Input() presentation!: Presentation;
   @Output() close: EventEmitter<boolean> = new EventEmitter();
-  problemStatement = '';
+  problemStatement?: string = '';
   thinkingText = '';
   contentText = '';
   phase: StreamPhase = StreamPhase.idle;
@@ -49,23 +49,17 @@ export class AISlideDescriptionComponent {
   ) {}
 
   editorModules = {
-  toolbar: [
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ header: [1, 2, 3, false] }],
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ header: [1, 2, 3, false] }],
 
-    // REMOVE THIS if you don't want size dropdown:
-    // [{ size: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
 
-    // REMOVE superscript/subscript (x² / x₂):
-    // [{ script: 'sub' }, { script: 'super' }],
+      ['blockquote', 'code-block'],
 
-    [{ list: 'ordered' }, { list: 'bullet' }],
-
-    ['blockquote', 'code-block'],
-
-    ['link', 'image']
-  ]
-};
+      ['link', 'image'],
+    ],
+  };
 
   get phaseTagColor(): string {
     const map: Record<StreamPhase, string> = {
@@ -108,7 +102,12 @@ export class AISlideDescriptionComponent {
   // ── Generate ──────────────────────────────────────────────────────────────
 
   async generate(): Promise<void> {
-    if (!this.problemStatement.trim()) return;
+    if (
+      !this.problemStatement?.trim() ||
+      [StreamPhase.thinking , StreamPhase.content].includes(this.phase)
+    ) {
+      return;
+    }
 
     this.thinkingText = '';
     const prevContent = this.contentText;

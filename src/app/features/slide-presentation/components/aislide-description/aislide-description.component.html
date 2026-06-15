@@ -4,16 +4,14 @@
   (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'0px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
-    <div class="modal-title">
+    <div class="modal-title gap-2">
       <div>
         <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
         Scratch Book
-        <nz-tag [nzColor]="phaseTagColor" class="phase-tag">
-          {{ phase }}
-        </nz-tag>
       </div>
       <div>
-        <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
+        <button nz-button nzType="default" (click)="handleInvokeMagicSpider()"
+          *ngIf="phase !=StreamPhase.thinking && phase !=StreamPhase.content">
           Start Magic Spider
         </button>
       </div>
@@ -47,22 +45,34 @@
         </div>
       </div>
       <!-- ── Input ───────────────────────────────────────────── -->
-      <div class="input-section" *ngIf="phase === StreamPhase.idle || phase === StreamPhase.done">
+      <div class="input-section">
         <div class="input-label d-flex gap-2">
           <div>
             Describe your topic or request changes
           </div>
-          <span class="char-count">{{ problemStatement.length }} characters</span>
+          <span class="char-count">{{ problemStatement?.length ?? 0 }} characters</span>
 
         </div>
-        <div class="d-flex w-100 justify-content-center align-items-center gap-2">
-          <div class="flex-fill">
-            <textarea [(ngModel)]="problemStatement"
-              placeholder="e.g. Explain the impact of climate change on coastal cities over the next 50 years…"
-              class="problem-input w-100 p-3"></textarea>
+        <div class="d-flex w-100 justify-content-center align-items-center gap-2 problem-wrapper">
+          <div class="flex-fill input-wrapper">
+            @if(problemStatement?.length == 0)
+            {
+              <span class="problem-placeholder " (click)="prblm.focus()" >
+                Whats the topic on your mind..
+              </span>
+            }
+            <span contentEditableModel contenteditable [(ngModel)]="problemStatement" class="problem-input w-100 d-flex" #prblm></span>
+            
           </div>
           <button class="send-btn" (click)="generate()">
-            <i class="fi fi-sr-paper-plane-top d-flex justify-content-between align-items-center"></i>
+            @if(phase == StreamPhase.thinking || phase == StreamPhase.content)
+            {
+              <span class="spinner-border req-spinner" role="status"></span>
+            }
+            @else
+            {
+              <i class="fi fi-sr-paper-plane-top d-flex justify-content-between align-items-center"></i>
+            }
           </button>
         </div>
       </div>

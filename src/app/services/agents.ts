@@ -165,7 +165,7 @@ export class LLM_Agents {
         );
         const response = await this.chatService.streamChat(
           {
-            model:"gemma-4-26b-a4b-it",
+            // model:"gemma-4-26b-a4b-it",
             messages: [
               ...messages,
               {
