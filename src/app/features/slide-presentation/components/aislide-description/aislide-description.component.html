@@ -39,7 +39,7 @@
       <!-- <ngx-quill #editor [modules]="modules" (contentChanged)="logChange($event);"></ngx-quill> -->
       <div class="content-section">
         <div class="markdown-output" #genContent>
-          <quill-editor [(ngModel)]="contentText" format="html" [modules]="this.editorModules"
+          <quill-editor [(ngModel)]="contentText" format="html" [modules]="this.editorModules" [readOnly]="phase === StreamPhase.content || phase === StreamPhase.thinking"
             class="w-100 h-100"></quill-editor>
           <span class="cursor" *ngIf="phase === StreamPhase.content">▌</span>
         </div>

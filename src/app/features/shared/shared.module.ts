@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from './components/logo/logo.component';
-
+import { AppRoutingModule } from "../../app-routing.module";
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -9,10 +10,13 @@ import { LogoComponent } from './components/logo/logo.component';
     LogoComponent
   ],
   imports: [
-    CommonModule
-  ],
+    CommonModule,
+    AppRoutingModule,
+    RouterModule
+],
   exports:[
-    LogoComponent
+    LogoComponent,
+    RouterModule
   ]
 })
 export class SharedModule { }
