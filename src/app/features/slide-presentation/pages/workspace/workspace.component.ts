@@ -18,6 +18,7 @@ import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { SettingsComponent } from '../settings/settings.component';
+import blobService from '../../../../services/blob.service';
 
 @Component({
   selector: 'app-workspace',
@@ -95,10 +96,11 @@ export class WorkspaceComponent {
     }
     const reader = new FileReader();
     reader.onload = () => {
+      const appImage = blobService.addImage(reader.result as string);
       this.presentation.getActiveSlide?.addImage({
         config: {
           attrs: {
-            imageSrc: reader.result as string,
+            imageId:appImage.id
           },
           zIndex: 0,
         },

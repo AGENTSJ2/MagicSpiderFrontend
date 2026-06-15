@@ -8,6 +8,7 @@ import pptxgen  from 'pptxgenjs';
 import { Image } from 'konva/lib/shapes/Image';
 import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
+import blobService from '../blob.service';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +64,7 @@ export class PresentationService {
           });
         }
         if (type == 'Image') {
-          slide.addText({ config: { attrs: compObj.node.attrs, zIndex: 0 } });
+          slide.addImage({ config: { attrs: compObj.node.attrs, zIndex: 0 } });
         }
       }
     }
@@ -97,9 +98,11 @@ export class PresentationService {
 
   removePresentation(pptId: string) {
     const key = this.getPresentationKey(pptId);
-    let test = localStorage.getItem(key);
+    const ppt = this.getPresentation(pptId);
+
+    // removing images of an presentation from local storage
+   this.removePresentationImages(ppt);
     localStorage.removeItem(key);
-    test = localStorage.getItem(key);
 
     let pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
@@ -111,6 +114,17 @@ export class PresentationService {
     );
   }
 
+  removePresentationImages(ppt:Presentation)
+  {
+    const components = ppt.slides.map((sl)=>sl.components).flat();
+    components.forEach((comp)=>{
+      if(comp.node.className == "Image")
+      {
+        blobService.removeImage(comp.node.attrs.imageId);
+      }
+    })
+  }
+  
   savePresentation(ppt: Presentation,thumbnail:string) {
     this.removePresentation(ppt.id);
     this.addPresentation(ppt,thumbnail);

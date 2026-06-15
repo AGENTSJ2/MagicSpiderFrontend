@@ -9,6 +9,7 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
 import { imageNodeService } from '../../../services/konva.services/image.service';
 import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
+import blobService from '../../../services/blob.service';
 
 export default class ImageController extends BaseController {
   override node: KonvaImage;
@@ -47,15 +48,6 @@ export default class ImageController extends BaseController {
       zIndexActions: event.zIndexActions,
     });
     return this.canvasComponent;
-  }
-
-  private getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
-    const attrs = { ...this.node.getAttrs() };
-    delete attrs['image'];
-    return {
-      attrs,
-      zIndex: this.node.getZIndex(),
-    };
   }
 
   protected override handleKeyboardStrokes = (event: KeyboardEvent) => {

@@ -12,6 +12,7 @@ import {
 } from '../../domain/canvasModels/imageComponent';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { Image } from 'konva/lib/shapes/Image';
+import blobService from '../../../../services/blob.service';
 
 @Component({
   selector: 'app-image-tool-box',
@@ -88,14 +89,7 @@ export class ImageToolBoxComponent implements OnChanges {
   ZIndexActions = ZIndexActions;
 
   move(action: ZIndexActions) {
-    // const updateEvent = new UpdateImageEvent({
-    //   ...this.event,
-    //   previousConfig: this.event.currentConfig,
-    //   currentConfig: this.localConfig,
-    //   trackHistory: true,
-    //   zIndexActions: action
-    // });
-    // this.presentation.publishEvent(updateEvent);
+    this.component.updateComponent({newConfig:this.localConfig,zIndexActions:action})
   }
 
   replaceImage(event: Event) {
@@ -107,7 +101,8 @@ export class ImageToolBoxComponent implements OnChanges {
 
     const reader = new FileReader();
     reader.onload = () => {
-      this.localConfig.attrs.imageSrc = reader.result as string;
+      const appImage = blobService.addImage(reader.result as string);
+      this.localConfig.attrs.imageId = appImage.id;
       this.applyChanges();
       input.value = '';
     };

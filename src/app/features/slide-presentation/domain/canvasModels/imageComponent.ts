@@ -8,8 +8,9 @@ import {
 } from '../EventModels/presentationEvents.model';
 import { Slide } from './slide.model';
 import { ICanvasComponent } from './ICanvasComponent';
+import blobService from '../../../../services/blob.service';
 export type SerializableImageConfig = Partial<ImageConfig> & {
-  imageSrc?: string;
+  imageId?: string;
 };
 export class ImageComponent implements ICanvasComponent {
   node: KonvaImage;
@@ -45,8 +46,9 @@ export class ImageComponent implements ICanvasComponent {
       this.node.getLayer()?.batchDraw();
     };
 
-    if (attrs.imageSrc) {
-      imageElement.src = attrs.imageSrc;
+    if (attrs.imageId) {
+      const image = blobService.getImage(attrs.imageId);
+      imageElement.src = image.imageSrc;
     }
 
     this.controller = new ImageController({
@@ -57,7 +59,10 @@ export class ImageComponent implements ICanvasComponent {
   }
 
   getSerializableConfig(): ComponentConfig<SerializableImageConfig> {
-    const attrs = { ...this.node.getAttrs() };
+    const attrs: SerializableImageConfig = {
+      ...this.node.getAttrs(),
+      imageId: this.config.attrs.imageId,
+    };
     delete attrs['image'];
     return {
       attrs,
@@ -77,12 +82,13 @@ export class ImageComponent implements ICanvasComponent {
     zIndexActions?: ZIndexActions;
   }): ImageComponent {
     const zIndex = this.node.zIndex();
-    const oldConfig: ComponentConfig<SerializableImageConfig> = params.previousConfig
-      ? structuredClone(params.previousConfig)
-      : {
-          attrs: this.node.toObject().attrs,
-          zIndex: zIndex,
-        };
+    const oldConfig: ComponentConfig<SerializableImageConfig> =
+      params.previousConfig
+        ? structuredClone(params.previousConfig)
+        : {
+            attrs: this.node.toObject().attrs,
+            zIndex: zIndex,
+          };
     const updatedComp = this.controller.applyConfigurations({
       currentConfig: params.newConfig,
       zIndexActions: params.zIndexActions,
