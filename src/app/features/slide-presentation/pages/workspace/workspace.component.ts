@@ -34,13 +34,14 @@ export class WorkspaceComponent {
   @ViewChild('pptList')
   pptList!: ElementRef;
   hasUnSavedChanges: boolean = false;
-  @HostListener('window:beforeunload', ['$event'])
-  onBeforeUnload(event: BeforeUnloadEvent): void {
-    if (this.hasUnSavedChanges) {
-      event.preventDefault();
-      event.returnValue = '';
-    }
-  }
+  // @HostListener('window:beforeunload', ['$event'])
+  // onBeforeUnload(event: BeforeUnloadEvent): void {
+  //   if (this.hasUnSavedChanges) {
+  //     event.preventDefault();
+  //     event.returnValue = '';
+      
+  //   }
+  // }
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
@@ -198,6 +199,7 @@ export class WorkspaceComponent {
     const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
     this.presentationService.savePresentation(this.presentation, thumbnail);
     this.message.success('Presentation Saved');
+    this.hasUnSavedChanges = false;
   }
 
   pptTimeOutTracker: any;
@@ -211,8 +213,11 @@ export class WorkspaceComponent {
 
   canDeactivate() {
     if (this.hasUnSavedChanges) {
-      confirm('There are unsaved changes');
-      return false;
+      const save = confirm('There are unsaved changes',);
+      if(save)
+      {
+        this.savePpt();
+      }
     }
     return true;
   }

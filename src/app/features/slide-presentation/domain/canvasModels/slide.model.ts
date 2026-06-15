@@ -140,7 +140,6 @@ export class Slide {
       throw new Error('No node found to restore');
     }
     this.controller.addComponent(compToRestore);
-    console.log(compToRestore.node._id);
   }
 
   selectComponent(

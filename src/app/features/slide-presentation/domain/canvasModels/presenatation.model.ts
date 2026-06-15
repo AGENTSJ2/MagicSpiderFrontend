@@ -52,6 +52,8 @@ export class Presentation {
     trackHistory?:boolean;
   }) {
     const trackHistory = params.trackHistory == undefined || params.trackHistory;
+    delete params.newConfig?.attrs['image']
+    delete params.oldConfig?.attrs['image']
     const newConfig =  structuredClone(params.newConfig);
     const oldConfig = structuredClone(params.oldConfig);
     const event: PresentationEvent = new PresentationEvent({
@@ -66,22 +68,6 @@ export class Presentation {
     this.eventBus.next(event);
   }
 
-  // emitPresentationEvent(params:{
-  //   trackHistory:boolean,
-  //   slideId:string,
-  //   nodeId:string
-  // })
-  // {
-  //   this.eventBus.next({
-  //     trackHistory:params.trackHistory,
-  //     presentationId:this.id,
-  //     slideId:params.slideId,
-  //     previousConfig:undefined,
-  //     currentConfig:undefined,
-  //     nodeId:params.nodeId,
-  //     eventType:PresentationEventType
-  //   })
-  // }
   addSlide() {
     const ConfiguredSlide = new Slide({
       presentation: this,
