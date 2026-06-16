@@ -4,7 +4,7 @@ import { Slide } from '../../features/slide-presentation/domain/canvasModels/sli
 import ShapeComponent, {
   ShapeType,
 } from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
-import pptxgen  from 'pptxgenjs';
+import pptxgen from 'pptxgenjs';
 import { Image } from 'konva/lib/shapes/Image';
 import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
@@ -15,8 +15,7 @@ import blobService from '../blob.service';
 })
 export class PresentationService {
   private readonly presentationCollectionKey = 'presentations';
-  constructor() {
-  }
+  constructor() {}
   private getPresentationKey(id: string) {
     return `PPT-${id}`;
   }
@@ -78,13 +77,13 @@ export class PresentationService {
       name: pptJson.name,
       id: pptJson.id,
       slideCount: pptJson.slides.length,
-      thumbnail:pptJson.thumbnail
+      thumbnail: pptJson.thumbnail,
     };
   }
-  
-  addPresentation(ppt: Presentation,thumbnail:string) {
+
+  addPresentation(ppt: Presentation, thumbnail: string) {
     const key = this.getPresentationKey(ppt.id);
-    const pttJsonString = this.pptToJsonString(ppt,thumbnail);
+    const pttJsonString = this.pptToJsonString(ppt, thumbnail);
     localStorage.setItem(key, pttJsonString);
     const pptIds = JSON.parse(
       localStorage.getItem(this.presentationCollectionKey) ?? '[]',
@@ -96,12 +95,14 @@ export class PresentationService {
     );
   }
 
-  removePresentation(pptId: string) {
+  removePresentation(pptId: string, removeImages: boolean) {
     const key = this.getPresentationKey(pptId);
     const ppt = this.getPresentation(pptId);
 
     // removing images of an presentation from local storage
-   this.removePresentationImages(ppt);
+    if (removeImages) {
+      this.removePresentationImages(ppt);
+    }
     localStorage.removeItem(key);
 
     let pptIds = JSON.parse(
@@ -114,29 +115,27 @@ export class PresentationService {
     );
   }
 
-  removePresentationImages(ppt:Presentation)
-  {
-    const components = ppt.slides.map((sl)=>sl.components).flat();
-    components.forEach((comp)=>{
-      if(comp.node.className == "Image")
-      {
+  removePresentationImages(ppt: Presentation) {
+    const components = ppt.slides.map((sl) => sl.components).flat();
+    components.forEach((comp) => {
+      if (comp.node.className == 'Image') {
         blobService.removeImage(comp.node.attrs.imageId);
       }
-    })
-  }
-  
-  savePresentation(ppt: Presentation,thumbnail:string) {
-    this.removePresentation(ppt.id);
-    this.addPresentation(ppt,thumbnail);
+    });
   }
 
-  pptToJsonString(ppt: Presentation,thumbnail:string) {
+  savePresentation(ppt: Presentation, thumbnail: string) {
+    this.removePresentation(ppt.id,false);
+    this.addPresentation(ppt, thumbnail);
+  }
+
+  pptToJsonString(ppt: Presentation, thumbnail: string) {
     const pptJson = {
       name: ppt.name,
       id: ppt.id,
       slides: ppt.slides.map((sl) => sl.toJson()),
       config: ppt.config,
-      thumbnail:thumbnail
+      thumbnail: thumbnail,
     };
     return JSON.stringify(pptJson);
   }
@@ -195,7 +194,7 @@ export class PresentationService {
     // const shapeType =( hasRoundedCorners
     //   ? "roundRect"
     //   : "rect") as pptxgen.ShapeType;
-    const shapeType = "rect" as pptxgen.ShapeType;
+    const shapeType = 'rect' as pptxgen.ShapeType;
     const options = {
       x: component.node.x() * this.ExportScaleFactor,
       y: component.node.y() * this.ExportScaleFactor,
@@ -220,7 +219,7 @@ export class PresentationService {
     options: pptxgen.ShapeProps;
   } {
     const radius = (component.node as any).radius();
-    const shapeType = "ellipse" as pptxgen.ShapeType;
+    const shapeType = 'ellipse' as pptxgen.ShapeType;
     const options = {
       x: (component.node.x() - radius) * this.ExportScaleFactor,
       y: (component.node.y() - radius) * this.ExportScaleFactor,
@@ -284,5 +283,5 @@ export interface PresentationMetaData {
   name?: string;
   id: string;
   slideCount: number;
-  thumbnail:string
+  thumbnail: string;
 }

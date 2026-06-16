@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
 
   handleRemovePPT(ppt: PresentationMetaData, event: Event) {
     event.stopImmediatePropagation();
-    this.presentationService.removePresentation(ppt.id);
+    this.presentationService.removePresentation(ppt.id,true);
     this.presentations = this.presentations.filter((p) => p.id != ppt.id);
   }
 

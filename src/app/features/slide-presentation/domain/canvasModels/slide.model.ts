@@ -159,13 +159,24 @@ export class Slide {
   }
   
   toJson() {
+    const parentLayerOfSlide = this.components.at(0)?.node.parent;
+    const children = parentLayerOfSlide?.children ?? [];
+    const componentsInOrder:ICanvasComponent [] = [];
+    for(let child of children)
+    {
+      const component = this.components.find((comp)=>comp.node._id == child._id);
+      if(component)
+      {
+        componentsInOrder.push(component);
+      }
+    }
     const json = {
       slideId: this.slideId,
       presentationId: this.presentationId,
-      components: this.components.map((cm) => {
+      components: componentsInOrder.map((cm) => {
         cm.node.id(cm.node._id.toString());
         const componentNode: any = cm.node.toObject();
-
+        componentNode.attrs.zIndex = cm.node.zIndex();
         if (cm.node.className == 'Image') {
           const imageId = (cm as ImageComponent).getSerializableConfig().attrs
             .imageId;
