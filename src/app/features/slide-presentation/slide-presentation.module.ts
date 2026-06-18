@@ -26,6 +26,7 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { QuillModule } from 'ngx-quill'
 import { SharedModule } from '../shared/shared.module';
 import { SettingsComponent } from './pages/settings/settings.component';
+import { ImageListComponent } from './components/image-list/image-list.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SettingsComponent } from './pages/settings/settings.component';
     AISlideDescriptionComponent,
     MagicSpiderAssistantComponent,
     ContentEditableSpanDirective,
-    SettingsComponent
+    SettingsComponent,
+    ImageListComponent
   ],
   imports: [
     CommonModule,

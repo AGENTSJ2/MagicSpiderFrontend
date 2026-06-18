@@ -1,0 +1,26 @@
+<div class="d-flex flex-column h-100">
+  <div class="img-upload">
+    <div class="upload-input-display" (click)="file.click()">
+      <p class="mb-0">Upload Image</p>
+    </div>
+    <input
+      type="file"
+      accept="image/*"
+      class="d-none"
+      #file
+      (change)="handleUploadImage($event)"
+    />
+  </div>
+  <div class="image-list-wrapper flex-fill">
+    @for (item of appImages; track $index) {
+      <div class="img-prev" (click)="handleAddImage()">
+        <button (click)="handleRemoveImage(item, $event)" class="del-btn">
+          <i
+            class="fi fi-rs-trash d-flex justify-content-center align-items-center"
+          ></i>
+        </button>
+        <img [src]="item.imageSrc" alt="" />
+      </div>
+    }
+  </div>
+</div>

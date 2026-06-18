@@ -13,7 +13,7 @@ export class WorkspaceController {
   showMagicSpiderAssistant: boolean = false;
   showSlideDescription: boolean = false;
   showToolBox: boolean = false;
-
+  showImageToolBox:boolean = true;
   constructor(
     private agentService: LLM_Agents,
     private presentationService: PresentationService,
@@ -58,6 +58,10 @@ export class WorkspaceController {
     });
   }
 
+  toggleImageToolBox()
+  {
+    this.showImageToolBox = !this.showImageToolBox;
+  }
   async exportPPT(presentation: Presentation) {
     try {
       await this.presentationService.exportPPTtoPPTX(presentation);
