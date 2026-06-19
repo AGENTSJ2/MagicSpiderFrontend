@@ -37,7 +37,6 @@
   display: flex;
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 5px;
   padding: 0px 10px;
   font-weight: 600;
   font-size: clamp(11px, 18px, 18px);
@@ -54,6 +53,7 @@
   background-color: white;
 
   .menu-item {
+    padding: 10px 0px;
     position: relative;
     cursor: pointer;
     .shape-types {
@@ -65,7 +65,6 @@
       padding: 5px;
       background-color: white;
       border: 1px solid var(--border-color-primary);
-      border-radius: 5px;
       top: -50%;
       right: -130%;
       z-index: 1;
@@ -79,7 +78,10 @@
         }
       }
     }
-
+    &:hover
+    {
+      background-color: var(--background-secondary);
+    }
     &:hover .shape-types {
       opacity: 1;
     }

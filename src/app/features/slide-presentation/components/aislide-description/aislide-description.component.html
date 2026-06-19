@@ -4,15 +4,15 @@
   (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'0px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
-    <div class="modal-title gap-2">
+    <div class="modal-title justify-content-between">
       <div>
         <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
         Scratch Book
       </div>
-      <div>
+      <div class="me-4">
         <button nz-button nzType="default" (click)="handleInvokeMagicSpider()"
           *ngIf="phase !=StreamPhase.thinking && phase !=StreamPhase.content">
-          Start Magic Spider
+          Create Slides With Magic Spider
         </button>
       </div>
     </div>

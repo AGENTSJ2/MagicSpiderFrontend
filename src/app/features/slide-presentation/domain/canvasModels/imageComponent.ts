@@ -47,8 +47,9 @@ export class ImageComponent implements ICanvasComponent {
     };
 
     if (attrs.imageId) {
-      const image = blobService.getImage(attrs.imageId);
-      imageElement.src = image.imageSrc;
+      blobService.getImage(attrs.imageId).then((image) => {
+        imageElement.src = image.imageSrc;
+      });
     }
 
     this.controller = new ImageController({

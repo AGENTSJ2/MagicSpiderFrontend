@@ -13,7 +13,7 @@
   </div>
   <div class="image-list-wrapper flex-fill">
     @for (item of appImages; track $index) {
-      <div class="img-prev" (click)="handleAddImage()">
+      <div class="img-prev" (click)="handleAddImage(item)">
         <button (click)="handleRemoveImage(item, $event)" class="del-btn">
           <i
             class="fi fi-rs-trash d-flex justify-content-center align-items-center"

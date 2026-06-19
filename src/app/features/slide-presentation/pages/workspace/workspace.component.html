@@ -46,7 +46,7 @@
         [nzDropdownMenu]="saveMenu"
       >
         <i
-          class="fi fi-sr-folder-download d-flex justify-content-center align-items-center"
+          class="fi fi-rs-disk d-flex justify-content-center align-items-center"
         ></i>
         <P class="mb-0">Save</P>
         <nz-dropdown-menu #saveMenu="nzDropdownMenu">
@@ -86,7 +86,7 @@
   </div>
   <div class="d-flex flex-1">
     <div class="side-wrap">
-      <div class="side-bar px-3 py-4 d-flex flex-column gap-3">
+      <div class="side-bar px-3 py-4 d-flex flex-column">
         <div class="menu-item d-flex gap-1 flex-column" (click)="addSlide()">
           <i
             class="fi fi-rr-rectangle-vertical-history d-flex justify-content-center align-items-center fs-4"
@@ -129,10 +129,9 @@
           (click)="workSpaceController.toggleImageToolBox()"
         >
           <i
-            class="fi fi-rr-file-upload d-flex justify-content-center align-items-center fs-4"
+            class="fi fi-rr-graphic-style d-flex justify-content-center align-items-center fs-4"
           ></i>
-          <p class="mb-0 text-center">Upload</p>
-          <!-- <input type="file" accept="image/*" class="d-none" (change)="handleImageUpload($event)" /> -->
+          <p class="mb-0 text-center">Images</p>
         </label>
       </div>
     </div>
@@ -210,7 +209,7 @@
 <!-- IMAGE LIST DRAWER -->
 <nz-drawer
   [nzVisible]="workSpaceController.showImageToolBox"
-  nzTitle="Image List"
+  nzTitle="Images"
   nzPlacement="left"
   (nzOnClose)="workSpaceController.toggleImageToolBox()"
   [nzMask]="false"

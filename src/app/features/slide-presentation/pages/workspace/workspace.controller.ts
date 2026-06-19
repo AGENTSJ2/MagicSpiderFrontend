@@ -13,7 +13,7 @@ export class WorkspaceController {
   showMagicSpiderAssistant: boolean = false;
   showSlideDescription: boolean = false;
   showToolBox: boolean = false;
-  showImageToolBox:boolean = true;
+  showImageToolBox:boolean = false;
   constructor(
     private agentService: LLM_Agents,
     private presentationService: PresentationService,

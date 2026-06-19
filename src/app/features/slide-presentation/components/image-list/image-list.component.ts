@@ -12,7 +12,12 @@ export class ImageListComponent {
   appImages:AppImage[] = [];
   constructor()
   {
-    this.appImages = blobService.getAllImages();
+    this.loadImages();
+  }
+
+  private async loadImages()
+  {
+    this.appImages = await blobService.getAllImages();
   }
   handleUploadImage(event:Event)
   {
@@ -30,10 +35,17 @@ export class ImageListComponent {
   { 
     event.stopImmediatePropagation();
     blobService.removeImage(item.id)
-    this.appImages = blobService.getAllImages();
+    this.loadImages();
   }
-  handleAddImage()
+  handleAddImage(appImage:AppImage)
   {
-
+    this.presentation.getActiveSlide?.addImage({
+        config: {
+          attrs: {
+            imageId:appImage.id
+          },
+          zIndex: 0,
+        },
+      })
   }
 }
