@@ -136,69 +136,75 @@
       </div>
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
-      <div
-        class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center"
-      >
-        <div class="parent-slide-wrapper">
-          @if (presentation.slides.length == 0) {
-            <div
-              class="empty-slide-state d-flex flex-column justify-content-center align-items-center gap-3"
-            >
-              <div
-                class="empty-icon-wrap d-flex justify-content-center align-items-center"
-              >
-                <i class="fi fi-rr-rectangle-vertical-history"></i>
-              </div>
-              <div class="text-center">
-                <p class="empty-title mb-1">No slides yet</p>
-                <p class="empty-sub mb-0">
-                  Click <strong>Slide</strong> in the sidebar to get started
-                </p>
-              </div>
-              <button class="empty-cta" (click)="addSlide()">
-                <i
-                  class="fi fi-rr-plus-small d-flex justify-content-center align-items-center"
-                ></i>
-                Add first slide
-              </button>
-            </div>
-          } @else {
-            <app-slide
-              *ngIf="presentation.getActiveSlide"
-              [slide]="presentation.getActiveSlide!"
-            ></app-slide>
-          }
-        </div>
-      </div>
+      @if (loading) {
 
-      <div class="d-flex w-100 justify-content-between bottom">
+      }
+      @else
+      {
         <div
-          class="bottom-list w-100"
-          #pptList
-          *ngIf="presentation.slides.length != 0"
+          class="slide-view d-flex flex-column flex-1 py-3 flex-1 justify-content-center align-items-center"
         >
-          @for (item of presentation.slides; track $index) {
-            <div class="slide-prev" (click)="selectSlide(item)">
-              <ng-container *ngIf="slideImages.get(item.slideId) as image">
-                <img [src]="image" [alt]="$index" />
-              </ng-container>
-              <ng-container *ngIf="!slideImages.get(item.slideId) as image">
+          <div class="parent-slide-wrapper">
+            @if (presentation.slides.length == 0) {
+              <div
+                class="empty-slide-state d-flex flex-column justify-content-center align-items-center gap-3"
+              >
                 <div
-                  class="d-flex justify-content-center align-items-center flex-column"
+                  class="empty-icon-wrap d-flex justify-content-center align-items-center"
                 >
-                  <h6 class="mb-1">Slide {{ $index }}</h6>
-                  <small>Click to preview</small>
+                  <i class="fi fi-rr-rectangle-vertical-history"></i>
                 </div>
-              </ng-container>
-              <button (click)="handleRemoveSlide(item, $event)" class="del-btn">
-                <i
-                  class="fi fi-rs-trash d-flex justify-content-center align-items-center"
-                ></i>
-              </button>
-            </div>
-          }
+                <div class="text-center">
+                  <p class="empty-title mb-1">No slides yet</p>
+                  <p class="empty-sub mb-0">
+                    Click <strong>Slide</strong> in the sidebar to get started
+                  </p>
+                </div>
+                <button class="empty-cta" (click)="addSlide()">
+                  <i
+                    class="fi fi-rr-plus-small d-flex justify-content-center align-items-center"
+                  ></i>
+                  Add first slide
+                </button>
+              </div>
+            } @else {
+              <app-slide
+                *ngIf="presentation.getActiveSlide"
+                [slide]="presentation.getActiveSlide!"
+              ></app-slide>
+            }
+          </div>
         </div>
-      </div>
+  
+        <div class="d-flex w-100 justify-content-between bottom">
+          <div
+            class="bottom-list w-100"
+            #pptList
+            *ngIf="presentation.slides.length != 0"
+          >
+            @for (item of presentation.slides; track $index) {
+              <div class="slide-prev" (click)="selectSlide(item)">
+                <ng-container *ngIf="slideImages.get(item.slideId) as image">
+                  <img [src]="image" [alt]="$index" />
+                </ng-container>
+                <ng-container *ngIf="!slideImages.get(item.slideId) as image">
+                  <div
+                    class="d-flex justify-content-center align-items-center flex-column"
+                  >
+                    <h6 class="mb-1">Slide {{ $index }}</h6>
+                    <small>Click to preview</small>
+                  </div>
+                </ng-container>
+                <button (click)="handleRemoveSlide(item, $event)" class="del-btn">
+                  <i
+                    class="fi fi-rs-trash d-flex justify-content-center align-items-center"
+                  ></i>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>

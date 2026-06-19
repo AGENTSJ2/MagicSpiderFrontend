@@ -34,14 +34,7 @@ export class WorkspaceComponent {
   @ViewChild('pptList')
   pptList!: ElementRef;
   hasUnSavedChanges: boolean = false;
-  // @HostListener('window:beforeunload', ['$event'])
-  // onBeforeUnload(event: BeforeUnloadEvent): void {
-  //   if (this.hasUnSavedChanges) {
-  //     event.preventDefault();
-  //     event.returnValue = '';
-      
-  //   }
-  // }
+  loading:boolean = false;
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
@@ -54,16 +47,25 @@ export class WorkspaceComponent {
   }
 
   async setUpPresentation(presentationId: string) {
-    this.presentation =
-      this.presentationService.getPresentation(presentationId);
-    this.name = this.presentation.name;
-    this.workSpaceController.setActivePresentation = this.presentation;
-    const firstSlide = this.presentation.slides.at(0);
-    this.listenPresentationEvents();
-    if (firstSlide) {
-      this.selectSlide(firstSlide);
+    try {
+      this.loading = true;
+      this.presentation =
+        await this.presentationService.getPresentation(presentationId);
+      this.name = this.presentation.name;
+      this.workSpaceController.setActivePresentation = this.presentation;
+      const firstSlide = this.presentation.slides.at(0);
+      this.listenPresentationEvents();
+      if (firstSlide) {
+        this.selectSlide(firstSlide);
+      }
+      this.hasUnSavedChanges = false;
+    } catch (error) {
+      console.error(error);
     }
-    this.hasUnSavedChanges = false;
+    finally
+    {
+      this.loading = false
+    }
   }
 
   selectedToolBox: ToolBoxType = ToolBoxType.None;
@@ -193,11 +195,11 @@ export class WorkspaceComponent {
     }
   }
 
-  savePpt() {
+  async savePpt() {
     this.presentation.name = this.name;
     const firstslide = this.presentation.slides.at(0);
     const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
-    this.presentationService.savePresentation(this.presentation, thumbnail);
+    await this.presentationService.savePresentation(this.presentation, thumbnail);
     this.message.success('Presentation Saved');
     this.hasUnSavedChanges = false;
   }

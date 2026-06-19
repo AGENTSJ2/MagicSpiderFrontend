@@ -16,19 +16,19 @@ export class HomeComponent implements OnInit {
     private router: Router,
   ) {}
   presentations: PresentationMetaData[] = [];
-  ngOnInit(): void {
-    this.presentations = this.presentationService.getPresentations();
-}
+  async ngOnInit(): Promise<void> {
+    this.presentations = await this.presentationService.getPresentations();
+  }
 
-  handleRemovePPT(ppt: PresentationMetaData, event: Event) {
+  async handleRemovePPT(ppt: PresentationMetaData, event: Event) {
     event.stopImmediatePropagation();
-    this.presentationService.removePresentation(ppt.id,true);
+    await this.presentationService.removePresentation(ppt.id, true);
     this.presentations = this.presentations.filter((p) => p.id != ppt.id);
   }
 
-  handleNewPPT() {
-    const presentation = this.presentationService.getPresentation('new');
-    this.presentationService.addPresentation(presentation, '');
+  async handleNewPPT() {
+    const presentation = await this.presentationService.getPresentation('new');
+    await this.presentationService.addPresentation(presentation, '');
     this.router.navigate(['/workspace/ppt'], {
       queryParams: { id: presentation.id },
     });
