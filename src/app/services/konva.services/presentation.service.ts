@@ -148,13 +148,6 @@ export class PresentationService {
     shapeType: pptxgen.ShapeType;
     options: pptxgen.ShapeProps;
   } {
-    // const radius = (component.node as Rect).cornerRadius();
-    // const hasRoundedCorners = Array.isArray(radius)
-    //   ? radius.some((r) => r > 0)
-    //   : radius > 0;
-    // const shapeType =( hasRoundedCorners
-    //   ? "roundRect"
-    //   : "rect") as pptxgen.ShapeType;
     const shapeType = 'rect' as pptxgen.ShapeType;
     const options = {
       x: component.node.x() * this.ExportScaleFactor,
@@ -238,6 +231,11 @@ export class PresentationService {
     return {
       options,
     };
+  }
+
+  saveScratchBook(pptId:string,content:string)
+  {
+    
   }
 }
 export interface PresentationMetaData {

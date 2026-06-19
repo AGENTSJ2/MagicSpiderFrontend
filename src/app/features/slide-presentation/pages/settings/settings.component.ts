@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Model } from '@google/genai';
 import { GeminiService } from '../../../../services/gemini.service';
 import { UserService } from '../../../../services/user.service';
@@ -17,11 +17,12 @@ interface SettingsNavItem {
   styleUrl: './settings.component.scss',
 })
 export class SettingsComponent implements OnInit {
+
   readonly navItems: SettingsNavItem[] = [
     { key: 'user', label: 'User Settings', icon: 'user' },
     { key: 'ai', label: 'AI Settings', icon: 'robot' },
   ];
-  activeSection: SettingsSection = 'user';
+  @Input() activeSection: SettingsSection = 'user';
 
   // User settings
   name = '';

@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivePresentationContext } from '../../services/active-presentation.context';
+import { SettingsComponent } from '../settings/settings.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +21,7 @@ export class WorkspaceController {
     private presentationService: PresentationService,
     private message: NzMessageService,
     private presentationContext: ActivePresentationContext,
+    private modal:NzModalService
   ) {}
 
   public get activePresentation(): Presentation | undefined {
@@ -31,17 +34,19 @@ export class WorkspaceController {
 
   magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
   magicSpiderInterrupt: Subject<boolean> = new Subject();
-  latestSlideMarkdown: string = ``;
-  showMagicSpider(params: { slideContent: string }) {
-    this.latestSlideMarkdown = params.slideContent.trim();
+  scratchBookContent: string = ``;
+  showMagicSpider() {
     this.showMagicSpiderAssistant = true;
     this.showSlideDescription = false;
+    this.showImageToolBox = false;
+    this.showToolBox = false;
   }
 
   toggleToolBox(show: boolean) {
     if (show) {
       this.showMagicSpiderAssistant = false;
       this.showSlideDescription = false;
+      this.showImageToolBox = false;
     }
     this.showToolBox = show;
   }
@@ -61,7 +66,30 @@ export class WorkspaceController {
   toggleImageToolBox()
   {
     this.showImageToolBox = !this.showImageToolBox;
+    if(this.showImageToolBox)
+    {
+      this.showMagicSpiderAssistant = false;
+      this.showToolBox = false;
+    }
   }
+  
+  handleOpenSettings(select?:'ai'|'user') {
+    const modelRef = this.modal.create({
+      nzTitle: 'Settings',
+      nzContent: SettingsComponent,
+      nzFooter: null,
+      nzWidth: 720,
+      nzBodyStyle: {
+        padding: '0',
+      },
+    });
+    if(select)
+    {
+      const comp = modelRef.getContentComponent();
+      comp.activeSection = select;
+    }
+  }
+
   async exportPPT(presentation: Presentation) {
     try {
       await this.presentationService.exportPPTtoPPTX(presentation);

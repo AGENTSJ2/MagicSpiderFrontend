@@ -189,7 +189,7 @@ export class WorkspaceComponent {
 
   toggleMagicAssistant(state: boolean) {
     if (state) {
-      this.workSpaceController.showMagicSpider({ slideContent: '' });
+      this.workSpaceController.showMagicSpider();
     } else {
       this.workSpaceController.showMagicSpiderAssistant = false;
     }
@@ -223,17 +223,7 @@ export class WorkspaceComponent {
     }
     return true;
   }
-  handleOpenSettings() {
-    this.modal.create({
-      nzTitle: 'Settings',
-      nzContent: SettingsComponent,
-      nzFooter: null,
-      nzWidth: 720,
-      nzBodyStyle: {
-        padding: '0',
-      },
-    });
-  }
+  
 }
 enum ToolBoxType {
   TextToolBox = 'Text',

@@ -11,6 +11,7 @@ import { Subject, Subscription } from 'rxjs';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
+import { PresentationService } from '../../../../services/konva.services/presentation.service';
 
 enum StreamPhase {
   idle = 'Idle',
@@ -30,7 +31,6 @@ export class AISlideDescriptionComponent {
   @Output() close: EventEmitter<boolean> = new EventEmitter();
   problemStatement?: string = '';
   thinkingText = '';
-  contentText = '';
   phase: StreamPhase = StreamPhase.idle;
   StreamPhase = StreamPhase;
   errorMessage = '';
@@ -46,6 +46,7 @@ export class AISlideDescriptionComponent {
     private cdr: ChangeDetectorRef,
     private agentService: LLM_Agents,
     public workspaceController: WorkspaceController,
+    private presentationService:PresentationService
   ) {}
 
   editorModules = {
@@ -93,7 +94,6 @@ export class AISlideDescriptionComponent {
     this.interrupt$.next(true);
     this.problemStatement = '';
     this.thinkingText = '';
-    this.contentText = '';
     this.phase = StreamPhase.idle;
     this.errorMessage = '';
     this.cdr.detectChanges();
@@ -110,8 +110,8 @@ export class AISlideDescriptionComponent {
     }
 
     this.thinkingText = '';
-    const prevContent = this.contentText;
-    this.contentText = '';
+    const prevContent = this.workspaceController.scratchBookContent;
+    this.workspaceController.scratchBookContent = '';
     this.phase = StreamPhase.thinking;
     this.errorMessage = '';
 
@@ -134,7 +134,7 @@ export class AISlideDescriptionComponent {
             });
           } else if (event.action === 'content') {
             this.phase = StreamPhase.content;
-            this.contentText += event.message;
+            this.workspaceController.scratchBookContent += event.message;
             this.genContentElement?.nativeElement.scrollTo({
               top: this.genContentElement.nativeElement.scrollHeight,
               behavior: 'smooth',
@@ -168,7 +168,7 @@ export class AISlideDescriptionComponent {
   // ── Copy ──────────────────────────────────────────────────────────────────
 
   copyContent(): void {
-    navigator.clipboard.writeText(this.contentText).catch(console.error);
+    navigator.clipboard.writeText(this.workspaceController.scratchBookContent).catch(console.error);
   }
 
   // ── Cleanup ───────────────────────────────────────────────────────────────
@@ -179,9 +179,16 @@ export class AISlideDescriptionComponent {
   }
 
   handleInvokeMagicSpider() {
-    this.workspaceController.showMagicSpider({
-      slideContent: this.contentText,
-    });
+    this.workspaceController.showMagicSpider();
     this.close.emit(true);
+  }
+  saveTimeOut:any;
+  handleContentChange()
+  {
+    clearTimeout(this.saveTimeOut);
+    this.saveTimeOut = setTimeout(()=>{
+      this.presentationService.saveScratchBook(this.presentation.id,this.workspaceController.scratchBookContent);
+    },1000);
+
   }
 }

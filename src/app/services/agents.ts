@@ -81,7 +81,7 @@ export class LLM_Agents {
         content: `Slide Description ${params.slideContent}`,
       },
     ];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 100; i++) {
       const slideJson = JSON.stringify(
         params.presentation.slides.map((sl) => sl.toJson()),
       );
@@ -155,7 +155,7 @@ export class LLM_Agents {
           content: '',
         },
       ];
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 100; i++) {
         if (stop) {
           break;
         }
