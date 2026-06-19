@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import db from './indexed-db';
+import { Stores } from './stores';
 
 /** Full persisted shape of a presentation. */
 export interface StoredPresentation {
@@ -21,21 +22,18 @@ export interface StoredPresentationMeta {
 
 @Injectable({ providedIn: 'root' })
 export class PresentationData {
-  private readonly recordStore = 'presentations';
-  private readonly metaStore = 'presentationMeta';
-  
+  static readonly recordStore = Stores.presentations;
+  static readonly metaStore = Stores.presentationMeta;
 
   constructor() {
-    db.createOrSetStore(this.recordStore);
-    db.createOrSetStore(this.metaStore);
   }
 
   async get(id: string): Promise<StoredPresentation | undefined> {
-    return db.get<StoredPresentation>(this.recordStore, id);
+    return db.get<StoredPresentation>(PresentationData.recordStore, id);
   }
 
   async list(): Promise<StoredPresentationMeta[]> {
-    return db.getAll<StoredPresentationMeta>(this.metaStore);
+    return db.getAll<StoredPresentationMeta>(PresentationData.metaStore);
   }
 
   async save(record: StoredPresentation): Promise<void> {
@@ -44,8 +42,8 @@ export class PresentationData {
 
   async remove(id: string): Promise<void> {
     await Promise.all([
-      db.delete(this.recordStore, id),
-      db.delete(this.metaStore, id),
+      db.delete(PresentationData.recordStore, id),
+      db.delete(PresentationData.metaStore, id),
     ]);
   }
 
@@ -60,8 +58,8 @@ export class PresentationData {
 
   private async writeRecord(record: StoredPresentation): Promise<void> {
     await Promise.all([
-      db.put(this.recordStore, record.id, record),
-      db.put(this.metaStore, record.id, this.toMeta(record)),
+      db.put(PresentationData.recordStore, record.id, record),
+      db.put(PresentationData.metaStore, record.id, this.toMeta(record)),
     ]);
   }
 }

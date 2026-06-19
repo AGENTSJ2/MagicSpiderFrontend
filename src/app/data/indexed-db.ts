@@ -1,32 +1,31 @@
+import { Stores } from './stores';
+
 class IndexedDb {
   private readonly dbPromise: Promise<IDBDatabase>;
-  private db!: IDBDatabase;
+
+  private readonly stores: string[] = Object.values(Stores);
+
   constructor(
     private readonly dbName: string,
     private readonly version: number,
   ) {
     this.dbPromise = this.open();
-    this.dbPromise.then((iDb)=>{
-      this.db = iDb;
-    })
   }
 
   private open(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
       request.onupgradeneeded = () => {
-        this.db = request.result;
+        const db = request.result;
+        for (const store of this.stores) {
+          if (!db.objectStoreNames.contains(store)) {
+            db.createObjectStore(store);
+          }
+        }
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
-  }
-
-  async createOrSetStore(store: string) {
-    await this.dbPromise;
-    if (!this.db.objectStoreNames.contains(store)) {
-      this.db.createObjectStore(store);
-    }
   }
 
   private async objectStore(
@@ -54,6 +53,11 @@ class IndexedDb {
     return IndexedDb.request(os.getAll()) as Promise<T[]>;
   }
 
+  async getAllKeys<T>(store: string): Promise<T[]> {
+    const os = await this.objectStore(store, 'readonly');
+    return IndexedDb.request(os.getAllKeys()) as Promise<T[]>;
+  }
+
   async put(store: string, key: IDBValidKey, value: unknown): Promise<void> {
     const os = await this.objectStore(store, 'readwrite');
     await IndexedDb.request(os.put(value, key));
@@ -64,5 +68,5 @@ class IndexedDb {
     await IndexedDb.request(os.delete(key));
   }
 }
-const db = new IndexedDb('MagicSpiderData', 1);
+const db = new IndexedDb('MagicSpiderData', 3);
 export default db;
