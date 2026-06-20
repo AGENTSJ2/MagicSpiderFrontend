@@ -78,6 +78,24 @@ export class Presentation {
     return ConfiguredSlide;
   }
 
+  /**
+   * Reorders slides in place. `slides` is the single source of truth used for
+   * rendering, saving and export, so mutating it here reflects everywhere.
+   */
+  moveSlide(previousIndex: number, currentIndex: number) {
+    if (
+      previousIndex === currentIndex ||
+      previousIndex < 0 ||
+      currentIndex < 0 ||
+      previousIndex >= this.slides.length ||
+      currentIndex >= this.slides.length
+    ) {
+      return;
+    }
+    const [moved] = this.slides.splice(previousIndex, 1);
+    this.slides.splice(currentIndex, 0, moved);
+  }
+
   removeSlide(slide: Slide) {
     const slideIdx = this.slides.findIndex((sl) => sl.slideId == slide.slideId);
     if (slideIdx < 0) {

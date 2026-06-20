@@ -24,6 +24,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { QuillModule } from 'ngx-quill'
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../shared/shared.module';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { ImageListComponent } from './components/image-list/image-list.component';
@@ -58,6 +59,7 @@ import { ImageListComponent } from './components/image-list/image-list.component
     NzMessageModule,
     NzSelectModule,
     QuillModule.forRoot(),
+    DragDropModule,
     SharedModule
   ]
 })

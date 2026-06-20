@@ -1,7 +1,6 @@
 import {
   Component,
   ElementRef,
-  HostListener,
   ViewChild,
 } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
@@ -13,12 +12,12 @@ import {
 } from '../../domain/EventModels/presentationEvents.model';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { SettingsComponent } from '../settings/settings.component';
 import blobService from '../../../../services/blob.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-workspace',
@@ -183,6 +182,14 @@ export class WorkspaceComponent {
   handleRemoveSlide(item: Slide, event: Event) {
     event.stopImmediatePropagation();
     this.presentation.removeSlide(item);
+  }
+
+  dropSlide(event: CdkDragDrop<Slide[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    this.presentation.moveSlide(event.previousIndex, event.currentIndex);
+    this.hasUnSavedChanges = true;
   }
 
   handleOpenAiDescription() {

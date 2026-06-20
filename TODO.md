@@ -1,5 +1,4 @@
 # Todo
-- Maintain agents status
 - Make changes visualize
 
 - Less Prior

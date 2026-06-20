@@ -9,19 +9,12 @@ import {
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { Model } from '@google/genai';
-import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
+import { AgentState, AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
 
-enum StreamPhase {
-  idle = 'Idle',
-  thinking = 'Thinking',
-  content = 'Content',
-  done = 'Done',
-  error = 'Error',
-}
 
 @Component({
   selector: 'app-aislide-description',
@@ -33,10 +26,8 @@ export class AISlideDescriptionComponent {
   @Output() close: EventEmitter<boolean> = new EventEmitter();
   problemStatement?: string = '';
   thinkingText = '';
-  phase: StreamPhase = StreamPhase.idle;
-  StreamPhase = StreamPhase;
   errorMessage = '';
-
+  AgentState = AgentState;
   private streamSub?: Subscription;
   private interrupt$ = new Subject<boolean>();
   @ViewChild('genContent')
@@ -46,7 +37,7 @@ export class AISlideDescriptionComponent {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private agentService: LLM_Agents,
+    public agentService: LLM_Agents,
     public workspaceController: WorkspaceController,
     private presentationService:PresentationService,
     private geminiService: GeminiService
@@ -69,29 +60,11 @@ export class AISlideDescriptionComponent {
     ],
   };
 
-  get phaseTagColor(): string {
-    const map: Record<StreamPhase, string> = {
-      [StreamPhase.idle]: 'default',
-      [StreamPhase.thinking]: 'gold',
-      [StreamPhase.content]: 'blue',
-      [StreamPhase.done]: 'green',
-      [StreamPhase.error]: 'red',
-    };
-    return map[this.phase];
-  }
-
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
-
   open(): void {
     this.workspaceController.showSlideDescription = true;
   }
 
   handleCancel(): void {
-    if (
-      this.phase === StreamPhase.thinking ||
-      this.phase === StreamPhase.content
-    )
-      return;
     this.workspaceController.showSlideDescription = false;
     this.reset();
   }
@@ -101,50 +74,35 @@ export class AISlideDescriptionComponent {
     this.interrupt$.next(true);
     this.problemStatement = '';
     this.thinkingText = '';
-    this.phase = StreamPhase.idle;
     this.errorMessage = '';
     this.cdr.detectChanges();
   }
 
   // ── Generate ──────────────────────────────────────────────────────────────
 
-  async generate(): Promise<void> {
-    if (
-      !this.problemStatement?.trim() ||
-      [StreamPhase.thinking , StreamPhase.content].includes(this.phase)
-    ) {
-      return;
-    }
-
+  async trigger(): Promise<void> {
     this.thinkingText = '';
     const prevContent = this.workspaceController.scratchBookContent;
     this.workspaceController.scratchBookContent = '';
-    this.phase = StreamPhase.thinking;
     this.errorMessage = '';
 
     try {
-      const stream$ = await this.agentService.ContentCreatorAgent({
-        userProblemStatement: this.problemStatement.trim(),
+      this.agentService.triggerContentCreator({
+        userProblemStatement: this.problemStatement!.trim(),
         previousContent: prevContent,
       });
-
-      this.streamSub = stream$.responseEvent.subscribe({
+      this.streamSub = this.agentService.contentCreatorStream.subscribe({
         next: (event: AgentStreamEvent) => {
           if (event.action === 'thinking') {
             this.thinkingText += event.message;
-            if (this.phase !== StreamPhase.thinking) {
-              this.phase = StreamPhase.thinking;
-            }
             this.scrollContOnValue(this.thinkingBoxElement?.nativeElement)
           } else if (event.action === 'content') {
-            this.phase = StreamPhase.content;
             this.workspaceController.scratchBookContent += event.message;
             this.scrollContOnValue(this.genContentElement?.nativeElement)
           }
           this.cdr.detectChanges();
         },
         error: (err: unknown) => {
-          this.phase = StreamPhase.error;
           this.errorMessage =
             err instanceof Error
               ? err.message
@@ -152,12 +110,10 @@ export class AISlideDescriptionComponent {
           this.cdr.detectChanges();
         },
         complete: () => {
-          this.phase = StreamPhase.done;
           this.cdr.detectChanges();
         },
       });
     } catch (err: unknown) {
-      this.phase = StreamPhase.error;
       this.errorMessage =
         err instanceof Error ? err.message : 'Failed to start generation.';
       this.cdr.detectChanges();
@@ -184,13 +140,6 @@ export class AISlideDescriptionComponent {
       });
     }
   }
-  // ── Copy ──────────────────────────────────────────────────────────────────
-
-  copyContent(): void {
-    navigator.clipboard.writeText(this.workspaceController.scratchBookContent).catch(console.error);
-  }
-
-  // ── Cleanup ───────────────────────────────────────────────────────────────
 
   ngOnDestroy(): void {
     this.streamSub?.unsubscribe();
@@ -210,5 +159,13 @@ export class AISlideDescriptionComponent {
       this.presentationService.saveScratchBook(this.presentation.id,this.workspaceController.scratchBookContent);
     },1000);
 
+  }
+  isAgentIntractable()
+  {
+    return this.agentService.InvokeEnabledStages.includes(this.agentService.contentCreatorState);
+  }
+  isAgentInaction()
+  {
+    return this.agentService.AgentInActionStages.includes(this.agentService.contentCreatorState);
   }
 }

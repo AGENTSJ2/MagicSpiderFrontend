@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { ChatResponse, Message, Tool } from 'ollama';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
@@ -39,7 +39,7 @@ export class LLM_Agents {
     'If you believe that task is complete then make the response function call list empty so that we can stop gracefully',
     'Never continue issuing tool calls after the task is complete.',
     'The Slide style should be modern and attractive ato look at',
-    DesignPrinciplesPrompt
+    DesignPrinciplesPrompt,
   ].join(' ');
 
   constructor(
@@ -50,6 +50,9 @@ export class LLM_Agents {
     this.magicSpiderEventStream.subscribe((event) => {
       this.magicSpiderState = event.action;
     });
+    this.contentCreatorStream.subscribe((event) => {
+      this.contentCreatorState = event.action;
+    });
   }
 
   private async pipeResponseToStream(
@@ -58,21 +61,21 @@ export class LLM_Agents {
       | AbortableAsyncIterator<ChatResponse>
       | AsyncGenerator<GenerateContentResponse, any, any>,
     provider: string,
-  ) : Promise<{thoughts:string,contents:string}> {
-    let thoughts :string = "";
-    let contents:string = "";
+  ): Promise<{ thoughts: string; contents: string }> {
+    let thoughts: string = '';
+    let contents: string = '';
     try {
       if (provider == 'ollama') {
         for await (const chunk of stream as AbortableAsyncIterator<ChatResponse>) {
           if (chunk.message.thinking) {
-            thoughts+=chunk.message.thinking;
+            thoughts += chunk.message.thinking;
             responseEvent.next({
               action: AgentState.thinking,
               message: chunk.message.thinking,
             });
           }
           if (chunk.message.content) {
-            contents+=chunk.message.content;
+            contents += chunk.message.content;
             responseEvent.next({
               action: AgentState.content,
               message: chunk.message.content,
@@ -88,7 +91,7 @@ export class LLM_Agents {
           const parts = chunk.candidates?.[0]?.content?.parts ?? [];
           for (const part of parts) {
             if (part.thought) {
-              thoughts+=part.text
+              thoughts += part.text;
               responseEvent.next({
                 action: AgentState.thinking,
                 message: part.text ?? '',
@@ -103,7 +106,7 @@ export class LLM_Agents {
               });
               continue;
             }
-            contents+=part.text;
+            contents += part.text;
             responseEvent.next({
               action: AgentState.content,
               message: part.text!,
@@ -112,13 +115,10 @@ export class LLM_Agents {
         }
       }
       responseEvent.complete();
-      
     } catch (error) {
       responseEvent.error(error);
-    }
-    finally
-    {
-      return {thoughts,contents}
+    } finally {
+      return { thoughts, contents };
     }
   }
 
@@ -142,43 +142,99 @@ export class LLM_Agents {
     return ackMessage;
   }
 
-  async ContentCreatorAgent(params: {
+  private contentCreatorSubject: Subject<AgentStreamEvent> = new Subject();
+  private interruptContentCreatorSubject: Subject<boolean> = new Subject();
+  private contentInterruptSub?:Subscription;
+  contentCreatorStream: Observable<AgentStreamEvent> = this.contentCreatorSubject.asObservable();
+  contentCreatorState: AgentState = AgentState.idle;
+  private async ContentCreatorAgent(params: {
     userProblemStatement: string;
     previousContent: string;
   }) {
-    const responseEvent = new Subject<AgentStreamEvent>();
-    const interrupt = new Subject<boolean>();
-
-    const { stream, provider } = await this.chatService.streamChat({
-      model: this.chatService.getModel('content')?.name,
-      messages: [
-        {
-          role: 'system',
-          content: this.ContentCreatorPrompt,
-        },
-        ...(params.previousContent.length != 0
-          ? [{ role: 'assistant', content: params.previousContent }]
-          : []),
-        {
-          role: 'user',
-          content: params.userProblemStatement,
-        },
-      ],
-    });
-    this.pipeResponseToStream(responseEvent, stream, provider);
-    interrupt.subscribe((ev) => {
-      if (ev) {
-        if (provider == 'ollama') {
-          (stream as any).abort();
+    if(params.userProblemStatement.length == 0)
+    {
+      return;
+    }
+    const abortController = new AbortController();
+    const localContentCreatorSubject = new Subject<AgentStreamEvent>();
+    try {
+      localContentCreatorSubject.subscribe((ev)=>{
+        this.contentCreatorSubject.next(ev);
+      });
+      localContentCreatorSubject.next({
+        action:AgentState.invoked,
+        message:"Content creator has been invoked"
+      })
+      this.contentInterruptSub?.unsubscribe();
+      this.interruptContentCreatorSubject.subscribe((ev) => {
+        if (ev) {
+          if(ev)
+          {
+            abortController.abort();
+          }
         }
-      }
-    });
-    return { responseEvent, interrupt };
+      });
+      // Agent working
+      const { stream, provider } = await this.chatService.streamChat(
+        {
+          model: this.chatService.getModel('content')?.name,
+          messages: [
+            {
+              role: 'system',
+              content: this.ContentCreatorPrompt,
+            },
+            ...(params.previousContent.length != 0
+              ? [{ role: 'assistant', content: params.previousContent }]
+              : []),
+            {
+              role: 'user',
+              content: params.userProblemStatement,
+            },
+          ],
+        },
+        [],
+        abortController,
+      );
+      await this.pipeResponseToStream(localContentCreatorSubject, stream, provider);
+      this.contentCreatorSubject.next({
+        action: AgentState.done,
+        message: "Completed",
+      });
+    } catch (error) {
+      this.contentCreatorSubject.next({
+        action: AgentState.error,
+        message: error?.toString() ?? 'Unknown error',
+      });
+    }
+    finally
+    {
+      localContentCreatorSubject.complete();
+      this.contentInterruptSub?.unsubscribe();
+    }
+
+  }
+
+  triggerContentCreator(params: {
+    userProblemStatement: string;
+    previousContent: string;
+  }) {
+    if (this.AgentInActionStages.includes(this.contentCreatorState)) {
+      this.interruptContentCreator();
+    }
+    if (this.InvokeEnabledStages.includes(this.contentCreatorState)) {
+      this.ContentCreatorAgent(params);
+    }
+  }
+
+  interruptContentCreator() {
+    this.interruptContentCreatorSubject.next(true);
   }
 
   private magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
   private magicSpiderInterrupt: Subject<boolean> = new Subject();
-  magicSpiderEventStream: Observable<AgentStreamEvent> = this.magicSpiderEvent.asObservable();
+  private spiderInterruptSub?:Subscription;
+  magicSpiderEventStream: Observable<AgentStreamEvent> =
+    this.magicSpiderEvent.asObservable();
   magicSpiderState: AgentState = AgentState.idle;
 
   private async MagicSpiderAgent(params: {
@@ -189,7 +245,8 @@ export class LLM_Agents {
     try {
       let stop: boolean = false;
       const abortController = new AbortController();
-      this.magicSpiderInterrupt.subscribe((intr) => {
+      this.spiderInterruptSub?.unsubscribe();
+      this.spiderInterruptSub = this.magicSpiderInterrupt.subscribe((intr) => {
         stop = intr;
         if (stop) {
           abortController.abort();
@@ -202,7 +259,7 @@ export class LLM_Agents {
       });
 
       const tools = await this.mcpService.listTools();
-      const messages:Message[] = [
+      const messages: Message[] = [
         {
           role: 'system',
           content: this.MagicSpiderPrompt,
@@ -249,7 +306,7 @@ export class LLM_Agents {
             });
           }
         });
-        const respSummary = await this.pipeResponseToStream(
+        await this.pipeResponseToStream(
           responseEvent,
           response.stream,
           response.provider,
@@ -271,6 +328,10 @@ export class LLM_Agents {
         action: AgentState.error,
         message: error?.toString() ?? 'Unknown error',
       });
+    }
+    finally
+    {
+      this.spiderInterruptSub?.unsubscribe();
     }
   }
 

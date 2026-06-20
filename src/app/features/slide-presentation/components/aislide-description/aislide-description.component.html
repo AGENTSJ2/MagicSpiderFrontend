@@ -1,6 +1,5 @@
 <nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="null"
-  [nzMaskClosable]="phase === StreamPhase.idle"
-  [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
+  
   (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'20px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
@@ -10,8 +9,7 @@
         Scratch Book
       </div>
       <div class="me-4">
-        <button nz-button nzType="default" (click)="handleInvokeMagicSpider()"
-          *ngIf="phase !=StreamPhase.thinking && phase !=StreamPhase.content">
+        <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
           Create Slides With Magic Spider
         </button>
       </div>
@@ -22,26 +20,21 @@
   <ng-container *nzModalContent>
     <div class="modal-body">
       <!-- ── Thinking ───────────────────────────────────────── -->
-      <div class="thinking-section" *ngIf="phase === StreamPhase.thinking">
+      <div class="thinking-section" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking || this.agentService.contentCreatorState == this.AgentState.invoked">
         <div class="thinking-header">
-          <nz-spin nzSimple [nzSize]="'small'" *ngIf="phase === StreamPhase.thinking"></nz-spin>
-          <span nz-icon nzType="bulb" nzTheme="twotone" *ngIf="phase !== StreamPhase.thinking"
-            style="color:#faad14"></span>
           <span class="thinking-label">Thinking...</span>
         </div>
         <div class="thinking-box" #thinkingBox>
           <pre
-            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="phase === StreamPhase.thinking">▌</span></pre>
+            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking">▌</span></pre>
         </div>
       </div>
-
       <!-- ── Content (Markdown) ─────────────────────────────── -->
-      <!-- <ngx-quill #editor [modules]="modules" (contentChanged)="logChange($event);"></ngx-quill> -->
       <div class="content-section">
         <div class="markdown-output" #genContent>
-          <quill-editor [(ngModel)]="workspaceController.scratchBookContent" format="html" [modules]="this.editorModules" [readOnly]="phase === StreamPhase.content || phase === StreamPhase.thinking"
+          <quill-editor [(ngModel)]="workspaceController.scratchBookContent" format="html" [modules]="this.editorModules" [readOnly]="isAgentInaction()"
             class="w-100 h-100" (ngModelChange)="handleContentChange()"></quill-editor>
-          <span class="cursor" *ngIf="phase === StreamPhase.content">▌</span>
+          <span class="cursor" *ngIf="isAgentInaction()">▌</span>
         </div>
       </div>
       <!-- ── Input ───────────────────────────────────────────── -->
@@ -66,10 +59,10 @@
             <span contentEditableModel contenteditable [(ngModel)]="problemStatement" class="problem-input w-100 d-flex" #prblm></span>
             
           </div>
-          <button class="send-btn" (click)="generate()">
-            @if(phase == StreamPhase.thinking || phase == StreamPhase.content)
+          <button class="send-btn" (click)="trigger()">
+            @if(isAgentInaction())
             {
-              <span class="spinner-border req-spinner" role="status"></span>
+              <i class="fi fi-sr-stop d-flex justify-content-between align-items-center"></i>
             }
             @else
             {
@@ -78,8 +71,6 @@
           </button>
         </div>
       </div>
-      <!-- ── Error ──────────────────────────────────────────────────── -->
-      <nz-alert *ngIf="phase === StreamPhase.error" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
-
+      <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
     </div>
   </ng-container>

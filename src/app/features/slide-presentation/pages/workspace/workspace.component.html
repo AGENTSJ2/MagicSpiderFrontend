@@ -137,7 +137,9 @@
     </div>
     <div class="content-wrapper flex-1 d-flex flex-column">
       @if (loading) {
-
+        <div class="flex-fill d-flex justify-content-center align-items-center">
+          <p class="mb-0 fw-semibold text-light-emphasis">Loading...</p>
+        </div>
       }
       @else
       {
@@ -181,9 +183,13 @@
             class="bottom-list w-100"
             #pptList
             *ngIf="presentation.slides.length != 0"
+            cdkDropList
+            cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="dropSlide($event)"
           >
-            @for (item of presentation.slides; track $index) {
-              <div class="slide-prev" (click)="selectSlide(item)">
+            @for (item of presentation.slides; track item.slideId) {
+              <div class="slide-prev" cdkDrag (click)="selectSlide(item)">
+                <div class="slide-prev-placeholder" *cdkDragPlaceholder></div>
                 <ng-container *ngIf="slideImages.get(item.slideId) as image">
                   <img [src]="image" [alt]="$index" />
                 </ng-container>
