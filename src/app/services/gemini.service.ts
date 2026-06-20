@@ -136,7 +136,7 @@ export class GeminiService {
     return convertedResult;
   }
 
-  async streamChat(request: Partial<ChatRequest>, tools?: McpTool[]) {
+  async streamChat(request: Partial<ChatRequest>, tools?: McpTool[],abortController?:AbortController) {
     const gemTools = this.getGeminiTools(tools ?? []);
     const stream = await this.gemini.models.generateContentStream({
       model: request.model ?? this.ModelName,
@@ -150,6 +150,7 @@ export class GeminiService {
           .map((m) => m.content)
           .join('\n'),
         tools: gemTools,
+        abortSignal:abortController?.signal
       },
     });
     return { stream: stream, provider: 'google' };

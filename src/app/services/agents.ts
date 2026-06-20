@@ -75,13 +75,22 @@ export class LLM_Agents {
   }) {
     try {
       let stop: boolean = false;
+      const abortController = new AbortController();
       params.interrupt.subscribe((intr) => {
         stop = intr;
+        if(stop)
+        {
+          console.log("trying to stope");
+          
+          abortController.abort();
+        }
       });
+
       params.responseStream.next({
         action: AgentState.invoked,
         message: 'Magic Spider has been called',
       });
+
       const tools = await this.mcpService.listTools();
       const messages = [
         {
@@ -97,10 +106,7 @@ export class LLM_Agents {
           content: '',
         },
       ];
-      for (let i = 0; i < 100; i++) {
-        if (stop) {
-          break;
-        }
+      while(!stop) {
         const responseEvent = new Subject<AgentStreamEvent>();
         const slideJson = JSON.stringify(
           params.presentation.slides.map((sl) => sl.toJson()),
@@ -118,6 +124,7 @@ export class LLM_Agents {
             tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
           },
           tools,
+          abortController
         );
 
         const toolCalls: ToolCall[] = [];
@@ -137,7 +144,6 @@ export class LLM_Agents {
           response.stream,
           response.provider,
         );
-        console.log(toolCalls);
         responseEvent.complete();
         if (toolCalls.length == 0) {
           console.log('stopped gracefully');
