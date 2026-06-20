@@ -233,9 +233,12 @@ export class PresentationService {
     };
   }
 
-  saveScratchBook(pptId:string,content:string)
-  {
-    
+   async saveScratchBook(pptId: string, content: string) {
+    await this.data.saveScratchBook(pptId, content);
+  }
+
+  async getScratchBook(pptId: string): Promise<string> {
+    return this.data.getScratchBook(pptId);
   }
 }
 export interface PresentationMetaData {

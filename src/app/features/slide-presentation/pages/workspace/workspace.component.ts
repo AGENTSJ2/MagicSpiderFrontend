@@ -53,6 +53,8 @@ export class WorkspaceComponent {
         await this.presentationService.getPresentation(presentationId);
       this.name = this.presentation.name;
       this.workSpaceController.setActivePresentation = this.presentation;
+      this.workSpaceController.scratchBookContent =
+        await this.presentationService.getScratchBook(this.presentation.id);
       const firstSlide = this.presentation.slides.at(0);
       this.listenPresentationEvents();
       if (firstSlide) {

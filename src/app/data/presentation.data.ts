@@ -24,6 +24,7 @@ export interface StoredPresentationMeta {
 export class PresentationData {
   static readonly recordStore = Stores.presentations;
   static readonly metaStore = Stores.presentationMeta;
+  static readonly scratchBookStore = Stores.scratchBook;
 
   constructor() {
   }
@@ -44,8 +45,19 @@ export class PresentationData {
     await Promise.all([
       db.delete(PresentationData.recordStore, id),
       db.delete(PresentationData.metaStore, id),
+      db.delete(PresentationData.scratchBookStore, id),
     ]);
   }
+
+  /** Scratchbook HTML content is keyed by the presentation id. */
+  async getScratchBook(pptId: string): Promise<string> {
+    return (await db.get<string>(PresentationData.scratchBookStore, pptId)) ?? '';
+  }
+
+  async saveScratchBook(pptId: string, content: string): Promise<void> {
+    await db.put(PresentationData.scratchBookStore, pptId, content);
+  }
+
 
   private toMeta(record: StoredPresentation): StoredPresentationMeta {
     return {
