@@ -142,12 +142,6 @@
       height: 25px;
     }
 
-    &.cdk-drag-preview {
-      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.25);
-      cursor: grabbing;
-      background-color: red;
-    }
-
     .slide-prev-placeholder {
       width: 200px;
       height: 112px;
@@ -163,6 +157,33 @@
   }
 }
 
+.slide-prev.cdk-drag-preview {
+  box-sizing: border-box;
+  width: 200px;
+  height: 112px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 1px solid var(--border-color-primary);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  cursor: grabbing;
+
+  img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+
+  // The delete button shouldn't ride along inside the preview.
+  .del-btn {
+    display: none;
+  }
+}
+
+// Eases the preview into its final slot after you drop.
 .cdk-drag-animating {
   transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
