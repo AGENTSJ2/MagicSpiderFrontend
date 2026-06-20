@@ -62,6 +62,11 @@ export class WorkspaceController {
       interrupt: this.magicSpiderInterrupt,
     });
   }
+  
+  InterruptMagicSpider()
+  {
+    this.magicSpiderInterrupt.next(true);
+  }
 
   toggleImageToolBox()
   {

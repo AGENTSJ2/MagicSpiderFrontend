@@ -39,7 +39,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
           });
           break;
         case AgentState.function:
-          this.thinkingText += ev.functionCall?.name;
+          this.thinkingText += `\nTool Call : ${ev.functionCall?.name}\n`;
           break;
         case AgentState.content:
           this.contentText = ev.message;
@@ -49,31 +49,37 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
           break
         case AgentState.error:
           this.thinkingText = "";
-          this.error = ev.message;
+          this.error = ev.message;          
           break
       }
     });
   }
-
-  isAgentIntractable()
-  {
-    const interStates = [AgentState.idle , AgentState.error , AgentState.done];
-    return interStates.includes(this.state);
+  readonly invokeEnabledStages = [AgentState.idle , AgentState.error , AgentState.done]; 
+  readonly agentActionStages = [AgentState.content , AgentState.function , AgentState.thinking , AgentState.invoked]
+  isAgentIntractable(){
+    return this.invokeEnabledStages.includes(this.state);
   }
-  
+  isAgentInMotion()
+  {
+    return this.agentActionStages.includes(this.state);
+  }
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
   }
 
   startMagicSpider()
   {
-    if(this.state == AgentState.done || this.state == AgentState.idle)
+
+    if(this.isAgentIntractable())
     {
       this.workspaceController.triggerMagicSpider({
         slideContent:this.attachScratchBook ?this.workspaceController.scratchBookContent : '',
         presentation:this.workspaceController.activePresentation!,
         userComment:this.userComment,
       })
+    }else
+    {
+      this.workspaceController.InterruptMagicSpider();
     }
   }
 }
