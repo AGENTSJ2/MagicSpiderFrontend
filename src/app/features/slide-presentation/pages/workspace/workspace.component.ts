@@ -1,8 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
@@ -18,6 +14,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import blobService from '../../../../services/blob.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import SlideController from '../../controllers/slide.controller';
 
 @Component({
   selector: 'app-workspace',
@@ -33,7 +30,7 @@ export class WorkspaceComponent {
   @ViewChild('pptList')
   pptList!: ElementRef;
   hasUnSavedChanges: boolean = false;
-  loading:boolean = false;
+  loading: boolean = false;
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
@@ -62,17 +59,22 @@ export class WorkspaceComponent {
       this.hasUnSavedChanges = false;
     } catch (error) {
       console.error(error);
-    }
-    finally
-    {
-      this.loading = false
+    } finally {
+      this.loading = false;
     }
   }
 
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
+  initialXandY = { x: 144, y: 144 };
   handleAddText() {
-    this.presentation.getActiveSlide?.addText({});
+    this.presentation.getActiveSlide?.addText({config:{
+      attrs:{
+        x:this.initialXandY.x,
+        y:this.initialXandY.y,
+      },
+      zIndex:0
+    }});
     this.workSpaceController.toggleToolBox(true);
   }
 
@@ -88,7 +90,13 @@ export class WorkspaceComponent {
   }
 
   addShape(shapeType: ShapeType) {
-    this.presentation.getActiveSlide?.addShape({ shapeType: shapeType });
+    this.presentation.getActiveSlide?.addShape({ shapeType: shapeType ,config:{
+      attrs:{
+        x:this.initialXandY.x,
+        y:this.initialXandY.y,
+      },
+      zIndex:0
+    } });
     this.workSpaceController.toggleToolBox(true);
   }
 
@@ -104,7 +112,9 @@ export class WorkspaceComponent {
       this.presentation.getActiveSlide?.addImage({
         config: {
           attrs: {
-            imageId:appImage.id
+            imageId: appImage.id,
+            x:this.initialXandY.x,
+            y:this.initialXandY.y
           },
           zIndex: 0,
         },
@@ -208,7 +218,10 @@ export class WorkspaceComponent {
     this.presentation.name = this.name;
     const firstslide = this.presentation.slides.at(0);
     const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
-    await this.presentationService.savePresentation(this.presentation, thumbnail);
+    await this.presentationService.savePresentation(
+      this.presentation,
+      thumbnail,
+    );
     this.message.success('Presentation Saved');
     this.hasUnSavedChanges = false;
   }
@@ -224,15 +237,13 @@ export class WorkspaceComponent {
 
   canDeactivate() {
     if (this.hasUnSavedChanges) {
-      const save = confirm('There are unsaved changes',);
-      if(save)
-      {
+      const save = confirm('There are unsaved changes');
+      if (save) {
         this.savePpt();
       }
     }
     return true;
   }
-  
 }
 enum ToolBoxType {
   TextToolBox = 'Text',
