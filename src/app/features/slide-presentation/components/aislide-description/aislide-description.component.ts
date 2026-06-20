@@ -123,7 +123,7 @@ export class AISlideDescriptionComponent {
     this.errorMessage = '';
 
     try {
-      const stream$ = await this.agentService.ContentCreator({
+      const stream$ = await this.agentService.ContentCreatorAgent({
         userProblemStatement: this.problemStatement.trim(),
         previousContent: prevContent,
       });

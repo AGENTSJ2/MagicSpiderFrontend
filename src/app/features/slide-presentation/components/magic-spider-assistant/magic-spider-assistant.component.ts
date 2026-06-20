@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
-import { AgentState } from '../../../../services/agents';
+import { AgentState, LLM_Agents } from '../../../../services/agents';
 import { GeminiService } from '../../../../services/gemini.service';
 import { Model } from '@google/genai';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,6 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
   userComment:string = "";
   @ViewChild('thinkingBox')
   thinkingBoxElement!: ElementRef;
-  state: AgentState = AgentState.idle;
   AgentState = AgentState;
   agentSub?:Subscription;
   attachScratchBook:boolean = false;
@@ -26,10 +25,8 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
     return this.geminiService.getModel('assistant');
   }
 
-  constructor(public workspaceController: WorkspaceController,private geminiService:GeminiService) {
-    this.agentSub = workspaceController.magicSpiderEvent.subscribe((ev) => {
-      this.state = ev.action;
-      console.log(ev.action);
+  constructor(public workspaceController: WorkspaceController,private geminiService:GeminiService,private agentService:LLM_Agents) {
+    this.agentSub = agentService.magicSpiderEventStream.subscribe((ev) => {
       switch (ev.action) {
         case AgentState.thinking:
           this.thinkingText += ev.message;
@@ -54,14 +51,13 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
       }
     });
   }
-  readonly invokeEnabledStages = [AgentState.idle , AgentState.error , AgentState.done]; 
-  readonly agentActionStages = [AgentState.content , AgentState.function , AgentState.thinking , AgentState.invoked]
+  
   isAgentIntractable(){
-    return this.invokeEnabledStages.includes(this.state);
+    return this.agentService.InvokeEnabledStages.includes(this.agentService.magicSpiderState);
   }
   isAgentInMotion()
   {
-    return this.agentActionStages.includes(this.state);
+    return this.agentService.AgentInActionStages.includes(this.agentService.magicSpiderState);
   }
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
@@ -69,17 +65,16 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
 
   startMagicSpider()
   {
-
     if(this.isAgentIntractable())
     {
-      this.workspaceController.triggerMagicSpider({
+      this.agentService.triggerMagicSpider({
         slideContent:this.attachScratchBook ?this.workspaceController.scratchBookContent : '',
         presentation:this.workspaceController.activePresentation!,
         userComment:this.userComment,
       })
     }else
     {
-      this.workspaceController.InterruptMagicSpider();
+      this.agentService.InterruptMagicSpider();
     }
   }
 }

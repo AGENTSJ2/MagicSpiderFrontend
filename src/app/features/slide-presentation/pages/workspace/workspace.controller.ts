@@ -32,8 +32,6 @@ export class WorkspaceController {
     this.presentationContext.activePresentation = v;
   }
 
-  magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
-  magicSpiderInterrupt: Subject<boolean> = new Subject();
   scratchBookContent: string = ``;
   showMagicSpider() {
     this.showMagicSpiderAssistant = true;
@@ -49,23 +47,6 @@ export class WorkspaceController {
       this.showImageToolBox = false;
     }
     this.showToolBox = show;
-  }
-
-  triggerMagicSpider(params: {
-    slideContent: string;
-    presentation: Presentation;
-    userComment: string;
-  }) {
-    this.agentService.MagicSpiderStream({
-      ...params,
-      responseStream: this.magicSpiderEvent,
-      interrupt: this.magicSpiderInterrupt,
-    });
-  }
-  
-  InterruptMagicSpider()
-  {
-    this.magicSpiderInterrupt.next(true);
   }
 
   toggleImageToolBox()

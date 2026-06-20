@@ -51,7 +51,7 @@ export class GeminiService {
     }
     return this.modelsPromise;
   }
-  
+
   private loadAgentModels() {
     // Migrate the legacy single default model to both agents on first run.
     const legacy = localStorage.getItem(this.legacyDefModelKey);
@@ -85,7 +85,7 @@ export class GeminiService {
     }
     this._models[agent] = model;
   }
-  
+
   private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
     const functionDeclarations = tools.map((tool) => ({
       name: tool.name,
@@ -136,12 +136,17 @@ export class GeminiService {
     return convertedResult;
   }
 
-  async streamChat(request: Partial<ChatRequest>, tools?: McpTool[],abortController?:AbortController) {
+  async streamChat(
+    request: Partial<ChatRequest>,
+    tools?: McpTool[],
+    abortController?: AbortController,
+  ) {
     const gemTools = this.getGeminiTools(tools ?? []);
     const stream = await this.gemini.models.generateContentStream({
       model: request.model ?? this.ModelName,
       contents: (request.messages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,
+        thought: msg.thinking != undefined,
         parts: [{ text: msg.content }],
       })),
       config: {
@@ -150,7 +155,7 @@ export class GeminiService {
           .map((m) => m.content)
           .join('\n'),
         tools: gemTools,
-        abortSignal:abortController?.signal
+        abortSignal: abortController?.signal,
       },
     });
     return { stream: stream, provider: 'google' };
