@@ -1,10 +1,12 @@
 .upload-input-display {
-    background-color: var(--background-secondary);
+    background-color: aliceblue;
     padding: 2rem;
     display: flex;
     justify-content: center;
+    color: var(--primary-color);
+    border: 1px solid rgb(227, 242, 255);
     align-items: center;
-    border: 1px solid lightgray;
+    // box-shadow: 0 2px 8px rgba(0,0,0,.08);
     cursor: pointer;
     p {
         font-size: 15px;
