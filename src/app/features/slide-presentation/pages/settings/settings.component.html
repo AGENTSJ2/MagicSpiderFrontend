@@ -52,6 +52,38 @@
       <h2 class="settings__title">AI Settings</h2>
 
       <div class="settings__field">
+        <label for="api-key">API Key</label>
+        <nz-input-group [nzSuffix]="apiKeySuffix">
+          <input
+            id="api-key"
+            nz-input
+            type="password"
+            autocomplete="off"
+            placeholder="Paste your Gemini API key"
+            [(ngModel)]="apiKey"
+            (keyup.enter)="saveApiKey()"
+          />
+        </nz-input-group>
+        <ng-template #apiKeySuffix>
+          <button
+            nz-button
+            nzType="link"
+            nzSize="small"
+            (click)="saveApiKey()"
+          >
+            Save
+          </button>
+        </ng-template>
+        <p class="settings__hint" *ngIf="!apiKeyError">
+          Stored only in this browser. Restrict the key by HTTP referrer and API
+          in Google Cloud Console so a leaked key can't be reused elsewhere.
+        </p>
+        <p class="settings__hint settings__hint--error" *ngIf="apiKeyError">
+          {{ apiKeyError }}
+        </p>
+      </div>
+
+      <div class="settings__field">
         <label>Provider</label>
         <nz-select [(ngModel)]="provider" class="settings__select">
           <nz-option

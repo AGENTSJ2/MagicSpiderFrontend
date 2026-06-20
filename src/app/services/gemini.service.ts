@@ -15,10 +15,9 @@ export type AgentKey = 'content' | 'assistant';
   providedIn: 'root',
 })
 export class GeminiService {
-  private readonly API_KEY: string = 'AIzaSyCYPombOhSAqcDQMDm_LfPbu8YYrjHcYkU';
-  // private readonly ModelName: string = 'gemini-3.5-flash';
   private readonly ModelName: string = 'gemma-4-31b-it';
-  private gemini: GoogleGenAI;
+  private gemini?: GoogleGenAI;
+  private _apiKey?: string;
   readonly availableModels: Model[] = [];
   private modelsPromise?: Promise<Model[]>;
   private readonly _models: Record<AgentKey, Model | undefined> = {
@@ -29,20 +28,61 @@ export class GeminiService {
     content: 'CONTENT-MODEL',
     assistant: 'ASSISTANT-MODEL',
   };
+  private readonly apiKeyStorageKey = 'GEMINI-API-KEY';
   private readonly legacyDefModelKey = 'DEF-MODEL';
 
+  get apiKey(): string | undefined {
+    return this._apiKey;
+  }
+
+  get hasApiKey(): boolean {
+    return !!this._apiKey;
+  }
+
   constructor() {
-    this.gemini = new GoogleGenAI({
-      apiKey: this.API_KEY,
-    });
-    this.loadModels();
+    const storedKey = localStorage.getItem(this.apiKeyStorageKey)?.trim();
+    if (storedKey) {
+      this._apiKey = storedKey;
+      this.gemini = new GoogleGenAI({ apiKey: storedKey });
+      this.loadModels();
+    }
     this.loadAgentModels();
+  }
+  
+  updateApiKey(key?: string): Promise<Model[]> {
+    const trimmed = key?.trim();
+    if (trimmed) {
+      localStorage.setItem(this.apiKeyStorageKey, trimmed);
+      this._apiKey = trimmed;
+      this.gemini = new GoogleGenAI({ apiKey: trimmed });
+    } else {
+      localStorage.removeItem(this.apiKeyStorageKey);
+      this._apiKey = undefined;
+      this.gemini = undefined;
+    }
+    // Drop the cached model list so it reloads against the new key.
+    this.availableModels.length = 0;
+    this.modelsPromise = undefined;
+    return this.loadModels();
+  }
+
+  private requireClient(): GoogleGenAI {
+    if (!this.gemini) {
+      throw new Error(
+        'No Gemini API key configured. Add your API key under AI Settings.',
+      );
+    }
+    return this.gemini;
   }
 
   loadModels(): Promise<Model[]> {
+    if (!this.gemini) {
+      return Promise.resolve(this.availableModels);
+    }
     if (!this.modelsPromise) {
+      const client = this.gemini;
       this.modelsPromise = (async () => {
-        const models = await this.gemini.models.list();
+        const models = await client.models.list();
         for await (const model of models) {
           this.availableModels.push(model);
         }
@@ -131,7 +171,7 @@ export class GeminiService {
     };
 
     const result: GenerateContentResponse =
-      await this.gemini.models.generateContent(reqParams);
+      await this.requireClient().models.generateContent(reqParams);
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
@@ -142,7 +182,7 @@ export class GeminiService {
     abortController?: AbortController,
   ) {
     const gemTools = this.getGeminiTools(tools ?? []);
-    const stream = await this.gemini.models.generateContentStream({
+    const stream = await this.requireClient().models.generateContentStream({
       model: request.model ?? this.ModelName,
       contents: (request.messages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,

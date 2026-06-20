@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Model } from '@google/genai';
+import { ApiError, Model } from '@google/genai';
 import { GeminiService } from '../../../../services/gemini.service';
 import { UserService } from '../../../../services/user.service';
 
@@ -35,24 +35,38 @@ export class SettingsComponent implements OnInit {
   contentModelName?: string;
   assistantModelName?: string;
   loadingModels = false;
+  apiKey = '';
+  apiKeyError = '';
 
   constructor(
     private userService: UserService,
     private geminiService: GeminiService,
   ) {}
 
-  ngOnInit(): void {
-    const user = this.userService.user;
-    this.name = user.name;
-    this.email = user.email ?? '';
+  async ngOnInit() {
+    try {
+      const user = this.userService.user;
+      this.name = user.name;
+      this.email = user.email ?? '';
+      this.apiKey = this.geminiService.apiKey ?? '';
+      this.contentModelName = this.geminiService.getModel('content')?.name;
+      this.assistantModelName = this.geminiService.getModel('assistant')?.name;
+      this.models = await this.geminiService.loadModels();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-    this.contentModelName = this.geminiService.getModel('content')?.name;
-    this.assistantModelName = this.geminiService.getModel('assistant')?.name;
-    this.loadingModels = true;
-    this.geminiService
-      .loadModels()
-      .then((models) => (this.models = models))
-      .finally(() => (this.loadingModels = false));
+  async saveApiKey() {
+    try {
+      this.apiKeyError = '';
+      this.models = await this.geminiService.updateApiKey(this.apiKey);
+    } catch (error:any) {
+      if(error instanceof ApiError)
+      {
+        this.apiKeyError = "Not an valid API Key"
+      }
+    }
   }
 
   selectSection(section: SettingsSection): void {
