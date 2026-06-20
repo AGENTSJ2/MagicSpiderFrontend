@@ -1,6 +1,6 @@
-# MagicSpiderFrontend
+# Magic Spider
 
-MagicSpiderFrontend is an Angular-based slide authoring interface with canvas editing, AI-assisted slide generation, and presentation export features.
+Magic Spider is an Angular-based slide authoring interface with canvas editing, AI-assisted slide generation, and presentation export features.
 
 ## Overview
 
