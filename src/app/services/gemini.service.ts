@@ -9,6 +9,8 @@ import {
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
+export type AgentKey = 'content' | 'assistant';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -19,19 +21,22 @@ export class GeminiService {
   private gemini: GoogleGenAI;
   readonly availableModels: Model[] = [];
   private modelsPromise?: Promise<Model[]>;
-  private _defaultModel?: Model;
-  private readonly defModelKey = 'DEF-MODEL';
-
-  public get defaultModel(): Model | undefined {
-    return this._defaultModel;
-  }
+  private readonly _models: Record<AgentKey, Model | undefined> = {
+    content: undefined,
+    assistant: undefined,
+  };
+  private readonly modelKeys: Record<AgentKey, string> = {
+    content: 'CONTENT-MODEL',
+    assistant: 'ASSISTANT-MODEL',
+  };
+  private readonly legacyDefModelKey = 'DEF-MODEL';
 
   constructor() {
     this.gemini = new GoogleGenAI({
       apiKey: this.API_KEY,
     });
     this.loadModels();
-    this.setDefaultModel();
+    this.loadAgentModels();
   }
 
   loadModels(): Promise<Model[]> {
@@ -47,12 +52,38 @@ export class GeminiService {
     return this.modelsPromise;
   }
   
-  private setDefaultModel() {
-    const modelString = localStorage.getItem(this.defModelKey);
-    if (!modelString) {
-      return;
+  private loadAgentModels() {
+    // Migrate the legacy single default model to both agents on first run.
+    const legacy = localStorage.getItem(this.legacyDefModelKey);
+    if (legacy) {
+      if (!localStorage.getItem(this.modelKeys.content)) {
+        localStorage.setItem(this.modelKeys.content, legacy);
+      }
+      if (!localStorage.getItem(this.modelKeys.assistant)) {
+        localStorage.setItem(this.modelKeys.assistant, legacy);
+      }
+      localStorage.removeItem(this.legacyDefModelKey);
     }
-    this._defaultModel = JSON.parse(modelString);
+
+    (Object.keys(this.modelKeys) as AgentKey[]).forEach((agent) => {
+      const modelString = localStorage.getItem(this.modelKeys[agent]);
+      if (modelString) {
+        this._models[agent] = JSON.parse(modelString);
+      }
+    });
+  }
+
+  getModel(agent: AgentKey): Model | undefined {
+    return this._models[agent];
+  }
+
+  updateModel(agent: AgentKey, model?: Model) {
+    if (model) {
+      localStorage.setItem(this.modelKeys[agent], JSON.stringify(model));
+    } else {
+      localStorage.removeItem(this.modelKeys[agent]);
+    }
+    this._models[agent] = model;
   }
   
   private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
@@ -63,12 +94,6 @@ export class GeminiService {
     }));
 
     return functionDeclarations.length > 0 ? [{ functionDeclarations }] : [];
-  }
-
-  updateDefaultModel(model?: Model) {
-    const modelJsonString = JSON.stringify(model);
-    localStorage.setItem(this.defModelKey, modelJsonString);
-    this._defaultModel = model;
   }
 
   async chat(
@@ -114,7 +139,7 @@ export class GeminiService {
   async streamChat(request: Partial<ChatRequest>, tools?: McpTool[]) {
     const gemTools = this.getGeminiTools(tools ?? []);
     const stream = await this.gemini.models.generateContentStream({
-      model: request.model ?? this._defaultModel?.name ?? this.ModelName,
+      model: request.model ?? this.ModelName,
       contents: (request.messages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,
         parts: [{ text: msg.content }],

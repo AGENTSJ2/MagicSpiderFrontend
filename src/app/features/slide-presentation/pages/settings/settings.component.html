@@ -63,13 +63,31 @@
       </div>
 
       <div class="settings__field">
-        <label>Default model</label>
+        <label>Content Writer model</label>
         <nz-select
-          [(ngModel)]="selectedModelName"
-          (ngModelChange)="onDefaultModelChange($event)"
+          [(ngModel)]="contentModelName"
+          (ngModelChange)="onContentModelChange($event)"
           class="settings__select"
           nzShowSearch
-          nzPlaceHolder="Select a default model"
+          nzPlaceHolder="Select a model for the content writer"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="settings__field">
+        <label>Magic Assistant model</label>
+        <nz-select
+          [(ngModel)]="assistantModelName"
+          (ngModelChange)="onAssistantModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzPlaceHolder="Select a model for the magic assistant"
           [nzLoading]="loadingModels"
         >
           <nz-option

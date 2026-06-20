@@ -32,7 +32,8 @@ export class SettingsComponent implements OnInit {
   readonly providers = [{ value: 'gemini', label: 'Gemini' }];
   provider = 'gemini';
   models: Model[] = [];
-  selectedModelName?: string;
+  contentModelName?: string;
+  assistantModelName?: string;
   loadingModels = false;
 
   constructor(
@@ -45,7 +46,8 @@ export class SettingsComponent implements OnInit {
     this.name = user.name;
     this.email = user.email ?? '';
 
-    this.selectedModelName = this.geminiService.defaultModel?.name;
+    this.contentModelName = this.geminiService.getModel('content')?.name;
+    this.assistantModelName = this.geminiService.getModel('assistant')?.name;
     this.loadingModels = true;
     this.geminiService
       .loadModels()
@@ -61,8 +63,13 @@ export class SettingsComponent implements OnInit {
     this.userService.updateUser({ name: this.name, email: this.email });
   }
 
-  onDefaultModelChange(modelName: string): void {
+  onContentModelChange(modelName: string): void {
     const model = this.models.find((m) => m.name === modelName);
-    this.geminiService.updateDefaultModel(model);
+    this.geminiService.updateModel('content', model);
+  }
+
+  onAssistantModelChange(modelName: string): void {
+    const model = this.models.find((m) => m.name === modelName);
+    this.geminiService.updateModel('assistant', model);
   }
 }

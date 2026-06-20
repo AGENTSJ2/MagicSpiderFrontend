@@ -12,9 +12,8 @@ import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
   providedIn: 'root',
 })
 export class LLM_Agents {
-  private chatService = new GeminiService();
   constructor(
-    // private chatService: OllamaChatService,
+    private chatService: GeminiService,
     private mcpService: McpHub,
   ) {}
 
@@ -32,7 +31,7 @@ export class LLM_Agents {
     const interrupt = new Subject<boolean>();
 
     const { stream, provider } = await this.chatService.streamChat({
-      model: 'gemma-4-31b-it',
+      model: this.chatService.getModel('content')?.name,
       messages: [
         {
           role: 'system',
@@ -66,63 +65,6 @@ export class LLM_Agents {
     'Never continue issuing tool calls after the task is complete.',
     'The Slide style should be modern and attractive ato look at',
   ].join(' ');
-  private async MagicSpider(params: {
-    slideContent: string;
-    presentation: Presentation;
-  }) {
-    const tools = await this.mcpService.listTools();
-    const messages = [
-      {
-        role: 'system',
-        content: this.MagicSpiderPrompt,
-      },
-      {
-        role: 'user',
-        content: `Slide Description ${params.slideContent}`,
-      },
-    ];
-    for (let i = 0; i < 100; i++) {
-      const slideJson = JSON.stringify(
-        params.presentation.slides.map((sl) => sl.toJson()),
-      );
-      const response: ChatResponse = await this.chatService.chat(
-        {
-          messages: [
-            ...messages,
-            {
-              role: 'user',
-              content: `Latest Slide JSON ${slideJson}`,
-            },
-          ],
-          tools: tools.map((tl) => convertMcpToolToOpenAiTool(tl)),
-        },
-        tools,
-      );
-      const ackMessage: Message = {
-        role: 'system',
-        content: '',
-      };
-      const toolCalls = response.message.tool_calls ?? [];
-      if (toolCalls.length == 0) {
-        console.log('stopped gracefully');
-        return;
-      }
-      console.log(response.message.tool_calls);
-      for (let tool of toolCalls) {
-        try {
-          await this.mcpService.callTool({
-            toolName: tool.function.name,
-            args: tool.function.arguments,
-          });
-          ackMessage.content += `Successfully called[${tool.function.name}]\n`;
-        } catch (error) {
-          ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
-          console.log(error);
-        }
-      }
-      messages.push(ackMessage);
-    }
-  }
 
   async MagicSpiderStream(params: {
     slideContent: string;
@@ -165,7 +107,7 @@ export class LLM_Agents {
         );
         const response = await this.chatService.streamChat(
           {
-            // model:"gemma-4-26b-a4b-it",
+            model: this.chatService.getModel('assistant')?.name,
             messages: [
               ...messages,
               {

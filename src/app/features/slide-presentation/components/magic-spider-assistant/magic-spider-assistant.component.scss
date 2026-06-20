@@ -4,21 +4,23 @@
 }
 .greet-section
 {
-  border: 1px solid lightblue;
+  border: none;
   background-color: aliceblue;
   padding: 12px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
   .greet-header
   {
     font-weight: 700;
     color: #000;
     letter-spacing: 0.8px;
-    font-size: 14px;
+    font-size: 18px;
     margin-bottom: 10px;
   }
   .greetBox
   {
-    line-height: 1.7;
-    font-weight: 500;
+    line-height: 1.6;
+    font-weight: 400;
+    font-size: 15px;
   }
 }
 .thinking-section {
@@ -69,7 +71,7 @@ textarea
   {
     position: relative;
     width: 100%;
-    display: flex;
+    // display: flex;
     .prmpt-place
     {
       position: absolute;
@@ -139,4 +141,8 @@ textarea
 {
   background-color: rgba(144, 238, 144, 0.329);
   border: 1px solid lightgreen;
+}
+.span-cont
+{
+  min-height: 30px;
 }

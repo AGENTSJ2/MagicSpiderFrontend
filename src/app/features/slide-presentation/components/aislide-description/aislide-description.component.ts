@@ -8,10 +8,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
+import { Model } from '@google/genai';
 import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { GeminiService } from '../../../../services/gemini.service';
 
 enum StreamPhase {
   idle = 'Idle',
@@ -46,8 +48,13 @@ export class AISlideDescriptionComponent {
     private cdr: ChangeDetectorRef,
     private agentService: LLM_Agents,
     public workspaceController: WorkspaceController,
-    private presentationService:PresentationService
+    private presentationService:PresentationService,
+    private geminiService: GeminiService
   ) {}
+
+  get contentModel(): Model | undefined {
+    return this.geminiService.getModel('content');
+  }
 
   editorModules = {
     toolbar: [

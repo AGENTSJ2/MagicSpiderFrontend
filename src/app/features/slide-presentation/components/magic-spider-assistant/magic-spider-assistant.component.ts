@@ -19,12 +19,14 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
   thinkingBoxElement!: ElementRef;
   state: AgentState = AgentState.idle;
   AgentState = AgentState;
-  defModel?:Model;
   agentSub?:Subscription;
   attachScratchBook:boolean = false;
-  
+
+  get defModel(): Model | undefined {
+    return this.geminiService.getModel('assistant');
+  }
+
   constructor(public workspaceController: WorkspaceController,private geminiService:GeminiService) {
-    this.defModel = geminiService.defaultModel;
     this.agentSub = workspaceController.magicSpiderEvent.subscribe((ev) => {
       this.state = ev.action;
       console.log(ev.action);
@@ -52,11 +54,13 @@ export class MagicSpiderAssistantComponent implements OnDestroy{
       }
     });
   }
+
   isAgentIntractable()
   {
     const interStates = [AgentState.idle , AgentState.error , AgentState.done];
     return interStates.includes(this.state);
   }
+  
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
   }

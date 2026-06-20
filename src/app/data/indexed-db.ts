@@ -68,5 +68,5 @@ class IndexedDb {
     await IndexedDb.request(os.delete(key));
   }
 }
-const db = new IndexedDb('MagicSpiderData', 3);
+const db = new IndexedDb('MagicSpiderData', 4);
 export default db;
