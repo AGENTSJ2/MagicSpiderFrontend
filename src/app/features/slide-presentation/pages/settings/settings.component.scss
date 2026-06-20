@@ -1,0 +1,79 @@
+.settings {
+  display: flex;
+  min-height: 420px;
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid #f0f0f0;
+    padding-right: 16px;
+  }
+
+  &__nav-item {
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #595959;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    &--active {
+      background: #e6f4ff;
+      color: #1677ff;
+      font-weight: 600;
+    }
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 420px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      color: #595959;
+    }
+  }
+
+  &__optional {
+    color: #bfbfbf;
+    font-weight: 400;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #8c8c8c;
+
+    &--error {
+      color: #ff4d4f;
+    }
+  }
+}

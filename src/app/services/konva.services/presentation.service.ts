@@ -4,44 +4,38 @@ import { Slide } from '../../features/slide-presentation/domain/canvasModels/sli
 import ShapeComponent, {
   ShapeType,
 } from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
-import pptxgen  from 'pptxgenjs';
+import pptxgen from 'pptxgenjs';
 import { Image } from 'konva/lib/shapes/Image';
 import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
+import blobService from '../blob.service';
+import {
+  PresentationData,
+  StoredPresentation,
+} from '../../data/presentation.data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PresentationService {
-  private readonly presentationCollectionKey = 'presentations';
-  constructor() {
-  }
-  private getPresentationKey(id: string) {
-    return `PPT-${id}`;
+  constructor(private readonly data: PresentationData) {}
+
+  async getPresentations(): Promise<PresentationMetaData[]> {
+    return this.data.list();
   }
 
-  getPresentations(): PresentationMetaData[] {
-    const pptIds = JSON.parse(
-      localStorage.getItem(this.presentationCollectionKey) ?? '[]',
-    ) as any[];
-    const ppts = pptIds.map((id) => this.getPresentationMetaData(id));
-    return ppts;
-  }
-
-  getPresentation(id: string) {
-    const key = this.getPresentationKey(id);
-    const savedPPT = localStorage.getItem(key);
-    if (!savedPPT) {
-      const pptCounts = this.getPresentations().length;
+  async getPresentation(id: string): Promise<Presentation> {
+    const record = await this.data.get(id);
+    if (!record) {
+      const pptCounts = (await this.data.list()).length;
       const newPPT = new Presentation({
         name: `Untitled Presentation ${pptCounts}`,
       });
       newPPT.addSlide();
       return newPPT;
     }
-    const pptJson = JSON.parse(savedPPT);
-    const ppt = new Presentation({ id: pptJson.id, name: pptJson.name });
-    const slides = pptJson.slides as Slide[];
+    const ppt = new Presentation({ id: record.id, name: record.name });
+    const slides = record.slides as Slide[];
     for (let slideObj of slides) {
       const slide = ppt.addSlide();
       const components = slideObj.components;
@@ -63,66 +57,48 @@ export class PresentationService {
           });
         }
         if (type == 'Image') {
-          slide.addText({ config: { attrs: compObj.node.attrs, zIndex: 0 } });
+          slide.addImage({ config: { attrs: compObj.node.attrs, zIndex: 0 } });
         }
       }
     }
     return ppt;
   }
-  getPresentationMetaData(id: string): PresentationMetaData {
-    const key = this.getPresentationKey(id);
-    const pptJson = JSON.parse(localStorage.getItem(key)!);
+
+  async addPresentation(ppt: Presentation, thumbnail: string) {
+    await this.data.save(this.pptToRecord(ppt, thumbnail));
+  }
+
+  async removePresentation(pptId: string, removeImages: boolean) {
+    // removing images of a presentation from blob storage
+    if (removeImages) {
+      const ppt = await this.getPresentation(pptId);
+      this.removePresentationImages(ppt);
+    }
+    await this.data.remove(pptId);
+  }
+
+  removePresentationImages(ppt: Presentation) {
+    const components = ppt.slides.map((sl) => sl.components).flat();
+    components.forEach((comp) => {
+      if (comp.node.className == 'Image') {
+        blobService.removeImage(comp.node.attrs.imageId);
+      }
+    });
+  }
+
+  async savePresentation(ppt: Presentation, thumbnail: string) {
+    // save() is an upsert keyed by id, so it both adds and updates.
+    await this.data.save(this.pptToRecord(ppt, thumbnail));
+  }
+
+  pptToRecord(ppt: Presentation, thumbnail: string): StoredPresentation {
     return {
-      name: pptJson.name,
-      id: pptJson.id,
-      slideCount: pptJson.slides.length,
-      thumbnail:pptJson.thumbnail
-    };
-  }
-  addPresentation(ppt: Presentation,thumbnail:string) {
-    const key = this.getPresentationKey(ppt.id);
-    const pttJsonString = this.pptToJsonString(ppt,thumbnail);
-    localStorage.setItem(key, pttJsonString);
-    const pptIds = JSON.parse(
-      localStorage.getItem(this.presentationCollectionKey) ?? '[]',
-    );
-    pptIds.push(ppt.id);
-    localStorage.setItem(
-      this.presentationCollectionKey,
-      JSON.stringify(pptIds),
-    );
-  }
-
-  removePresentation(pptId: string) {
-    const key = this.getPresentationKey(pptId);
-    let test = localStorage.getItem(key);
-    localStorage.removeItem(key);
-    test = localStorage.getItem(key);
-
-    let pptIds = JSON.parse(
-      localStorage.getItem(this.presentationCollectionKey) ?? '[]',
-    );
-    pptIds = pptIds.filter((id: string) => id != pptId);
-    localStorage.setItem(
-      this.presentationCollectionKey,
-      JSON.stringify(pptIds),
-    );
-  }
-
-  savePresentation(ppt: Presentation,thumbnail:string) {
-    this.removePresentation(ppt.id);
-    this.addPresentation(ppt,thumbnail);
-  }
-
-  pptToJsonString(ppt: Presentation,thumbnail:string) {
-    const pptJson = {
       name: ppt.name,
       id: ppt.id,
       slides: ppt.slides.map((sl) => sl.toJson()),
       config: ppt.config,
-      thumbnail:thumbnail
+      thumbnail: thumbnail,
     };
-    return JSON.stringify(pptJson);
   }
   //EXPORT FUNCTIONS BELLOW
   private readonly ExportScaleFactor = (1 / 100) * 0.7501;
@@ -172,14 +148,7 @@ export class PresentationService {
     shapeType: pptxgen.ShapeType;
     options: pptxgen.ShapeProps;
   } {
-    // const radius = (component.node as Rect).cornerRadius();
-    // const hasRoundedCorners = Array.isArray(radius)
-    //   ? radius.some((r) => r > 0)
-    //   : radius > 0;
-    // const shapeType =( hasRoundedCorners
-    //   ? "roundRect"
-    //   : "rect") as pptxgen.ShapeType;
-    const shapeType = "rect" as pptxgen.ShapeType;
+    const shapeType = 'rect' as pptxgen.ShapeType;
     const options = {
       x: component.node.x() * this.ExportScaleFactor,
       y: component.node.y() * this.ExportScaleFactor,
@@ -204,7 +173,7 @@ export class PresentationService {
     options: pptxgen.ShapeProps;
   } {
     const radius = (component.node as any).radius();
-    const shapeType = "ellipse" as pptxgen.ShapeType;
+    const shapeType = 'ellipse' as pptxgen.ShapeType;
     const options = {
       x: (component.node.x() - radius) * this.ExportScaleFactor,
       y: (component.node.y() - radius) * this.ExportScaleFactor,
@@ -263,10 +232,18 @@ export class PresentationService {
       options,
     };
   }
+
+   async saveScratchBook(pptId: string, content: string) {
+    await this.data.saveScratchBook(pptId, content);
+  }
+
+  async getScratchBook(pptId: string): Promise<string> {
+    return this.data.getScratchBook(pptId);
+  }
 }
 export interface PresentationMetaData {
   name?: string;
   id: string;
   slideCount: number;
-  thumbnail:string
+  thumbnail: string;
 }

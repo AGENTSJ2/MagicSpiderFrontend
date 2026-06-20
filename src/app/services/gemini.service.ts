@@ -3,25 +3,139 @@ import {
   GenerateContentParameters,
   GenerateContentResponse,
   GoogleGenAI,
+  Model,
   Part,
 } from '@google/genai';
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
+export type AgentKey = 'content' | 'assistant';
+
 @Injectable({
   providedIn: 'root',
 })
 export class GeminiService {
-  private readonly API_KEY: string = 'AIzaSyCYPombOhSAqcDQMDm_LfPbu8YYrjHcYkU';
-  // private readonly ModelName: string = 'gemini-3.5-flash';
   private readonly ModelName: string = 'gemma-4-31b-it';
-  private gemini: GoogleGenAI;
+  private gemini?: GoogleGenAI;
+  private _apiKey?: string;
+  readonly availableModels: Model[] = [];
+  private modelsPromise?: Promise<Model[]>;
+  private readonly _models: Record<AgentKey, Model | undefined> = {
+    content: undefined,
+    assistant: undefined,
+  };
+  private readonly modelKeys: Record<AgentKey, string> = {
+    content: 'CONTENT-MODEL',
+    assistant: 'ASSISTANT-MODEL',
+  };
+  private readonly apiKeyStorageKey = 'GEMINI-API-KEY';
+  private readonly legacyDefModelKey = 'DEF-MODEL';
+
+  get apiKey(): string | undefined {
+    return this._apiKey;
+  }
+
+  get hasApiKey(): boolean {
+    return !!this._apiKey;
+  }
 
   constructor() {
-    this.gemini = new GoogleGenAI({
-      apiKey: this.API_KEY,
+    const storedKey = localStorage.getItem(this.apiKeyStorageKey)?.trim();
+    if (storedKey) {
+      this._apiKey = storedKey;
+      this.gemini = new GoogleGenAI({ apiKey: storedKey });
+      this.loadModels();
+    }
+    this.loadAgentModels();
+  }
+  
+  updateApiKey(key?: string): Promise<Model[]> {
+    const trimmed = key?.trim();
+    if (trimmed) {
+      localStorage.setItem(this.apiKeyStorageKey, trimmed);
+      this._apiKey = trimmed;
+      this.gemini = new GoogleGenAI({ apiKey: trimmed });
+    } else {
+      localStorage.removeItem(this.apiKeyStorageKey);
+      this._apiKey = undefined;
+      this.gemini = undefined;
+    }
+    // Drop the cached model list so it reloads against the new key.
+    this.availableModels.length = 0;
+    this.modelsPromise = undefined;
+    return this.loadModels();
+  }
+
+  private requireClient(): GoogleGenAI {
+    if (!this.gemini) {
+      throw new Error(
+        'No Gemini API key configured. Add your API key under AI Settings.',
+      );
+    }
+    return this.gemini;
+  }
+
+  loadModels(): Promise<Model[]> {
+    if (!this.gemini) {
+      return Promise.resolve(this.availableModels);
+    }
+    if (!this.modelsPromise) {
+      const client = this.gemini;
+      this.modelsPromise = (async () => {
+        const models = await client.models.list();
+        for await (const model of models) {
+          this.availableModels.push(model);
+        }
+        return this.availableModels;
+      })();
+    }
+    return this.modelsPromise;
+  }
+
+  private loadAgentModels() {
+    // Migrate the legacy single default model to both agents on first run.
+    const legacy = localStorage.getItem(this.legacyDefModelKey);
+    if (legacy) {
+      if (!localStorage.getItem(this.modelKeys.content)) {
+        localStorage.setItem(this.modelKeys.content, legacy);
+      }
+      if (!localStorage.getItem(this.modelKeys.assistant)) {
+        localStorage.setItem(this.modelKeys.assistant, legacy);
+      }
+      localStorage.removeItem(this.legacyDefModelKey);
+    }
+
+    (Object.keys(this.modelKeys) as AgentKey[]).forEach((agent) => {
+      const modelString = localStorage.getItem(this.modelKeys[agent]);
+      if (modelString) {
+        this._models[agent] = JSON.parse(modelString);
+      }
     });
   }
+
+  getModel(agent: AgentKey): Model | undefined {
+    return this._models[agent];
+  }
+
+  updateModel(agent: AgentKey, model?: Model) {
+    if (model) {
+      localStorage.setItem(this.modelKeys[agent], JSON.stringify(model));
+    } else {
+      localStorage.removeItem(this.modelKeys[agent]);
+    }
+    this._models[agent] = model;
+  }
+
+  private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
+    const functionDeclarations = tools.map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      parameters: toGeminiSchema(tool.inputSchema),
+    }));
+
+    return functionDeclarations.length > 0 ? [{ functionDeclarations }] : [];
+  }
+
   async chat(
     request: Partial<ChatRequest>,
     tools?: McpTool[],
@@ -57,37 +171,36 @@ export class GeminiService {
     };
 
     const result: GenerateContentResponse =
-      await this.gemini.models.generateContent(reqParams);
+      await this.requireClient().models.generateContent(reqParams);
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
-  async streamChat(request: Partial<ChatRequest>,tools?: McpTool[],) {
+
+  async streamChat(
+    request: Partial<ChatRequest>,
+    tools?: McpTool[],
+    abortController?: AbortController,
+  ) {
     const gemTools = this.getGeminiTools(tools ?? []);
-    const stream = await this.gemini.models.generateContentStream({
+    const systemInstruction = request.messages
+          ?.filter((m) => m.role === 'system')
+          .map((m) => m.content)
+          .join('\n');
+    const otherMessages = request.messages?.filter((m)=>m.role!=='system');
+    const stream = await this.requireClient().models.generateContentStream({
       model: request.model ?? this.ModelName,
-      contents: (request.messages ?? []).map((msg) => ({
+      contents: (otherMessages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,
+        thought: msg.thinking != undefined,
         parts: [{ text: msg.content }],
       })),
       config: {
-        systemInstruction: request.messages
-          ?.filter((m) => m.role === 'system')
-          .map((m) => m.content)
-          .join('\n'),
-        tools:gemTools
+        systemInstruction: systemInstruction,
+        tools: gemTools,
+        abortSignal: abortController?.signal,
       },
     });
     return { stream: stream, provider: 'google' };
-  }
-
-  private getGeminiTools(tools: McpTool[]): Array<Record<string, unknown>> {
-    const functionDeclarations = tools.map((tool) => ({
-      name: tool.name,
-      description: tool.description,
-      parameters: toGeminiSchema(tool.inputSchema),
-    }));
-
-    return functionDeclarations.length > 0 ? [{ functionDeclarations }] : [];
   }
 }
 

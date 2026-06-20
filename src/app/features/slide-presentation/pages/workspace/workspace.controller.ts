@@ -4,6 +4,9 @@ import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Subject } from 'rxjs';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { ActivePresentationContext } from '../../services/active-presentation.context';
+import { SettingsComponent } from '../settings/settings.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Injectable({
   providedIn: 'root',
@@ -12,49 +15,65 @@ export class WorkspaceController {
   showMagicSpiderAssistant: boolean = false;
   showSlideDescription: boolean = false;
   showToolBox: boolean = false;
-
+  showImageToolBox:boolean = false;
+  attachScratchBook: boolean = true;
   constructor(
-    private agentService: LLM_Agents,
     private presentationService: PresentationService,
     private message: NzMessageService,
+    private presentationContext: ActivePresentationContext,
+    private modal:NzModalService
   ) {}
 
-  _activePresentation?: Presentation;
   public get activePresentation(): Presentation | undefined {
-    return this._activePresentation;
+    return this.presentationContext.activePresentation;
   }
 
   public set setActivePresentation(v: Presentation | undefined) {
-    this._activePresentation = v;
+    this.presentationContext.activePresentation = v;
   }
 
-  magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
-  magicSpiderInterrupt: Subject<boolean> = new Subject();
-  latestSlideMarkdown: string = ``;
-  showMagicSpider(params: { slideContent: string }) {
-    this.latestSlideMarkdown = params.slideContent.trim();
+  scratchBookContent: string = ``;
+  showMagicSpider() {
     this.showMagicSpiderAssistant = true;
     this.showSlideDescription = false;
+    this.showImageToolBox = false;
+    this.showToolBox = false;
   }
 
   toggleToolBox(show: boolean) {
     if (show) {
       this.showMagicSpiderAssistant = false;
       this.showSlideDescription = false;
+      this.showImageToolBox = false;
     }
     this.showToolBox = show;
   }
 
-  triggerMagicSpider(params: {
-    slideContent: string;
-    presentation: Presentation;
-    userComment: string;
-  }) {
-    this.agentService.MagicSpiderStream({
-      ...params,
-      responseStream: this.magicSpiderEvent,
-      interrupt: this.magicSpiderInterrupt,
+  toggleImageToolBox()
+  {
+    this.showImageToolBox = !this.showImageToolBox;
+    if(this.showImageToolBox)
+    {
+      this.showMagicSpiderAssistant = false;
+      this.showToolBox = false;
+    }
+  }
+  
+  handleOpenSettings(select?:'ai'|'user') {
+    const modelRef = this.modal.create({
+      nzTitle: 'Settings',
+      nzContent: SettingsComponent,
+      nzFooter: null,
+      nzWidth: 720,
+      nzBodyStyle: {
+        padding: '0',
+      },
     });
+    if(select)
+    {
+      const comp = modelRef.getContentComponent();
+      comp.activeSection = select;
+    }
   }
 
   async exportPPT(presentation: Presentation) {

@@ -1,7 +1,5 @@
 import { Subject } from "rxjs";
 import { ShapeConfig } from "konva/lib/Shape";
-import type { Presentation } from "../canvasModels/presenatation.model";
-import type { Slide } from "../canvasModels/slide.model";
 
 export class PresentationEvent {
     readonly nodeId: string;
@@ -31,10 +29,10 @@ export interface ComponentConfig<T> {
 export class PresentationEventStream extends Subject<PresentationEvent> { }
 
 export enum ZIndexActions {
-    moveToFront,
-    moveToBack,
-    moveUp,
-    moveDown
+    moveToFront = "moveToFront",
+    moveToBack = "moveToBack",
+    moveUp = "moveUp",
+    moveDown = "moveDown"
 }
 
 export enum PresentationEventType {

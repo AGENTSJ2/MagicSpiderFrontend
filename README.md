@@ -1,27 +1,77 @@
 # MagicSpiderFrontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.11.
+MagicSpiderFrontend is an Angular-based slide authoring interface with canvas editing, AI-assisted slide generation, and presentation export features.
 
-## Development server
+## Overview
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+This application lets users create, edit, and save slide presentations in the browser. It includes:
 
-## Code scaffolding
+- A slide workspace powered by Konva for drag-and-drop canvas components
+- Text, image, and basic shape tools
+- AI helpers for enriching slides via a "Magic Spider" assistant
+- Slide saving via browser localStorage
+- PPTX export using `pptxgenjs`
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Key Features
 
-## Build
+- **Presentation library**: create and manage multiple presentations from the home page
+- **Canvas slide editor**: add slides, select components, and update properties using side panels
+- **AI assistant**: use the Magic Spider agent to analyze slides and generate or update content
+- **Local persistence**: saved presentations live in `localStorage`
+- **Export to PPTX**: download slide decks as PowerPoint files
+- **Modern Angular UI**: built with Angular 18, `ng-zorro-antd`, Bootstrap, and `ngx-quill`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Project Structure
 
-## Running unit tests
+- `src/app/app.module.ts` - root module
+- `src/app/app-routing.module.ts` - route config for home and workspace
+- `src/app/components/home` - home page and presentation browser
+- `src/app/features/slide-presentation` - slide editor feature module
+- `src/app/features/slide-presentation/pages/workspace` - main editor workspace
+- `src/app/features/slide-presentation/components` - slide, toolbox, AI assistant, and description UI
+- `src/app/services/konva.services` - presentation and Konva canvas services
+- `src/app/services` - AI provider services, MCP integration, and agents
+- `src/app/features/slide-presentation/MCP` - Model Context Protocol tool integration
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Running Locally
 
-## Running end-to-end tests
+1. Install dependencies
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+```bash
+npm install
+```
 
-## Further help
+2. Start the development server
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+npm start
+```
+
+3. Open the app
+
+Navigate to `http://localhost:4200/`
+
+## Available Scripts
+
+- `npm start` - runs the Angular development server
+- `npm run build` - builds the application
+- `npm run watch` - builds in watch mode for development
+- `npm test` - runs unit tests via Karma
+
+
+## Dependencies
+
+Major dependencies include:
+
+- `@angular/*` (18.x)
+- `bootstrap`
+- `ng-zorro-antd`
+- `konva`
+- `pptxgenjs`
+- `ngx-quill`
+- `@google/genai`
+- `@modelcontextprotocol/sdk`
+- `ollama`
+- `zod`
+
+

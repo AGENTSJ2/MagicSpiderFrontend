@@ -38,15 +38,17 @@ export class Slide {
     });
   }
 
-  addText(params: { config?: ComponentConfig<TextConfig> ,trackHistory?:boolean}) {
+  addText(params: {
+    config?: ComponentConfig<TextConfig>;
+    trackHistory?: boolean;
+  }) {
     const component = new TextComponent({
       slide: this,
       config: params?.config,
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    if(params.trackHistory == undefined || params!.trackHistory)
-    {
+    if (params.trackHistory == undefined || params!.trackHistory) {
       this.presentation.emitEvent({
         slide: this,
         component: component,
@@ -64,7 +66,7 @@ export class Slide {
   addShape(params: {
     config?: ComponentConfig<ShapeConfig>;
     shapeType: ShapeType;
-    trackHistory?:boolean
+    trackHistory?: boolean;
   }) {
     const component = new ShapeComponent({
       slide: this,
@@ -73,8 +75,7 @@ export class Slide {
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    if(params.trackHistory == undefined || params.trackHistory)
-    {
+    if (params.trackHistory == undefined || params.trackHistory) {
       this.presentation.emitEvent({
         slide: this,
         component: component,
@@ -89,15 +90,17 @@ export class Slide {
     return component;
   }
 
-  addImage(params: { config?: ComponentConfig<SerializableImageConfig> ,trackHistory?:boolean}) {
+  addImage(params: {
+    config?: ComponentConfig<SerializableImageConfig>;
+    trackHistory?: boolean;
+  }) {
     const component = new ImageComponent({
       slide: this,
       config: params.config,
       eventBus: this.eventBus,
     });
     this.controller.addComponent(component);
-    if(params.trackHistory == undefined || params.trackHistory)
-    {
+    if (params.trackHistory == undefined || params.trackHistory) {
       this.presentation.emitEvent({
         slide: this,
         component: component,
@@ -109,7 +112,7 @@ export class Slide {
     return component;
   }
 
-  removeComponent(node: ICanvasComponent,trackHistory:boolean = true) {
+  removeComponent(node: ICanvasComponent, trackHistory: boolean = true) {
     const index = this.components.findIndex(
       (x) => x.node._id.toString() === node.node._id.toString(),
     );
@@ -120,8 +123,7 @@ export class Slide {
     removed.node.remove();
     this.controller.removeSelectionOfComponent(removed.node);
     this.presentation.controller.addToTrash(removed);
-    if(trackHistory == undefined || trackHistory)
-    {
+    if (trackHistory == undefined || trackHistory) {
       this.presentation.emitEvent({
         slide: this,
         component: removed,
@@ -132,16 +134,12 @@ export class Slide {
     }
   }
 
-  restoreComponent(nodeId:string)
-  {
+  restoreComponent(nodeId: string) {
     const compToRestore = this.presentation.controller.takeFromTrash(nodeId);
-    if(!compToRestore)
-    {
-      throw new Error("No node found to restore");
+    if (!compToRestore) {
+      throw new Error('No node found to restore');
     }
     this.controller.addComponent(compToRestore);
-    console.log(compToRestore.node._id);
-    
   }
 
   selectComponent(
@@ -154,20 +152,38 @@ export class Slide {
   destroy() {
     this.controller.destroy();
   }
-  
-  getLatestSlideImage()
-  {
+
+  getLatestSlideImage() {
     const img = this.controller.getStageSnapShot();
-    return img;  
+    return img;
   }
+  
   toJson() {
+    const parentLayerOfSlide = this.components.at(0)?.node.parent;
+    const children = parentLayerOfSlide?.children ?? [];
+    const componentsInOrder:ICanvasComponent [] = [];
+    for(let child of children)
+    {
+      const component = this.components.find((comp)=>comp.node._id == child._id);
+      if(component)
+      {
+        componentsInOrder.push(component);
+      }
+    }
     const json = {
       slideId: this.slideId,
       presentationId: this.presentationId,
-      components: this.components.map((cm) => {
+      components: componentsInOrder.map((cm) => {
         cm.node.id(cm.node._id.toString());
+        const componentNode: any = cm.node.toObject();
+        componentNode.attrs.zIndex = cm.node.zIndex();
+        if (cm.node.className == 'Image') {
+          const imageId = (cm as ImageComponent).getSerializableConfig().attrs
+            .imageId;
+          componentNode.attrs.imageId = imageId;
+        }
         return {
-          node: JSON.parse(cm.node.toJSON()),
+          node: componentNode,
         };
       }),
     };

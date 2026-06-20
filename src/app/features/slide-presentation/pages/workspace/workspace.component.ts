@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
@@ -8,9 +8,13 @@ import {
 } from '../../domain/EventModels/presentationEvents.model';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import blobService from '../../../../services/blob.service';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import SlideController from '../../controllers/slide.controller';
 
 @Component({
   selector: 'app-workspace',
@@ -25,33 +29,52 @@ export class WorkspaceComponent {
   slideImages: Map<string, string> = new Map();
   @ViewChild('pptList')
   pptList!: ElementRef;
-
+  hasUnSavedChanges: boolean = false;
+  loading: boolean = false;
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
     private route: ActivatedRoute,
     private message: NzMessageService,
+    private modal: NzModalService,
   ) {
     const id = this.route.snapshot.queryParamMap.get('id');
     this.setUpPresentation(id!);
   }
 
   async setUpPresentation(presentationId: string) {
-    this.presentation =
-      this.presentationService.getPresentation(presentationId);
-    this.name = this.presentation.name;
-    this.workSpaceController.setActivePresentation = this.presentation;
-    const firstSlide = this.presentation.slides.at(0);
-    this.listenPresentationEvents();
-    if (firstSlide) {
-      this.selectSlide(firstSlide);
+    try {
+      this.loading = true;
+      this.presentation =
+        await this.presentationService.getPresentation(presentationId);
+      this.name = this.presentation.name;
+      this.workSpaceController.setActivePresentation = this.presentation;
+      this.workSpaceController.scratchBookContent =
+        await this.presentationService.getScratchBook(this.presentation.id);
+      const firstSlide = this.presentation.slides.at(0);
+      this.listenPresentationEvents();
+      if (firstSlide) {
+        this.selectSlide(firstSlide);
+      }
+      this.hasUnSavedChanges = false;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.loading = false;
     }
   }
 
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
+  initialXandY = { x: 144, y: 144 };
   handleAddText() {
-    this.presentation.getActiveSlide?.addText({});
+    this.presentation.getActiveSlide?.addText({config:{
+      attrs:{
+        x:this.initialXandY.x,
+        y:this.initialXandY.y,
+      },
+      zIndex:0
+    }});
     this.workSpaceController.toggleToolBox(true);
   }
 
@@ -67,7 +90,13 @@ export class WorkspaceComponent {
   }
 
   addShape(shapeType: ShapeType) {
-    this.presentation.getActiveSlide?.addShape({ shapeType: shapeType });
+    this.presentation.getActiveSlide?.addShape({ shapeType: shapeType ,config:{
+      attrs:{
+        x:this.initialXandY.x,
+        y:this.initialXandY.y,
+      },
+      zIndex:0
+    } });
     this.workSpaceController.toggleToolBox(true);
   }
 
@@ -79,10 +108,13 @@ export class WorkspaceComponent {
     }
     const reader = new FileReader();
     reader.onload = () => {
+      const appImage = blobService.addImage(reader.result as string);
       this.presentation.getActiveSlide?.addImage({
         config: {
           attrs: {
-            imageSrc: reader.result as string,
+            imageId: appImage.id,
+            x:this.initialXandY.x,
+            y:this.initialXandY.y
           },
           zIndex: 0,
         },
@@ -112,7 +144,14 @@ export class WorkspaceComponent {
       const targetSlide = this.presentation.slides.find(
         (sl) => sl.slideId == slideId,
       );
-      if (targetSlide) {
+      if (!targetSlide) {
+        return;
+      }
+      const targetComponent = targetSlide?.components.find(
+        (cm) => event.nodeId == cm.node._id.toString(),
+      );
+      if (event.trackHistory) {
+        this.hasUnSavedChanges = true;
         let timeOutTracker = this.slideTimeOutMap.get(slideId!);
         clearTimeout(timeOutTracker);
         timeOutTracker = setTimeout(async () => {
@@ -121,14 +160,10 @@ export class WorkspaceComponent {
         }, 1000);
         this.slideTimeOutMap.set(slideId!, timeOutTracker);
       }
-      const comp = targetSlide?.components.find(
-        (cm) => event.nodeId == cm.node._id.toString(),
-      );
-
       if (event.eventType == PresentationEventType.SELECT) {
-        this.selectedToolBox = this.getToolBoxType(comp!);
+        this.selectedToolBox = this.getToolBoxType(targetComponent!);
       }
-      this.setSelectedComponent(comp);
+      this.setSelectedComponent(targetComponent);
     });
   }
 
@@ -159,23 +194,36 @@ export class WorkspaceComponent {
     this.presentation.removeSlide(item);
   }
 
+  dropSlide(event: CdkDragDrop<Slide[]>) {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+    this.presentation.moveSlide(event.previousIndex, event.currentIndex);
+    this.hasUnSavedChanges = true;
+  }
+
   handleOpenAiDescription() {
     this.workSpaceController.showSlideDescription = true;
   }
 
   toggleMagicAssistant(state: boolean) {
     if (state) {
-      this.workSpaceController.showMagicSpider({ slideContent: '' });
+      this.workSpaceController.showMagicSpider();
     } else {
       this.workSpaceController.showMagicSpiderAssistant = false;
     }
   }
-  savePpt() {
+
+  async savePpt() {
     this.presentation.name = this.name;
     const firstslide = this.presentation.slides.at(0);
     const thumbnail = this.slideImages.get(firstslide?.slideId ?? '') ?? '';
-    this.presentationService.savePresentation(this.presentation,thumbnail);
-    this.message.success("Presentation Saved")
+    await this.presentationService.savePresentation(
+      this.presentation,
+      thumbnail,
+    );
+    this.message.success('Presentation Saved');
+    this.hasUnSavedChanges = false;
   }
 
   pptTimeOutTracker: any;
@@ -185,6 +233,16 @@ export class WorkspaceComponent {
         this.name = this.presentation.name;
       });
     }
+  }
+
+  canDeactivate() {
+    if (this.hasUnSavedChanges) {
+      const save = confirm('There are unsaved changes');
+      if (save) {
+        this.savePpt();
+      }
+    }
+    return true;
   }
 }
 enum ToolBoxType {

@@ -1,32 +1,131 @@
-<p>home works!</p>
-<div class="presentations">
-    <h5>Presentations</h5>
-    <div class="d-flex gap-3 p-2 ppt-prev-list ">
-        <div (click)="handleNewPPT()"
-            class="ppt-prev p-2 add-new-ppt d-flex justify-content-center align-items-center flex-column ">
-            <i class="fi fi-rr-multiple d-flex justify-content-center align-items-center fs-4 fw-semibold"></i>
-            <p class="mb-0 fw-semibold mt-2">Add New</p>
-        </div>
-        @for (item of presentations; track $index) {
-        <div class="ppt-wrap" routerLink="/workspace/ppt" [queryParams]="{ id: item.id }">
-            <div class="ppt-prev d-flex justify-content-center align-items-center">
-                <ng-container *ngIf="item.thumbnail as image">
-                    <img [src]="image" alt="" >
-                </ng-container>
-                <ng-container *ngIf="!item.thumbnail">
-                    <img [src]="'images/ppt.png'" alt="ppt" class="pptpng">
-                </ng-container>
-                <button (click)="handleRemovePPT(item,$event)" class="del-btn">
-                    <i class="fi fi-rs-trash d-flex justify-content-center align-items-center"></i>
-                </button>
-            </div>
-            <div class="mt-2 d-flex justify-content-between ">
-                <p class="mb-0 ppt-name">{{item.name}}</p>
-                <p class="mb-0">
-                    {{item.slideCount}}
-                </p>
-            </div>
-        </div>
-        }
+<div class="ms-home">
+
+  <!-- ── Sticky Nav ── -->
+  <nav class="ms-nav">
+    <app-logo></app-logo>
+    <button class="ms-nav-btn" (click)="handleNewPPT()">
+      <i class="fi fi-rr-plus d-flex align-items-center"></i>
+      New Presentation
+    </button>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="ms-hero">
+    <!-- Spinning web decoration -->
+    <div class="ms-web-deco" aria-hidden="true">
+      <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="200" y1="200" x2="200" y2="10"    stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="334" y2="66"    stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="390" y2="200"   stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="334" y2="334"   stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="200" y2="390"   stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="66"  y2="334"   stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="10"  y2="200"   stroke="currentColor" stroke-width="1"/>
+        <line x1="200" y1="200" x2="66"  y2="66"    stroke="currentColor" stroke-width="1"/>
+        <polygon points="200,150 235,165 250,200 235,235 200,250 165,235 150,200 165,165"
+                 fill="none" stroke="currentColor" stroke-width="1"/>
+        <polygon points="200,100 271,129 300,200 271,271 200,300 129,271 100,200 129,129"
+                 fill="none" stroke="currentColor" stroke-width="1"/>
+        <polygon points="200,50 306,94 350,200 306,306 200,350 94,306 50,200 94,94"
+                 fill="none" stroke="currentColor" stroke-width="1"/>
+        <polygon points="200,10 334,66 390,200 334,334 200,390 66,334 10,200 66,66"
+                 fill="none" stroke="currentColor" stroke-width="1"/>
+      </svg>
     </div>
+
+    <!-- Ambient glow orbs -->
+    <div class="ms-orb ms-orb-1" aria-hidden="true"></div>
+    <div class="ms-orb ms-orb-2" aria-hidden="true"></div>
+
+    <div class="ms-hero-content">
+      <div class="ms-hero-tag">
+        <i class="fi fi-rr-magic-wand d-flex align-items-center"></i>
+        Presentation Tool
+      </div>
+      <h1 class="ms-hero-title">
+        Create slides that<br>
+        <span class="ms-gradient-text">leave a mark.</span>
+      </h1>
+      <p class="ms-hero-sub">
+        Design, build and deliver stunning presentations<br>powered by AI — in minutes.
+      </p>
+      <button class="ms-hero-cta" (click)="handleNewPPT()">
+        Start Creating
+        <i class="fi fi-rr-arrow-right d-flex align-items-center"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Presentations ── -->
+  <section class="ms-section">
+    <div class="ms-section-head">
+      <h2 class="ms-section-title">My Presentations</h2>
+      @if (presentations.length > 0) {
+        <span class="ms-count">{{ presentations.length }}</span>
+      }
+    </div>
+    <div class="ms-grid">
+      <!-- Add New Card -->
+      <div class="ms-card ms-add-card" (click)="handleNewPPT()">
+        <div class="ms-add-inner">
+          <div class="ms-add-ring">
+            <i class="fi fi-rr-plus d-flex align-items-center justify-content-center"></i>
+          </div>
+          <span>New Presentation</span>
+        </div>
+      </div>
+
+      <!-- Presentation Cards -->
+      @for (item of presentations; track item.id) {
+        <div class="ms-card" routerLink="/workspace/ppt" [queryParams]="{ id: item.id }">
+          <div class="ms-thumb">
+            @if (item.thumbnail) {
+              <img [src]="item.thumbnail" [alt]="item.name" />
+            } @else {
+              <div class="ms-thumb-placeholder">
+                <img src="images/ppt.png" alt="presentation" />
+              </div>
+            }
+            <div class="ms-thumb-overlay">
+              <button class="ms-del-btn" (click)="handleRemovePPT(item, $event)" title="Delete">
+                <i class="fi fi-rs-trash d-flex align-items-center justify-content-center"></i>
+              </button>
+              <span class="ms-open-label">Open</span>
+            </div>
+          </div>
+          <div class="ms-card-footer">
+            <span class="ms-card-name" [title]="item.name">{{ item.name }}</span>
+            <span class="ms-slide-count">
+              <i class="fi fi-rr-layers d-flex align-items-center"></i>
+              {{ item.slideCount }}
+            </span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Empty state -->
+    @if (presentations.length === 0) {
+      <div class="ms-empty">
+        <div class="ms-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+            <line x1="12" y1="12" x2="12" y2="1"      stroke="currentColor" stroke-width="0.9"/>
+            <line x1="12" y1="12" x2="21.5" y2="6.5"  stroke="currentColor" stroke-width="0.9"/>
+            <line x1="12" y1="12" x2="21.5" y2="17.5" stroke="currentColor" stroke-width="0.9"/>
+            <line x1="12" y1="12" x2="12" y2="23"     stroke="currentColor" stroke-width="0.9"/>
+            <line x1="12" y1="12" x2="2.5" y2="17.5"  stroke="currentColor" stroke-width="0.9"/>
+            <line x1="12" y1="12" x2="2.5" y2="6.5"   stroke="currentColor" stroke-width="0.9"/>
+            <polygon points="12,8 15.5,10 15.5,14 12,16 8.5,14 8.5,10"
+                     fill="none" stroke="currentColor" stroke-width="0.9"/>
+            <polygon points="12,5 18,8.5 18,15.5 12,19 6,15.5 6,8.5"
+                     fill="none" stroke="currentColor" stroke-width="0.9"/>
+          </svg>
+        </div>
+        <p class="ms-empty-title">No presentations yet</p>
+        <p class="ms-empty-sub">Click <strong>New Presentation</strong> to get started.</p>
+      </div>
+    }
+  </section>
+
 </div>

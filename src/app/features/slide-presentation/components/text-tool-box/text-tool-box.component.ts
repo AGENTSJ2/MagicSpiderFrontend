@@ -7,14 +7,11 @@ import {
 import { Subscription } from 'rxjs';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import {
-  BulletStyle,
-  ListType,
-  NumberStyle,
-  TextComponent,
   TextToolboxConfig,
 } from '../../domain/canvasModels/textComponent.model';
 import { Text, TextConfig } from 'konva/lib/shapes/Text';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
+import { getFormattedText } from '../../../../core/utilities';
 
 @Component({
   selector: 'app-text-tool-box',
@@ -93,7 +90,7 @@ export class TextToolBoxComponent implements OnChanges {
     this.sub = this.form.valueChanges.subscribe((values) => {
       Object.assign(this.localConfig.attrs, values);
       (this.localConfig.attrs as any).rawText = values.text;
-      this.localConfig.attrs.text = this.getFormattedText(
+      this.localConfig.attrs.text = getFormattedText(
         values.text,
         values.listType,
         values.bulletStyle,
@@ -107,8 +104,6 @@ export class TextToolBoxComponent implements OnChanges {
   }
   ZIndexActions = ZIndexActions;
   move(action: ZIndexActions) {
-    console.log(this.localConfig);
-    
     this.component.updateComponent({
       newConfig: this.localConfig,
       zIndexActions: action,
@@ -136,96 +131,5 @@ export class TextToolBoxComponent implements OnChanges {
       newConfig: this.localConfig,
     });
   }
-
-  private getFormattedText(
-    text = '',
-    listType: ListType = 'none',
-    bulletStyle: BulletStyle = 'disc',
-    numberStyle: NumberStyle = 'decimal',
-  ): string {
-    if (listType === 'none') {
-      return text;
-    }
-
-    let itemNumber = 0;
-    return text
-      .split('\n')
-      .map((line) => {
-        if (!line.trim()) {
-          return line;
-        }
-
-        itemNumber += 1;
-        if (listType === 'bullet') {
-          return `${this.getBulletMarker(bulletStyle)} ${line}`;
-        }
-
-        return `${this.getNumberMarker(itemNumber, numberStyle)} ${line}`;
-      })
-      .join('\n');
-  }
-
-  private getBulletMarker(style: BulletStyle): string {
-    const markers: Record<BulletStyle, string> = {
-      disc: '•',
-      circle: '◦',
-      square: '▪',
-      dash: '-',
-      check: '✓',
-    };
-    return markers[style];
-  }
-
-  private getNumberMarker(value: number, style: NumberStyle): string {
-    switch (style) {
-      case 'lower-alpha':
-        return `${this.getAlphaMarker(value, false)}.`;
-      case 'upper-alpha':
-        return `${this.getAlphaMarker(value, true)}.`;
-      case 'lower-roman':
-        return `${this.getRomanMarker(value).toLowerCase()}.`;
-      case 'upper-roman':
-        return `${this.getRomanMarker(value)}.`;
-      default:
-        return `${value}.`;
-    }
-  }
-
-  private getAlphaMarker(value: number, upperCase: boolean): string {
-    let result = '';
-    let current = value;
-    while (current > 0) {
-      current -= 1;
-      result = String.fromCharCode(97 + (current % 26)) + result;
-      current = Math.floor(current / 26);
-    }
-    return upperCase ? result.toUpperCase() : result;
-  }
-
-  private getRomanMarker(value: number): string {
-    const numerals: Array<[number, string]> = [
-      [1000, 'M'],
-      [900, 'CM'],
-      [500, 'D'],
-      [400, 'CD'],
-      [100, 'C'],
-      [90, 'XC'],
-      [50, 'L'],
-      [40, 'XL'],
-      [10, 'X'],
-      [9, 'IX'],
-      [5, 'V'],
-      [4, 'IV'],
-      [1, 'I'],
-    ];
-    let current = value;
-    let result = '';
-    for (const [amount, numeral] of numerals) {
-      while (current >= amount) {
-        result += numeral;
-        current -= amount;
-      }
-    }
-    return result;
-  }
+ 
 }

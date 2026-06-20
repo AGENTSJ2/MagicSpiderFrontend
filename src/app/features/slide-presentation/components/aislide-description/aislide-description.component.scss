@@ -3,7 +3,6 @@
   letter-spacing: 0.3px;
 }
 
-/* ── Modal Title ─────────────────────────────────────────────────────── */
 .modal-title {
   display: flex;
   align-items: center;
@@ -20,7 +19,6 @@
   text-transform: uppercase;
 }
 
-/* ── Body ────────────────────────────────────────────────────────────── */
 .modal-body {
   display: flex;
   flex-direction: column;
@@ -28,7 +26,6 @@
   min-height: 180px;
 }
 
-/* ── Input Section ───────────────────────────────────────────────────── */
 .input-label {
   font-weight: 600;
   color: rgba(0, 0, 0, 0.75);
@@ -37,20 +34,37 @@
   align-items: center;
   gap: 6px;
 }
-
-.problem-input {
-  font-size: 14px;
-  line-height: 1.6;
-  border-radius: 8px;
-  // resize: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.problem-input:focus,
-.problem-input:active {
-  outline: none;
-  box-shadow: none;
-  border: 1px solid var(--primary-color) !important;
+.problem-wrapper
+{
+  border: 1px solid lightgray;
+  padding: 10px;
+  .input-wrapper
+  {
+    position: relative;
+    min-height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .problem-placeholder
+    {
+      display: block;
+      width: 100%;
+      position: absolute;
+      top: 25%;
+    }
+    .problem-input {
+      font-size: 14px;
+      line-height: 1.6;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .problem-input:focus,
+    .problem-input:active {
+      outline: none;
+      box-shadow: none;
+      // border: 1px solid var(--primary-color) !important;
+    }
+  }
 }
 .char-count {
   text-align: right;
@@ -59,11 +73,21 @@
   margin: 4px 0 0;
 }
 
-/* ── Thinking Section ────────────────────────────────────────────────── */
+.model-chip {
+  padding: 0px 8px;
+  border-radius: 20px;
+  background-color: aliceblue;
+  font-size: 11px;
+  border: 1px solid var(--primary-color);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
 .thinking-section {
-  border-radius: 10px;
   background: #fffbe6;
-  border: 1px solid #ffe58f;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
   padding: 12px 14px;
 }
 
@@ -77,7 +101,6 @@
 .thinking-label {
   font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.8px;
   color: #ad6800;
 }
@@ -99,19 +122,12 @@
   margin: 0;
 }
 
-/* ── Content Section ─────────────────────────────────────────────────── */
-.content-section {
-  // border-radius: 10px;
-  // border: 1px solid #d9d9d9;
-  // overflow: hidden;
-}
 .idle {
   min-height: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 1px dashed #d9d9d9;
-  border-radius: 12px;
   background: var(--background-secondary);
   text-align: center;
   padding: 24px;
@@ -205,7 +221,6 @@
 
 .markdown-output code {
   background: #f5f5f5;
-  border-radius: 4px;
   padding: 1px 5px;
   font-size: 0.9em;
   font-family: 'JetBrains Mono', monospace;
@@ -250,14 +265,15 @@
 }
 
 .send-btn {
-  background-color: var(--primary-color);
-  border: none;
+  border:2px solid var(--primary-color);
+  background-color: white;
   width: fit-content;
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 .ql-editor
 {
@@ -269,5 +285,11 @@
 {
   padding: 20px;
   min-height: 360px;
-
+}
+.req-spinner
+{
+  width: 20px;
+  height: 20px;
+  outline: none;
+  display: block;
 }

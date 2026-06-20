@@ -22,7 +22,12 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { ContentEditableSpanDirective } from '../.././directives/content-editable-span.directive';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { QuillModule } from 'ngx-quill'
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { SharedModule } from '../shared/shared.module';
+import { SettingsComponent } from './pages/settings/settings.component';
+import { ImageListComponent } from './components/image-list/image-list.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +38,9 @@ import { QuillModule } from 'ngx-quill'
     ImageToolBoxComponent,
     AISlideDescriptionComponent,
     MagicSpiderAssistantComponent,
-    ContentEditableSpanDirective
+    ContentEditableSpanDirective,
+    SettingsComponent,
+    ImageListComponent
   ],
   imports: [
     CommonModule,
@@ -50,7 +57,10 @@ import { QuillModule } from 'ngx-quill'
     NzDrawerModule,
     NzDropDownModule,
     NzMessageModule,
-    QuillModule.forRoot()
+    NzSelectModule,
+    QuillModule.forRoot(),
+    DragDropModule,
+    SharedModule
   ]
 })
 export class SlidePresentationModule { }

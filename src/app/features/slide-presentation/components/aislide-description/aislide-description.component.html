@@ -1,20 +1,16 @@
 <nz-modal [(nzVisible)]="workspaceController.showSlideDescription" [nzTitle]="modalTitle" [nzFooter]="null"
-  [nzMaskClosable]="phase === StreamPhase.idle"
-  [nzClosable]="phase === StreamPhase.idle || phase === StreamPhase.done || phase === StreamPhase.error"
-  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'0px'}" nzWidth="70vw">
+  
+  (nzOnCancel)="handleCancel()" nzClassName="content-creator-modal" [nzStyle]="{top:'20px'}" nzWidth="70vw">
   <!-- Title Template -->
   <ng-template #modalTitle>
-    <div class="modal-title">
+    <div class="modal-title justify-content-between">
       <div>
         <span nz-icon nzType="highlight" nzTheme="twotone" style="margin-right:8px;font-size:18px;"></span>
         Scratch Book
-        <nz-tag [nzColor]="phaseTagColor" class="phase-tag">
-          {{ phase }}
-        </nz-tag>
       </div>
-      <div>
+      <div class="me-4">
         <button nz-button nzType="default" (click)="handleInvokeMagicSpider()">
-          Start Magic Spider
+          Create Slides With Magic Spider
         </button>
       </div>
     </div>
@@ -24,50 +20,57 @@
   <ng-container *nzModalContent>
     <div class="modal-body">
       <!-- ── Thinking ───────────────────────────────────────── -->
-      <div class="thinking-section" *ngIf="phase === StreamPhase.thinking">
+      <div class="thinking-section" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking || this.agentService.contentCreatorState == this.AgentState.invoked">
         <div class="thinking-header">
-          <nz-spin nzSimple [nzSize]="'small'" *ngIf="phase === StreamPhase.thinking"></nz-spin>
-          <span nz-icon nzType="bulb" nzTheme="twotone" *ngIf="phase !== StreamPhase.thinking"
-            style="color:#faad14"></span>
-          <span class="thinking-label">Thinking process</span>
+          <span class="thinking-label">Thinking...</span>
         </div>
         <div class="thinking-box" #thinkingBox>
           <pre
-            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="phase === StreamPhase.thinking">▌</span></pre>
+            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking">▌</span></pre>
         </div>
       </div>
-
       <!-- ── Content (Markdown) ─────────────────────────────── -->
-      <!-- <ngx-quill #editor [modules]="modules" (contentChanged)="logChange($event);"></ngx-quill> -->
       <div class="content-section">
         <div class="markdown-output" #genContent>
-          <quill-editor [(ngModel)]="contentText" format="html" [modules]="this.editorModules"
-            class="w-100 h-100"></quill-editor>
-          <span class="cursor" *ngIf="phase === StreamPhase.content">▌</span>
+          <quill-editor [(ngModel)]="workspaceController.scratchBookContent" format="html" [modules]="this.editorModules" [readOnly]="isAgentInaction()"
+            class="w-100 h-100" (ngModelChange)="handleContentChange()"></quill-editor>
+          <span class="cursor" *ngIf="isAgentInaction()">▌</span>
         </div>
       </div>
       <!-- ── Input ───────────────────────────────────────────── -->
-      <div class="input-section" *ngIf="phase === StreamPhase.idle || phase === StreamPhase.done">
-        <div class="input-label d-flex gap-2">
+      <div class="input-section">
+        <div class="input-label d-flex gap-2 align-items-center">
           <div>
             Describe your topic or request changes
           </div>
-          <span class="char-count">{{ problemStatement.length }} characters</span>
-
-        </div>
-        <div class="d-flex w-100 justify-content-center align-items-center gap-2">
-          <div class="flex-fill">
-            <textarea [(ngModel)]="problemStatement"
-              placeholder="e.g. Explain the impact of climate change on coastal cities over the next 50 years…"
-              class="problem-input w-100 p-3"></textarea>
+          <span class="char-count">{{ problemStatement?.length ?? 0 }} characters</span>
+          <div class="model-chip user-select-none ms-auto" (click)="workspaceController.handleOpenSettings('ai')">
+            {{ contentModel?.displayName ?? 'Select model' }}
           </div>
-          <button class="send-btn" (click)="generate()">
-            <i class="fi fi-sr-paper-plane-top d-flex justify-content-between align-items-center"></i>
+        </div>
+        <div class="d-flex w-100 justify-content-center align-items-center gap-2 problem-wrapper">
+          <div class="flex-fill input-wrapper">
+            @if(problemStatement?.length == 0)
+            {
+              <span class="problem-placeholder " (click)="prblm.focus()" >
+                Whats the topic on your mind..
+              </span>
+            }
+            <span contentEditableModel contenteditable [(ngModel)]="problemStatement" class="problem-input w-100 d-flex" #prblm></span>
+            
+          </div>
+          <button class="send-btn" (click)="trigger()">
+            @if(isAgentInaction())
+            {
+              <i class="fi fi-sr-stop d-flex justify-content-between align-items-center"></i>
+            }
+            @else
+            {
+              <i class="fi fi-sr-paper-plane-top d-flex justify-content-between align-items-center"></i>
+            }
           </button>
         </div>
       </div>
-      <!-- ── Error ──────────────────────────────────────────────────── -->
-      <nz-alert *ngIf="phase === StreamPhase.error" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
-
+      <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
     </div>
   </ng-container>

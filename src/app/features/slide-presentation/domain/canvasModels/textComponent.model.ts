@@ -9,7 +9,12 @@ import {
   ZIndexActions,
 } from '../EventModels/presentationEvents.model';
 import { TextConfig } from 'konva/lib/shapes/Text';
-import { ShapeConfig } from 'konva/lib/Shape';
+import {
+  BulletStyle,
+  getFormattedText,
+  ListType,
+  NumberStyle,
+} from '../../../../core/utilities';
 
 export class TextComponent implements ICanvasComponent {
   node: Konva.Text;
@@ -26,7 +31,7 @@ export class TextComponent implements ICanvasComponent {
       ...(this.config?.attrs ? this.config.attrs : {}),
       x: init.config?.attrs.x ?? 0,
       y: init.config?.attrs.y ?? 0,
-      text: init.config?.attrs.text ?? 'New Text',
+      text:init.config?.attrs.text ?? 'New Text',
       fontSize: init.config?.attrs.fontSize ?? 50,
       draggable: true,
     });
@@ -73,14 +78,7 @@ export class TextComponent implements ICanvasComponent {
     return updatedComp;
   }
 }
-export type ListType = 'none' | 'bullet' | 'number';
-export type BulletStyle = 'disc' | 'circle' | 'square' | 'dash' | 'check';
-export type NumberStyle =
-  | 'decimal'
-  | 'lower-alpha'
-  | 'upper-alpha'
-  | 'lower-roman'
-  | 'upper-roman';
+
 export interface TextToolboxConfig extends TextConfig {
   rawText?: string;
   listType?: ListType;

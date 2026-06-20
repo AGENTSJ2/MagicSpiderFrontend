@@ -3,17 +3,18 @@
   height: 100vh;
 
   .nav {
-    min-height: 70px;
+    height: 62px;
+    padding: 0px 20px;
     width: 100%;
-    background-color: var(--primary-color);
+    background-color: white;
     color: white;
     flex-shrink: 0;
-
+    border-bottom: 1px solid var(--border-color-primary);
     .home-btn {
       width: 100px;
 
       i {
-        font-size: 20px;
+        font-size: 2px;
       }
 
       cursor: pointer;
@@ -36,14 +37,13 @@
   display: flex;
   align-items: center;
   border: 1px solid transparent;
-  border-radius: 5px;
   padding: 0px 10px;
   font-weight: 600;
-  font-size: clamp(11px, 20px, 20px);
-
+  font-size: clamp(11px, 18px, 18px);
+  color: #000;
   &:focus {
     outline: none;
-    border: 1px solid white;
+    border: 1px solid var(--border-color-primary);
   }
 }
 
@@ -53,6 +53,7 @@
   background-color: white;
 
   .menu-item {
+    padding: 10px 0px;
     position: relative;
     cursor: pointer;
     .shape-types {
@@ -64,7 +65,6 @@
       padding: 5px;
       background-color: white;
       border: 1px solid var(--border-color-primary);
-      border-radius: 5px;
       top: -50%;
       right: -130%;
       z-index: 1;
@@ -78,7 +78,10 @@
         }
       }
     }
-
+    &:hover
+    {
+      background-color: var(--background-secondary);
+    }
     &:hover .shape-types {
       opacity: 1;
     }
@@ -104,7 +107,7 @@
   padding: 10px;
   background-color: whitesmoke;
   min-width: 0;
-
+  min-height: 132px;
   &::-webkit-scrollbar {
     width: 1px !important;
     height: 1px !important;
@@ -138,7 +141,51 @@
       width: 25px;
       height: 25px;
     }
+
+    .slide-prev-placeholder {
+      width: 200px;
+      height: 112px;
+      flex-shrink: 0;
+      border: 1px dashed var(--primary-color);
+      background-color: rgba(0, 0, 0, 0.04);
+    }
   }
+
+  // Smoothly animate siblings as an item is dropped/reordered.
+  &.cdk-drop-list-dragging .slide-prev:not(.cdk-drag-placeholder) {
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.slide-prev.cdk-drag-preview {
+  box-sizing: border-box;
+  width: 200px;
+  height: 112px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 1px solid var(--border-color-primary);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  cursor: grabbing;
+
+  img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+
+  // The delete button shouldn't ride along inside the preview.
+  .del-btn {
+    display: none;
+  }
+}
+
+// Eases the preview into its final slot after you drop.
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .add-slide {
@@ -164,13 +211,15 @@
   border: 1px solid transparent;
   background-color: transparent;
   padding: 10px;
-
+  color: black;
+  font-weight: 500;
   i {
     font-size: 20px;
   }
 
   &:hover {
-    border: 1px solid white;
+    // border: 1px solid var(--primary-color);
+    background: var(--background-secondary);
   }
 }
 
@@ -183,12 +232,13 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: var(--background-secondary);
     padding: 30px;
 
     p {
-      font-size: 17px;
+      margin-top: 20px;
+      font-size: 15px;
       font-weight: 600;
+      color: gray;
     }
   }
 

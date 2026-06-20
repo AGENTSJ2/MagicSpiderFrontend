@@ -1,0 +1,134 @@
+<div class="settings">
+  <aside class="settings__sidebar p-3">
+    <button
+      *ngFor="let item of navItems"
+      type="button"
+      class="settings__nav-item"
+      [class.settings__nav-item--active]="activeSection === item.key"
+      (click)="selectSection(item.key)"
+    >
+      {{ item.label }}
+    </button>
+  </aside>
+
+  <section class="settings__content p-3">
+    <!-- User Settings -->
+    <ng-container *ngIf="activeSection === 'user'">
+      <h2 class="settings__title">User Settings</h2>
+
+      <div class="settings__field">
+        <label for="user-name">Name</label>
+        <input
+          id="user-name"
+          nz-input
+          placeholder="Your name"
+          [(ngModel)]="name"
+        />
+      </div>
+
+      <div class="settings__field">
+        <label for="user-email">Email <span class="settings__optional">(optional)</span></label>
+        <input
+          id="user-email"
+          nz-input
+          type="email"
+          placeholder="you@example.com"
+          [(ngModel)]="email"
+        />
+      </div>
+
+      <button
+        nz-button
+        nzType="primary"
+        [disabled]="!name.trim()"
+        (click)="saveUserSettings()"
+      >
+        Save
+      </button>
+    </ng-container>
+
+    <!-- AI Settings -->
+    <ng-container *ngIf="activeSection === 'ai'">
+      <h2 class="settings__title">AI Settings</h2>
+
+      <div class="settings__field">
+        <label for="api-key">API Key</label>
+        <nz-input-group [nzSuffix]="apiKeySuffix">
+          <input
+            id="api-key"
+            nz-input
+            type="password"
+            autocomplete="off"
+            placeholder="Paste your Gemini API key"
+            [(ngModel)]="apiKey"
+            (keyup.enter)="saveApiKey()"
+          />
+        </nz-input-group>
+        <ng-template #apiKeySuffix>
+          <button
+            nz-button
+            nzType="link"
+            nzSize="small"
+            (click)="saveApiKey()"
+          >
+            Save
+          </button>
+        </ng-template>
+        <p class="settings__hint" *ngIf="!apiKeyError">
+          Stored only in this browser. Restrict the key by HTTP referrer and API
+          in Google Cloud Console so a leaked key can't be reused elsewhere.
+        </p>
+        <p class="settings__hint settings__hint--error" *ngIf="apiKeyError">
+          {{ apiKeyError }}
+        </p>
+      </div>
+
+      <div class="settings__field">
+        <label>Provider</label>
+        <nz-select [(ngModel)]="provider" class="settings__select">
+          <nz-option
+            *ngFor="let p of providers"
+            [nzValue]="p.value"
+            [nzLabel]="p.label"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="settings__field">
+        <label>Content Writer model</label>
+        <nz-select
+          [(ngModel)]="contentModelName"
+          (ngModelChange)="onContentModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzPlaceHolder="Select a model for the content writer"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="settings__field">
+        <label>Magic Assistant model</label>
+        <nz-select
+          [(ngModel)]="assistantModelName"
+          (ngModelChange)="onAssistantModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzPlaceHolder="Select a model for the magic assistant"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
+    </ng-container>
+  </section>
+</div>

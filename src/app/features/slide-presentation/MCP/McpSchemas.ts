@@ -1,51 +1,100 @@
 import { z } from 'zod';
 import { ZIndexActions } from '../domain/EventModels/presentationEvents.model';
-import { ShapeType } from '../domain/canvasModels/shapeComponent.model';
 
-export const createAddSchema = (isShape: boolean) => {
-  if (isShape) {
-    return z.object({
-      slideId: z.string(),
-      shapeType: z
-        .number()
-        .int()
-        .min(1)
-        .max(2)
-        .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
-      initialConfig: InitialComponentConfigSchema.optional(),
-    });
-  }
-  return z.object({
-    slideId: z.string(),
-    initialConfig: InitialComponentConfigSchema.optional(),
-  });
-};
-
-export const createUpdateSchema = () =>
-  z.object({
-    slideId: z.string(),
-    nodeId: z.string(),
-    newConfig: ComponentConfigSchema,
-    zIndexActions: z.enum(ZIndexActions).optional(),
-  });
-
-export const createDeleteSchema = () =>
-  z.object({
-    slideId: z.string(),
-    nodeId: z.string(),
-  });
-
-export const KonvaAttrsSchema = z.record(
-  z.string(),
-  z.union([z.string(), z.number(), z.boolean(), z.null()]),
+const KonvaAttrValueSchema: z.ZodType<unknown> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null(),
+    z.array(KonvaAttrValueSchema),
+    z.record(z.string(), KonvaAttrValueSchema),
+  ])
 );
+
+export const KonvaAttrsSchema = z.record(z.string(), KonvaAttrValueSchema)
+  .describe("Partial configuration containing only the Konva attributes that should be updated. Examples include x, y, width, height, fill, stroke, rotation, opacity, scaleX, scaleY, dash, points, gradient stops, etc.");
+
+export const InitialComponentConfigSchema = z.object({
+  attrs: KonvaAttrsSchema.optional(),
+  zIndex: z.number().optional(),
+});
 
 export const ComponentConfigSchema = z.object({
   attrs: KonvaAttrsSchema,
   zIndex: z.number(),
 });
 
-export const InitialComponentConfigSchema = z.object({
-  attrs: KonvaAttrsSchema.optional(),
-  zIndex: z.number().optional(),
+export const addComponentSchema = z.object({
+  slideId: z.string(),
+  initialConfig: InitialComponentConfigSchema.optional(),
+});
+
+export const updateSchema = z.object({
+  slideId: z.string(),
+  nodeId: z.string(),
+  newConfig: ComponentConfigSchema,
+  zIndexActions: z.enum(ZIndexActions).optional(),
+});
+
+export const deleteSchema = z.object({
+  slideId: z.string(),
+  nodeId: z.string(),
+});
+
+
+// UNIQUE TO TEXT START
+export const KonvaTextAttrsSchema = z
+  .record(z.string(), KonvaAttrValueSchema)
+  .describe(`
+    Partial configuration containing only the Konva Text attributes that should be updated.
+
+    Standard Konva Text attributes include:
+    x, y, width, height, fill, stroke, rotation, opacity,
+    scaleX, scaleY, fontSize, fontFamily, fontStyle,
+    align, verticalAlign, lineHeight, padding, wrap, ellipsis, etc.
+
+    This schema may also contain custom text editor attributes:
+    - listType: 'none' | 'bullet' | 'number' 
+    - bulletStyle: 'disc' | 'circle' | 'square' | 'dash' | 'check'
+    - numberStyle: 'decimal' | 'lower-alpha' | 'upper-alpha' | 'lower-roman' | 'upper-roman'
+    Note : 
+    - text should be line break separated in order to apply list
+    - In order to apply list listType should not be none or undefined
+
+  `);
+
+export const TextComponentConfigSchema = z.object({
+  attrs: KonvaTextAttrsSchema,
+  zIndex: z.number(),
+});
+
+export const AddTextSchema = addComponentSchema.extend({
+  initialConfig:TextComponentConfigSchema.optional()
+});
+
+export const updateTextSchema = z.object({
+  slideId: z.string(),
+  nodeId: z.string(),
+  newConfig: TextComponentConfigSchema,
+  zIndexActions: z.enum(ZIndexActions).optional(),
+});
+
+// TEXT UNIQUE ENDED
+
+export const AddShapeSchema = addComponentSchema.extend({
+  shapeType: z
+    .number()
+    .min(1)
+    .max(2)
+    .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
+});
+
+export const AddImageSchema = addComponentSchema.extend({
+  // TODO override the initial config to serialisable image config to support formating
+});
+
+
+export const RemoveSlideSchema = z.object({
+  slideId: z.string(),
 });
