@@ -31,6 +31,7 @@
     "ollama": "^0.6.3",
     "pptxgenjs": "^4.0.1",
     "rxjs": "~7.8.0",
+    "three": "^0.169.0",
     "tslib": "^2.3.0",
     "zod": "^4.4.3",
     "zone.js": "~0.14.10"
@@ -40,6 +41,7 @@
     "@angular/cli": "^18.2.11",
     "@angular/compiler-cli": "^18.2.0",
     "@types/jasmine": "~5.1.0",
+    "@types/three": "^0.169.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
