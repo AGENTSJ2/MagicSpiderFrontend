@@ -188,7 +188,12 @@
             (cdkDropListDropped)="dropSlide($event)"
           >
             @for (item of presentation.slides; track item.slideId) {
-              <div class="slide-prev" cdkDrag (click)="selectSlide(item)">
+              <div
+                class="slide-prev"
+                cdkDrag
+                [cdkDragStartDelay]="{ touch: 250, mouse: 0 }"
+                (click)="selectSlide(item)"
+              >
                 <div class="slide-prev-placeholder" *cdkDragPlaceholder></div>
                 <ng-container *ngIf="slideImages.get(item.slideId) as image">
                   <img [src]="image" [alt]="$index" />

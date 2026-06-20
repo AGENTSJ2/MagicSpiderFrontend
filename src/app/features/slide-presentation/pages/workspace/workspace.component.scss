@@ -3,7 +3,8 @@
   height: 100vh;
 
   .nav {
-    height: 62px;
+    min-height: 62px;
+    height: fit-content;
     padding: 0px 20px;
     width: 100%;
     background-color: white;
