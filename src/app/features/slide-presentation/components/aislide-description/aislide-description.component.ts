@@ -135,17 +135,11 @@ export class AISlideDescriptionComponent {
             if (this.phase !== StreamPhase.thinking) {
               this.phase = StreamPhase.thinking;
             }
-            this.thinkingBoxElement?.nativeElement.scrollTo({
-              top: this.thinkingBoxElement.nativeElement.scrollHeight,
-              behavior: 'smooth',
-            });
+            this.scrollContOnValue(this.thinkingBoxElement?.nativeElement)
           } else if (event.action === 'content') {
             this.phase = StreamPhase.content;
             this.workspaceController.scratchBookContent += event.message;
-            this.genContentElement?.nativeElement.scrollTo({
-              top: this.genContentElement.nativeElement.scrollHeight,
-              behavior: 'smooth',
-            });
+            this.scrollContOnValue(this.genContentElement?.nativeElement)
           }
           this.cdr.detectChanges();
         },
@@ -167,11 +161,29 @@ export class AISlideDescriptionComponent {
       this.errorMessage =
         err instanceof Error ? err.message : 'Failed to start generation.';
       this.cdr.detectChanges();
+      console.log(err);
+      
     } finally {
       this.problemStatement = '';
     }
   }
+  scrollContOnValue(el:any) {
 
+    if (!el) {
+      return;
+    }
+
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+
+    const threshold = 100; // px
+
+    if (distanceFromBottom <= threshold) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }
   // ── Copy ──────────────────────────────────────────────────────────────────
 
   copyContent(): void {
@@ -186,6 +198,7 @@ export class AISlideDescriptionComponent {
   }
 
   handleInvokeMagicSpider() {
+    this.workspaceController.attachScratchBook = true;
     this.workspaceController.showMagicSpider();
     this.close.emit(true);
   }

@@ -10,70 +10,92 @@ import { Subscription } from 'rxjs';
   templateUrl: './magic-spider-assistant.component.html',
   styleUrl: './magic-spider-assistant.component.scss',
 })
-export class MagicSpiderAssistantComponent implements OnDestroy{
+export class MagicSpiderAssistantComponent implements OnDestroy {
   thinkingText = '';
-  contentText =  '';
+  contentText = '';
   error = '';
-  userComment:string = "";
+  userComment: string = '';
   @ViewChild('thinkingBox')
   thinkingBoxElement!: ElementRef;
   AgentState = AgentState;
-  agentSub?:Subscription;
-  attachScratchBook:boolean = false;
+  agentSub?: Subscription;
+  
 
   get defModel(): Model | undefined {
     return this.geminiService.getModel('assistant');
   }
 
-  constructor(public workspaceController: WorkspaceController,private geminiService:GeminiService,private agentService:LLM_Agents) {
+  constructor(
+    public workspaceController: WorkspaceController,
+    private geminiService: GeminiService,
+    private agentService: LLM_Agents,
+  ) {
     this.agentSub = agentService.magicSpiderEventStream.subscribe((ev) => {
       switch (ev.action) {
         case AgentState.thinking:
           this.thinkingText += ev.message;
-          this.thinkingBoxElement?.nativeElement.scrollTo({
-            top: this.thinkingBoxElement.nativeElement.scrollHeight,
-            behavior: 'smooth',
-          });
+          this.scrollThinkingContOnValue();
           break;
         case AgentState.function:
           this.thinkingText += `\nTool Call : ${ev.functionCall?.name}\n`;
+          this.scrollThinkingContOnValue();
           break;
         case AgentState.content:
           this.contentText = ev.message;
+          this.scrollThinkingContOnValue();
           break;
-        case AgentState.done :
-          this.thinkingText = "";
-          break
+        case AgentState.done:
+          this.thinkingText = '';
+          break;
         case AgentState.error:
-          this.thinkingText = "";
-          this.error = ev.message;          
-          break
+          this.thinkingText = '';
+          this.error = ev.message;
+          break;
       }
     });
   }
-  
-  isAgentIntractable(){
-    return this.agentService.InvokeEnabledStages.includes(this.agentService.magicSpiderState);
+  scrollThinkingContOnValue() {
+    const el = this.thinkingBoxElement?.nativeElement;
+
+    if (!el) {
+      return;
+    }
+
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+
+    const threshold = 100; // px
+
+    if (distanceFromBottom <= threshold) {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   }
-  isAgentInMotion()
-  {
-    return this.agentService.AgentInActionStages.includes(this.agentService.magicSpiderState);
+  isAgentIntractable() {
+    return this.agentService.InvokeEnabledStages.includes(
+      this.agentService.magicSpiderState,
+    );
+  }
+  isAgentInMotion() {
+    return this.agentService.AgentInActionStages.includes(
+      this.agentService.magicSpiderState,
+    );
   }
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
   }
 
-  startMagicSpider()
-  {
-    if(this.isAgentIntractable())
-    {
+  startMagicSpider() {
+    if (this.isAgentIntractable()) {
       this.agentService.triggerMagicSpider({
-        slideContent:this.attachScratchBook ?this.workspaceController.scratchBookContent : '',
-        presentation:this.workspaceController.activePresentation!,
-        userComment:this.userComment,
-      })
-    }else
-    {
+        slideContent: this.workspaceController.attachScratchBook
+          ? this.workspaceController.scratchBookContent
+          : '',
+        presentation: this.workspaceController.activePresentation!,
+        userComment: this.userComment,
+      });
+    } else {
       this.agentService.InterruptMagicSpider();
     }
   }

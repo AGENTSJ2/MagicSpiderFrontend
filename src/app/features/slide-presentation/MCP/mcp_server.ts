@@ -69,16 +69,16 @@ export class MagicSpiderServer extends McpServer {
       },
       async (args)=>this.mcpActions.updateText(args)
     );
-    this.registerTool(
-      'addImage',
-      {
-        title: 'addImage',
-        description:
-          'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
-        inputSchema: AddImageSchema,
-      },
-      async (args)=>this.mcpActions.addImage(args)
-    );
+    // this.registerTool(
+    //   'addImage',
+    //   {
+    //     title: 'addImage',
+    //     description:
+    //       'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
+    //     inputSchema: AddImageSchema,
+    //   },
+    //   async (args)=>this.mcpActions.addImage(args)
+    // );
     this.registerTool(
       'updateImage',
       {

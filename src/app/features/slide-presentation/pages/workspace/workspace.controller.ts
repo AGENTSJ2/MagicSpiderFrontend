@@ -16,8 +16,8 @@ export class WorkspaceController {
   showSlideDescription: boolean = false;
   showToolBox: boolean = false;
   showImageToolBox:boolean = false;
+  attachScratchBook: boolean = true;
   constructor(
-    private agentService: LLM_Agents,
     private presentationService: PresentationService,
     private message: NzMessageService,
     private presentationContext: ActivePresentationContext,

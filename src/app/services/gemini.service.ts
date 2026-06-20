@@ -182,18 +182,20 @@ export class GeminiService {
     abortController?: AbortController,
   ) {
     const gemTools = this.getGeminiTools(tools ?? []);
+    const systemInstruction = request.messages
+          ?.filter((m) => m.role === 'system')
+          .map((m) => m.content)
+          .join('\n');
+    const otherMessages = request.messages?.filter((m)=>m.role!=='system');
     const stream = await this.requireClient().models.generateContentStream({
       model: request.model ?? this.ModelName,
-      contents: (request.messages ?? []).map((msg) => ({
+      contents: (otherMessages ?? []).map((msg) => ({
         role: msg.role === 'assistant' ? 'model' : msg.role,
         thought: msg.thinking != undefined,
         parts: [{ text: msg.content }],
       })),
       config: {
-        systemInstruction: request.messages
-          ?.filter((m) => m.role === 'system')
-          .map((m) => m.content)
-          .join('\n'),
+        systemInstruction: systemInstruction,
         tools: gemTools,
         abortSignal: abortController?.signal,
       },

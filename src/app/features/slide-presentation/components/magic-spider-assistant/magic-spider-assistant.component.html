@@ -1,70 +1,51 @@
 <div class="parent h-100 d-flex flex-column">
   <div class="flex-fill">
+    @if (isAgentIntractable()) {
+    <div class="greet-section">
+      <div class="greet-header">Hello There..</div>
+      <div class="greetBox">Need help creating a presentation? I can help you design clean, professional slides. 😊😊
+      </div>
+    </div>
+    } @else if(isAgentInMotion()) {
+    <div class="thinking-section">
+      <div class="thinking-header">
+        <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+        <span class="thinking-label">Thinking...</span>
+      </div>
+      <div class="thinking-box" #thinkingBox>
+        <pre class="thinking-text">{{ thinkingText }}<span class="cursor">▌</span></pre>
+      </div>
+    </div>
+    }
     <div class="d-flex justify-content-center align-items-center greet-cont">
       <video autoplay muted playsinline>
         <source src="videos/robot-talking.mp4" type="video/mp4" />
       </video>
     </div>
-    @if (isAgentIntractable()) {
-      <div class="greet-section">
-        <div class="greet-header">Hello There..</div>
-        <div class="greetBox">Need help creating a presentation? I can help you design clean, professional slides. 😊😊</div>
-      </div>
-    } @else if(isAgentInMotion()) {
-      <div class="thinking-section">
-        <div class="thinking-header">
-          <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
-          <span class="thinking-label">Thinking...</span>
-        </div>
-        <div class="thinking-box" #thinkingBox>
-          <pre
-            class="thinking-text">{{ thinkingText }}<span class="cursor">▌</span></pre>
-        </div>
-      </div>
-    }
   </div>
   <div class="d-flex gap-2">
     <div class="prompt-area w-100 d-flex">
       <div class="promt-control">
         <div class="flex-fill justify-content-center align-items-center span-cont">
           @if (userComment.trim().length == 0) {
-            <span (click)="promptspan.focus()" class="prmpt-place"
-              >Ask me to edit slides for you..</span
-            >
+          <span (click)="promptspan.focus()" class="prmpt-place">Ask me to edit slides for you..</span>
           }
-          <span
-            [(ngModel)]="userComment"
-            contentEditableModel
-            contenteditable="true"
-            placeholder="Ask me to edit slides for you.."
-            #promptspan
-            class="userComment"
-          ></span>
+          <span [(ngModel)]="userComment" contentEditableModel contenteditable="true"
+            placeholder="Ask me to edit slides for you.." #promptspan class="userComment"></span>
         </div>
-        <div
-          class="d-flex mt-2 gap-3"
-          [style.pointer-events]="isAgentIntractable() ? 'auto' : 'none'"
-        >
-          <div
-            class="context-chip user-select-none"
-            (click)="attachScratchBook = !attachScratchBook"
-            [ngClass]="{ attached: attachScratchBook }"
-          >
-            <i
-              class="fi fi-rr-clip d-flex justify-content-center align-items-center"
-            ></i>
+        <div class="d-flex mt-2 gap-3" [style.pointer-events]="isAgentIntractable() ? 'auto' : 'none'">
+          <div class="context-chip user-select-none" (click)="workspaceController.attachScratchBook= !workspaceController.attachScratchBook"
+            [ngClass]="{ attached: workspaceController.attachScratchBook}">
+            <i class="fi fi-rr-clip d-flex justify-content-center align-items-center"></i>
             <p class="mb-0">
               {{
-                attachScratchBook
-                  ? "Scratch Book Attached"
-                  : "Attach Scratch Book"
+              workspaceController.attachScratchBook
+              ? "Scratch Book Attached"
+              : "Attach Scratch Book"
               }}
             </p>
           </div>
-          <div
-            class="model-chip user-select-none"
-            (click)="workspaceController.handleOpenSettings('ai')"
-          >
+          <div class="model-chip user-select-none" (click)="workspaceController.handleOpenSettings('ai')">
             {{ defModel?.displayName }}
           </div>
         </div>
@@ -73,13 +54,11 @@
         <button (click)="startMagicSpider()">
           @if(isAgentIntractable())
           {
-          <i
-            class="fi fi-sr-paper-plane-top d-flex justify-content-center align-items-center"
-          ></i>
+          <i class="fi fi-sr-paper-plane-top d-flex justify-content-center align-items-center"></i>
           }
           @else
           {
-            <i class="fi fi-rr-stop d-flex justify-content-center align-items-center"></i>
+          <i class="fi fi-rr-stop d-flex justify-content-center align-items-center"></i>
           }
         </button>
       </div>

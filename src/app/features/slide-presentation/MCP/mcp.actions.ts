@@ -104,14 +104,12 @@ export class McpActions {
     args: z.infer<typeof AddShapeSchema>,
   ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
-    const shape = shapeNodeService.addShapeNode({
-      eventBus: this.getPresentationOrThrow().eventBus,
-      slide: slide,
-      shapeType: args.shapeType,
-      config: this.normalizeInitialConfig(args.initialConfig),
-    });
+    const shape = slide.addShape({
+      shapeType:args.shapeType,
+      config:this.normalizeInitialConfig(args.initialConfig)
+    })
     const result: CallToolResult = {
-      content: [{ type: 'text', text: `Added shape ${shape.node._id}` }],
+      content: [{ type: 'text', text: `Added shape ${shape?.node?._id}` }],
     };
     return result;
   }
@@ -119,21 +117,19 @@ export class McpActions {
   async updateShape(
     args: z.infer<typeof updateSchema>,
   ): Promise<CallToolResult> {
-    const node = this.getComponentOrThrow<ShapeComponent>(args);
-    const configs = node.controller.getConfigsOfNode({
+    const shapeComponent = this.getComponentOrThrow<ShapeComponent>(args);
+    const configs = shapeComponent.controller.getConfigsOfNode({
       newConfig: {
         ...args.newConfig,
-        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
+        zIndex: args.newConfig.zIndex ?? shapeComponent.node.zIndex(),
       },
     });
-
-    const shape = shapeNodeService.updateShapeNode({
-      node: node.node,
-      config: configs.currentConfig,
-      zIndexActions: args.zIndexActions,
-    });
+    shapeComponent.updateComponent({
+      newConfig:configs.currentConfig,
+      zIndexActions:args.zIndexActions
+    })
     const result: CallToolResult = {
-      content: [{ type: 'text', text: `Updated shape ${shape?._id}` }],
+      content: [{ type: 'text', text: `Updated shape ${shapeComponent?.node?._id}` }],
     };
     return result;
   }
@@ -144,7 +140,7 @@ export class McpActions {
     const removed = this.removeComponent(args);
     return {
       content: [
-        { type: 'text', text: `Removed component of id ${removed.node._id}` },
+        { type: 'text', text: `Removed component of id ${removed?.node?._id}` },
       ],
     };
   }
@@ -163,92 +159,77 @@ export class McpActions {
         initialConfig.attrs.numberStyle,
       );
     }
-    const text = textNodeService.addTextNode({
-      eventBus: this.getPresentationOrThrow().eventBus,
-      slide,
-      config: initialConfig,
-    });
+    const text = slide.addText({
+      config:initialConfig
+    })
     return {
-      content: [{ type: 'text', text: `Added text ${text?.node._id}` }],
+      content: [{ type: 'text', text: `Added text ${text?.node?._id}` }],
     };
   }
 
   async updateText(
     args: z.infer<typeof updateTextSchema>,
   ): Promise<CallToolResult> {
-    const node = this.getComponentOrThrow<TextComponent>(args);
-    const configs = node.controller.getConfigsOfNode({
+    const textComponent = this.getComponentOrThrow<TextComponent>(args);
+    const configs = textComponent.controller.getConfigsOfNode({
       newConfig: {
         ...args.newConfig,
-        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
+        zIndex: args.newConfig.zIndex ?? textComponent.node.zIndex(),
       },
     });
     if (configs.currentConfig.text) {
-      configs.currentConfig.text =getFormattedText(
+      configs.currentConfig.text = getFormattedText(
         configs.currentConfig.attrs.text,
         configs.currentConfig.attrs.listType,
         configs.currentConfig.attrs.bulletStyle,
         configs.currentConfig.attrs.numberStyle,
       );
     }
-    const text = textNodeService.updateTextNode({
-      node: node.node,
-      config: configs.currentConfig,
-      zIndexActions: args.zIndexActions,
-    });
+    const text = textComponent.updateComponent({
+      newConfig:configs.currentConfig,
+      zIndexActions:args.zIndexActions
+    })
     return {
-      content: [{ type: 'text', text: `Updated text ${text?._id}` }],
+      content: [{ type: 'text', text: `Updated text ${text?.node?._id}` }],
     };
   }
 
   // Image
-
   async addImage(
     args: z.infer<typeof AddImageSchema>,
   ): Promise<CallToolResult> {
-    const slide = this.getSlideOrThrow(args.slideId);
-    const image = imageNodeService.addImageNode({
-      eventBus: this.getPresentationOrThrow().eventBus,
-      slide,
-      config: { attrs: {}, zIndex: 0 },
-    });
-    return {
-      content: [{ type: 'text', text: `Added image ${image.node._id}` }],
-    };
+    throw Error("Not Implemented");
   }
 
   updateImage(args: z.infer<typeof updateSchema>): CallToolResult {
-    const node = this.getComponentOrThrow<ImageComponent>(args);
-    const configs = node.controller.getConfigsOfNode({
+    const imageComponent = this.getComponentOrThrow<ImageComponent>(args);
+    const configs = imageComponent.controller.getConfigsOfNode({
       newConfig: {
         ...args.newConfig,
-        zIndex: args.newConfig.zIndex ?? node.node.zIndex(),
+        zIndex: args.newConfig.zIndex ?? imageComponent.node.zIndex(),
       },
     });
-    const image = imageNodeService.updateImageNode({
-      node: node.node,
-      currentConfig: configs.currentConfig,
-      zIndexActions: args.zIndexActions,
+    imageComponent.updateComponent({
+      newConfig:configs.currentConfig,
+      zIndexActions:args.zIndexActions
     });
     return {
-      content: [{ type: 'text', text: `Updated image ${image?._id}` }],
+      content: [{ type: 'text', text: `Updated image ${imageComponent?.node?._id}` }],
     };
   }
 
   addSlide(): CallToolResult {
-    const slide = slideService.addSlide({
-      presentation: this.getPresentationOrThrow(),
-    });
+    const presentation = this.getPresentationOrThrow();
+    const slide = presentation.addSlide();
     return {
       content: [{ type: 'text', text: `Added slide ${slide?.slideId}` }],
     };
   }
 
   removeSlide(args: z.infer<typeof RemoveSlideSchema>): CallToolResult {
-    slideService.removeSlide({
-      presentation: this.getPresentationOrThrow(),
-      slideId: args.slideId,
-    });
+    const presentation = this.getPresentationOrThrow();
+    const slide = this.getSlideOrThrow(args.slideId);
+    presentation.removeSlide(slide);
     return {
       content: [{ type: 'text', text: `Removed slide ${args.slideId}` }],
     };
