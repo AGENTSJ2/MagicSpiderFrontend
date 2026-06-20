@@ -50,6 +50,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
         case AgentState.error:
           this.thinkingText = '';
           this.error = ev.message;
+          this.workspaceController.handleAgentError(ev.message);
           break;
       }
     });

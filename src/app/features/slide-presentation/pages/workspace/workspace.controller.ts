@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
+import { AgentStreamEvent, isApiKeyError, LLM_Agents } from '../../../../services/agents';
 import { Subject } from 'rxjs';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -74,6 +74,17 @@ export class WorkspaceController {
       const comp = modelRef.getContentComponent();
       comp.activeSection = select;
     }
+  }
+
+  // Handles errors surfaced by the agents. When the failure is caused by a
+  // missing or invalid API key, prompt the user and open AI Settings so they
+  // can add one. Returns true when the error was an API key error.
+  handleAgentError(error: unknown): boolean {
+    if (!isApiKeyError(error)) {
+      return false;
+    }
+    this.message.warning('An API key is required. Please add your API key in AI Settings.');
+    return true;
   }
 
   async exportPPT(presentation: Presentation) {

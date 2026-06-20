@@ -364,6 +364,27 @@ export interface AgentStreamEvent {
   message: string;
   functionCall?: any;
 }
+
+export function isApiKeyError(error: unknown): boolean {
+  const message = (
+    typeof error === 'string' ? error : (error as any)?.message ?? String(error ?? '')
+  ).toLowerCase();
+  if (!message) {
+    return false;
+  }
+  return [
+    'api key',
+    'api_key',
+    'api-key',
+    'api_key_invalid',
+    'permission_denied',
+    'permission denied',
+    'unauthenticated',
+    'unauthorized',
+    '401',
+    '403',
+  ].some((needle) => message.includes(needle));
+}
 export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {
   return {
     type: 'function',

@@ -99,6 +99,9 @@ export class AISlideDescriptionComponent {
           } else if (event.action === 'content') {
             this.workspaceController.scratchBookContent += event.message;
             this.scrollContOnValue(this.genContentElement?.nativeElement)
+          } else if (event.action === AgentState.error) {
+            this.errorMessage = event.message;
+            this.workspaceController.handleAgentError(event.message);
           }
           this.cdr.detectChanges();
         },
@@ -107,6 +110,7 @@ export class AISlideDescriptionComponent {
             err instanceof Error
               ? err.message
               : 'Stream error. Please try again.';
+          this.workspaceController.handleAgentError(err);
           this.cdr.detectChanges();
         },
         complete: () => {
