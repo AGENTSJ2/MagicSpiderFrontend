@@ -78,6 +78,10 @@ export class ImageListComponent implements OnDestroy {
     blobService.removeImage(item.id)
     this.loadImages();
   }
+  handleUpdateDescription(item:AppImage)
+  {
+    blobService.updateDescription(item.id, item.description ?? '');
+  }
   handleAddImage(appImage:AppImage)
   {
     this.presentation.getActiveSlide?.addImage({

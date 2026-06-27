@@ -44,9 +44,11 @@ export class LLM_Agents {
   ].join(' ');
 
   private readonly ImageGeneratorPrompt = [
-    'Generate a single high quality, presentation-ready image based on the user request.',
-    'The image should be clean, modern and visually appealing so it fits well inside a slide.',
-    'Prefer a transparent or simple background unless the user asks otherwise.',
+    'Generate a single high-quality visual based on the user request.',
+    'The output should be clear, professional, and suitable for presentations, documents, dashboards, or other user-facing content.',
+    'Use an appropriate visual style for the request (illustration, diagram, concept art, UI mockup, infographic, etc.).',
+    'Keep the composition clean and focused, with minimal unnecessary elements.',
+    'Prefer a transparent or simple background unless the user requests otherwise.',
   ].join(' ');
 
   constructor(
@@ -285,7 +287,7 @@ export class LLM_Agents {
         abortController,
       );
 
-      const appImage = blobService.addImage(image.dataUrl);
+      const appImage = blobService.addImage(image.dataUrl,image.text);
 
       this.imageGeneratorSubject.next({
         action: AgentState.content,

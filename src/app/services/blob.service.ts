@@ -4,9 +4,13 @@ import { Stores } from '../data/stores';
 export class BlobService {
   private readonly blobKeyPrefix = 'BLOB-';
   static readonly storeName = Stores.blobs;
+  static readonly descriptionStore = Stores.imageDescriptions;
 
   /** In-memory cache so freshly added blobs are readable before the async write settles. */
   private cache = new Map<string, string>();
+
+  /** In-memory cache of image descriptions, keyed by the same blob key. */
+  private descriptionCache = new Map<string, string>();
 
   /** Resolves once blobs from the legacy `MagicSpiderBlobs` DB have been imported. */
   private readonly migration: Promise<void>;
@@ -21,48 +25,81 @@ export class BlobService {
 
   async getAllImages(): Promise<AppImage[]> {
     await this.migration;
-    const [keys, values] = await Promise.all([
+    const [keys, values, descKeys, descValues] = await Promise.all([
       db.getAllKeys<IDBValidKey>(BlobService.storeName),
       db.getAll<string>(BlobService.storeName),
+      db.getAllKeys<IDBValidKey>(BlobService.descriptionStore),
+      db.getAll<string>(BlobService.descriptionStore),
     ]);
+    const descriptions = new Map<string, string>();
+    descKeys.forEach((key, index) => {
+      descriptions.set(String(key), descValues[index] ?? '');
+    });
     return keys.map((key, index) => {
       const id = String(key);
       const imageSrc = values[index] ?? '';
+      const description = descriptions.get(id) ?? '';
       this.cache.set(id, imageSrc);
-      return { id, imageSrc };
+      this.descriptionCache.set(id, description);
+      return { id, imageSrc, description };
     });
   }
 
-  addImage(image: string): AppImage {
+  addImage(image: string, description = ''): AppImage {
     const key = `${this.blobKeyPrefix}${this.generateKey()}`;
     this.cache.set(key, image);
     // Persist in the background; cache covers reads until the write settles.
     db.put(BlobService.storeName, key, image).catch((err) =>
       console.error('Failed to persist blob', key, err),
     );
+    if (description) {
+      this.updateDescription(key, description);
+    }
     return {
       id: key,
       imageSrc: image,
+      description,
     };
+  }
+
+  /** Set or clear the optional description stored alongside an image. */
+  updateDescription(key: string, description: string): void {
+    this.descriptionCache.set(key, description);
+    db.put(BlobService.descriptionStore, key, description).catch((err) =>
+      console.error('Failed to persist image description', key, err),
+    );
   }
 
   removeImage(key: string): void {
     this.cache.delete(key);
+    this.descriptionCache.delete(key);
     db.delete(BlobService.storeName, key).catch((err) =>
       console.error('Failed to remove blob', key, err),
+    );
+    db.delete(BlobService.descriptionStore, key).catch((err) =>
+      console.error('Failed to remove image description', key, err),
     );
   }
 
   async getImage(key: string): Promise<AppImage> {
     if (this.cache.has(key)) {
-      return { id: key, imageSrc: this.cache.get(key)! };
+      return {
+        id: key,
+        imageSrc: this.cache.get(key)!,
+        description: this.descriptionCache.get(key) ?? '',
+      };
     }
     await this.migration;
-    const imageSrc = (await db.get<string>(BlobService.storeName, key)) ?? '';
-    this.cache.set(key, imageSrc);
+    const [imageSrc, description] = await Promise.all([
+      db.get<string>(BlobService.storeName, key),
+      db.get<string>(BlobService.descriptionStore, key),
+    ]);
+    this.cache.set(key, imageSrc ?? '');
+    this.descriptionCache.set(key, description ?? '');
     return {
       id: key,
-      imageSrc,
+      imageSrc: imageSrc ?? '',
+      description: description ?? '',
     };
   }
 
@@ -121,4 +158,6 @@ export default blobService;
 export interface AppImage {
   id: string;
   imageSrc: string;
+  /** Optional, user-editable description stored in the `imageDescriptions` store. */
+  description?: string;
 }
