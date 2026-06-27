@@ -9,6 +9,7 @@ import { GenerateContentResponse } from '@google/genai';
 import type { AbortableAsyncIterator, ChatRequest, ToolCall } from 'ollama';
 import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
 import { DesignPrinciplesPrompt } from '../features/slide-presentation/MCP/prompts/designPrinciples';
+import blobService from './blob.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -42,6 +43,12 @@ export class LLM_Agents {
     DesignPrinciplesPrompt,
   ].join(' ');
 
+  private readonly ImageGeneratorPrompt = [
+    'Generate a single high quality, presentation-ready image based on the user request.',
+    'The image should be clean, modern and visually appealing so it fits well inside a slide.',
+    'Prefer a transparent or simple background unless the user asks otherwise.',
+  ].join(' ');
+
   constructor(
     private chatService: GeminiService,
     private mcpService: McpHub,
@@ -52,6 +59,9 @@ export class LLM_Agents {
     });
     this.contentCreatorStream.subscribe((event) => {
       this.contentCreatorState = event.action;
+    });
+    this.imageGeneratorStream.subscribe((event) => {
+      this.imageGeneratorState = event.action;
     });
   }
 
@@ -230,6 +240,88 @@ export class LLM_Agents {
     this.interruptContentCreatorSubject.next(true);
   }
 
+  private imageGeneratorSubject: Subject<AgentStreamEvent> = new Subject();
+  private interruptImageGeneratorSubject: Subject<boolean> = new Subject();
+  private imageInterruptSub?: Subscription;
+  imageGeneratorStream: Observable<AgentStreamEvent> =
+    this.imageGeneratorSubject.asObservable();
+  imageGeneratorState: AgentState = AgentState.idle;
+
+  private async ImageGeneratorAgent(params: {
+    prompt: string;
+    presentation: Presentation;
+  }) {
+    if (params.prompt.trim().length == 0) {
+      return;
+    }
+    const abortController = new AbortController();
+    try {
+      this.imageGeneratorSubject.next({
+        action: AgentState.invoked,
+        message: 'Image generator has been invoked',
+      });
+
+      const activeSlide = params.presentation.getActiveSlide;
+      if (!activeSlide) {
+        throw new Error('Select a slide before generating an image.');
+      }
+
+      this.imageInterruptSub?.unsubscribe();
+      this.imageInterruptSub = this.interruptImageGeneratorSubject.subscribe(
+        (ev) => {
+          if (ev) {
+            abortController.abort();
+          }
+        },
+      );
+
+      this.imageGeneratorSubject.next({
+        action: AgentState.thinking,
+        message: 'Generating image...',
+      });
+
+      const image = await this.chatService.generateImage(
+        [this.ImageGeneratorPrompt, params.prompt].join('\n'),
+        abortController,
+      );
+
+      const appImage = blobService.addImage(image.dataUrl);
+
+      this.imageGeneratorSubject.next({
+        action: AgentState.content,
+        message: image.text || 'Image added to the active slide.',
+        attachment:appImage
+      });
+      this.imageGeneratorSubject.next({
+        action: AgentState.done,
+        message: 'Completed',
+      });
+    } catch (error) {
+      this.imageGeneratorSubject.next({
+        action: AgentState.error,
+        message: error?.toString() ?? 'Unknown error',
+      });
+    } finally {
+      this.imageInterruptSub?.unsubscribe();
+    }
+  }
+
+  triggerImageGenerator(params: {
+    prompt: string;
+    presentation: Presentation;
+  }) {
+    if (this.AgentInActionStages.includes(this.imageGeneratorState)) {
+      this.interruptImageGenerator();
+    }
+    if (this.InvokeEnabledStages.includes(this.imageGeneratorState)) {
+      this.ImageGeneratorAgent(params);
+    }
+  }
+
+  interruptImageGenerator() {
+    this.interruptImageGeneratorSubject.next(true);
+  }
+
   private magicSpiderEvent: Subject<AgentStreamEvent> = new Subject();
   private magicSpiderInterrupt: Subject<boolean> = new Subject();
   private spiderInterruptSub?:Subscription;
@@ -363,6 +455,7 @@ export interface AgentStreamEvent {
   action: AgentState;
   message: string;
   functionCall?: any;
+  attachment?:any;
 }
 
 export function isApiKeyError(error: unknown): boolean {

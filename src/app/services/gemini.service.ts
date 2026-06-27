@@ -3,19 +3,26 @@ import {
   GenerateContentParameters,
   GenerateContentResponse,
   GoogleGenAI,
+  Modality,
   Model,
   Part,
 } from '@google/genai';
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
-export type AgentKey = 'content' | 'assistant';
+export type AgentKey = 'content' | 'assistant' | 'image';
+
+export interface GeneratedImage {
+  dataUrl: string;
+  text: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class GeminiService {
   private readonly ModelName: string = 'gemma-4-31b-it';
+  private readonly DefaultImageModel: string = 'gemini-2.5-flash-image';
   private gemini?: GoogleGenAI;
   private _apiKey?: string;
   readonly availableModels: Model[] = [];
@@ -23,10 +30,12 @@ export class GeminiService {
   private readonly _models: Record<AgentKey, Model | undefined> = {
     content: undefined,
     assistant: undefined,
+    image: undefined,
   };
   private readonly modelKeys: Record<AgentKey, string> = {
     content: 'CONTENT-MODEL',
     assistant: 'ASSISTANT-MODEL',
+    image: 'IMAGE-MODEL',
   };
   private readonly apiKeyStorageKey = 'GEMINI-API-KEY';
   private readonly legacyDefModelKey = 'DEF-MODEL';
@@ -201,6 +210,54 @@ export class GeminiService {
       },
     });
     return { stream: stream, provider: 'google' };
+  }
+
+  /**
+   * Generates an image from a text prompt using Gemini's image generation
+   * models (e.g. `gemini-2.5-flash-image`). The model returns the image inline
+   * as base64 data, which we wrap in a data URL the rest of the app can store
+   * as a blob or render directly.
+   */
+  async generateImage(
+    prompt: string,
+    abortController?: AbortController,
+  ): Promise<GeneratedImage> {
+    const model =
+      this.getModel('image')?.name ?? this.DefaultImageModel;
+    const response = await this.requireClient().models.generateContent({
+      model,
+      contents: prompt,
+      config: {
+        responseModalities: [Modality.IMAGE, Modality.TEXT],
+        abortSignal: abortController?.signal,
+      },
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
+    let text = '';
+    let image: GeneratedImage | undefined;
+    for (const part of parts) {
+      if (part.text) {
+        text += part.text;
+      }
+      if (part.inlineData?.data && !image) {
+        const mimeType = part.inlineData.mimeType ?? 'image/png';
+        image = {
+          dataUrl: `data:${mimeType};base64,${part.inlineData.data}`,
+          text: '',
+        };
+      }
+    }
+
+    if (!image) {
+      throw new Error(
+        text
+          ? `Image generation returned no image. Model said: ${text}`
+          : 'Image generation returned no image data.',
+      );
+    }
+    image.text = text;
+    return image;
   }
 }
 

@@ -129,6 +129,25 @@
           ></nz-option>
         </nz-select>
       </div>
+
+      <div class="settings__field">
+        <label>Image Generator model</label>
+        <nz-select
+          [(ngModel)]="imageModelName"
+          (ngModelChange)="onImageModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzAllowClear
+          nzPlaceHolder="Defaults to gemini-2.5-flash-image"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
     </ng-container>
   </section>
 </div>

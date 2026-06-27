@@ -34,6 +34,7 @@ export class SettingsComponent implements OnInit {
   models: Model[] = [];
   contentModelName?: string;
   assistantModelName?: string;
+  imageModelName?: string;
   loadingModels = false;
   apiKey = '';
   apiKeyError = '';
@@ -51,6 +52,7 @@ export class SettingsComponent implements OnInit {
       this.apiKey = this.geminiService.apiKey ?? '';
       this.contentModelName = this.geminiService.getModel('content')?.name;
       this.assistantModelName = this.geminiService.getModel('assistant')?.name;
+      this.imageModelName = this.geminiService.getModel('image')?.name;
       this.models = await this.geminiService.loadModels();
     } catch (error) {
       console.error(error);
@@ -85,5 +87,10 @@ export class SettingsComponent implements OnInit {
   onAssistantModelChange(modelName: string): void {
     const model = this.models.find((m) => m.name === modelName);
     this.geminiService.updateModel('assistant', model);
+  }
+
+  onImageModelChange(modelName: string): void {
+    const model = this.models.find((m) => m.name === modelName);
+    this.geminiService.updateModel('image', model);
   }
 }

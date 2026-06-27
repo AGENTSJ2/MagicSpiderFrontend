@@ -1,4 +1,23 @@
 <div class="d-flex flex-column h-100">
+  <div class="img-generate mb-3">
+    <textarea
+      class="generate-prompt"
+      rows="2"
+      placeholder="Describe an image to generate with Gemini…"
+      [(ngModel)]="imagePrompt"
+      [disabled]="generating"
+    ></textarea>
+    <button
+      type="button"
+      class="generate-btn"
+      [disabled]="generating || !imagePrompt.trim()"
+      (click)="generateImage()"
+    >
+      {{ generating ? 'Generating…' : 'Generate Image' }}
+    </button>
+    <p class="generate-error" *ngIf="generateError">{{ generateError }}</p>
+  </div>
+
   <div class="img-upload mb-3">
     <div class="upload-input-display" (click)="file.click()">
       <p class="mb-0">Upload Image</p>
