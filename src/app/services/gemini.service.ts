@@ -195,7 +195,7 @@ export class GeminiService {
           ?.filter((m) => m.role === 'system')
           .map((m) => m.content)
           .join('\n');
-    const otherMessages = request.messages?.filter((m)=>m.role!=='system');
+    const otherMessages = request.messages?.filter((m)=>m.role!=='system') ?? [];
     const stream = await this.requireClient().models.generateContentStream({
       model: request.model ?? this.ModelName,
       contents: (otherMessages ?? []).map((msg) => ({

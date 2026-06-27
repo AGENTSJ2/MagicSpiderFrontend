@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
 import { Presentation } from '../../features/slide-presentation/domain/canvasModels/presenatation.model';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',

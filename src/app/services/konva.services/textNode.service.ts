@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
 import {
   ComponentConfig,

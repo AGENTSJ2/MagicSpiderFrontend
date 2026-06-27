@@ -136,16 +136,16 @@ export class LLM_Agents {
 
   private async invokeTools(toolCalls: ToolCall[]): Promise<Message> {
     const ackMessage: Message = {
-      role: 'system',
+      role: 'assistant',
       content: '',
     };
     for (let tool of toolCalls) {
       try {
-        await this.mcpService.callTool({
+        const result = await this.mcpService.callTool({
           toolName: tool.function.name,
           args: tool.function.arguments,
         });
-        ackMessage.content += `Successfully called[${tool.function.name}]\n`;
+        ackMessage.content += `Successfully called[${tool.function.name}] result : ${JSON.stringify(result.content)} \n`;
       } catch (error) {
         ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
         console.log(error);
@@ -372,11 +372,14 @@ export class LLM_Agents {
         const slideJson = JSON.stringify(
           params.presentation.slides.map((sl) => sl.toJson()),
         );
+        const newMessages = [
+          ...messages
+        ]
         const response = await this.chatService.streamChat(
           {
             model: this.chatService.getModel('assistant')?.name,
             messages: [
-              ...messages,
+              ...newMessages,
               {
                 role: 'user',
                 content: `Latest Slide JSON ${slideJson}`,

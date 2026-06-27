@@ -81,7 +81,6 @@ export const updateTextSchema = z.object({
 });
 
 // TEXT UNIQUE ENDED
-
 export const AddShapeSchema = addComponentSchema.extend({
   shapeType: z
     .number()
@@ -90,8 +89,27 @@ export const AddShapeSchema = addComponentSchema.extend({
     .describe('Shape type: 1 = CIRCLE, 2 = RECT'),
 });
 
+// Image
+export const KonvaImageAttrsSchema = z
+  .record(z.string(), KonvaAttrValueSchema)
+  .describe(`
+    Partial configuration containing only the Konva Image attributes that should be updated.
+
+    Standard Konva Image attributes include:
+    x, y, width, height, fill, stroke, rotation, opacity,
+    scaleX, scaleY, fontSize, fontFamily, fontStyle,
+    align, verticalAlign, lineHeight, padding, wrap, ellipsis, etc.
+
+    This Schema Also include an mandatory imageId , 
+    This is the id of image available in application.
+    call "available-images" resource call to get more info in case of unavailable imageId 
+  `);
+export const ImageComponentConfigSchema = z.object({
+  attrs: KonvaImageAttrsSchema,
+  zIndex: z.number(),
+});
 export const AddImageSchema = addComponentSchema.extend({
-  // TODO override the initial config to serialisable image config to support formating
+  initialConfig:ImageComponentConfigSchema
 });
 
 

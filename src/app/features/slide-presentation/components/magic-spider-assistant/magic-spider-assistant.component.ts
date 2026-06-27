@@ -37,7 +37,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
           this.scrollThinkingContOnValue();
           break;
         case AgentState.function:
-          this.thinkingText += `\nTool Call : ${ev.functionCall?.name}\n`;
+          this.thinkingText += `\nCalling Tool : ${ev.functionCall?.name}\n`;
           this.scrollThinkingContOnValue();
           break;
         case AgentState.content:

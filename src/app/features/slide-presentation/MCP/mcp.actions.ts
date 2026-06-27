@@ -1,21 +1,14 @@
-import { ShapeConfig } from 'konva/lib/Shape';
 import { Presentation } from '../domain/canvasModels/presenatation.model';
 import {
   ComponentConfig,
-  ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import ShapeComponent, {
-  ShapeType,
 } from '../domain/canvasModels/shapeComponent.model';
 import { InternalMcpError } from './mcp.erros';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import {
   ImageComponent,
-  SerializableImageConfig,
 } from '../domain/canvasModels/imageComponent';
-import { imageNodeService } from '../../../services/konva.services/image.service';
-import { textNodeService } from '../../../services/konva.services/textNode.service';
-import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
 import { slideService } from '../../../services/konva.services/slide.service';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
@@ -33,6 +26,7 @@ import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { Injectable } from '@angular/core';
 import { ActivePresentationContext } from '../services/active-presentation.context';
 import { getFormattedText } from '../../../core/utilities';
+import blobService from '../../../services/blob.service';
 
 @Injectable({
   providedIn: 'root',
@@ -144,8 +138,8 @@ export class McpActions {
       ],
     };
   }
-  // Text
 
+  // Text
   async addText(args: z.infer<typeof AddTextSchema>): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
     const initialConfig = this.normalizeInitialConfig(
@@ -198,7 +192,17 @@ export class McpActions {
   async addImage(
     args: z.infer<typeof AddImageSchema>,
   ): Promise<CallToolResult> {
-    throw Error("Not Implemented");
+    const slide = this.getSlideOrThrow(args.slideId);
+    const initialConfig = this.normalizeInitialConfig(
+      args.initialConfig,
+    ) as any;
+    const image = slide.addImage({
+      config:initialConfig
+    })
+    const result: CallToolResult = {
+      content: [{ type: 'text', text: `Added Image ${image?.node?._id}` }],
+    };
+    return result;
   }
 
   updateImage(args: z.infer<typeof updateSchema>): CallToolResult {
@@ -232,6 +236,21 @@ export class McpActions {
     presentation.removeSlide(slide);
     return {
       content: [{ type: 'text', text: `Removed slide ${args.slideId}` }],
+    };
+  }
+
+  async getAvailableImageList():Promise<CallToolResult>
+  {
+    const list = await blobService.getAllImages();
+    const imgs = list.map((img)=> {
+      return {
+        id:img.id,
+        description:img.description
+      }
+    })
+    const text = JSON.stringify(imgs);
+    return {
+      content: [{ type: 'resource', resource: {uri:"magicspider://availableImages",text} }],
     };
   }
 }

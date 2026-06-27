@@ -16,7 +16,8 @@ import { Injectable } from '@angular/core';
 export class MagicSpiderServer extends McpServer {
   constructor(private mcpActions :McpActions) {
     super({ name: 'MagicSpiderServer', version: '1.0.0' });
-    this.registerTools()
+    this.registerTools();
+    this.registerResources();
   }
 
   registerTools() {
@@ -69,16 +70,16 @@ export class MagicSpiderServer extends McpServer {
       },
       async (args)=>this.mcpActions.updateText(args)
     );
-    // this.registerTool(
-    //   'addImage',
-    //   {
-    //     title: 'addImage',
-    //     description:
-    //       'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
-    //     inputSchema: AddImageSchema,
-    //   },
-    //   async (args)=>this.mcpActions.addImage(args)
-    // );
+    this.registerTool(
+      'addImage',
+      {
+        title: 'addImage',
+        description:
+          'Add a new image component to a slide. Creates an image node and inserts it onto the target slide.',
+        inputSchema: AddImageSchema,
+      },
+      async (args)=>this.mcpActions.addImage(args)
+    );
     this.registerTool(
       'updateImage',
       {
@@ -108,5 +109,15 @@ export class MagicSpiderServer extends McpServer {
       },
       async (args)=>this.mcpActions.removeSlide(args)
     );
+  }
+  
+  registerResources(){
+    this.registerTool(
+      "available-images",
+      {
+        description:"This is an resource provides the list of images available inside the application"
+      },
+      async () => this.mcpActions.getAvailableImageList()
+    )
   }
 }
