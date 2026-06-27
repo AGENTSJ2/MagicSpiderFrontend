@@ -1,14 +1,9 @@
 import { Presentation } from '../domain/canvasModels/presenatation.model';
-import {
-  ComponentConfig,
-} from '../domain/EventModels/presentationEvents.model';
-import ShapeComponent, {
-} from '../domain/canvasModels/shapeComponent.model';
+import { ComponentConfig } from '../domain/EventModels/presentationEvents.model';
+import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 import { InternalMcpError } from './mcp.erros';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
-import {
-  ImageComponent,
-} from '../domain/canvasModels/imageComponent';
+import { ImageComponent } from '../domain/canvasModels/imageComponent';
 import { slideService } from '../../../services/konva.services/slide.service';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
@@ -25,7 +20,7 @@ import { z } from 'zod';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types';
 import { Injectable } from '@angular/core';
 import { ActivePresentationContext } from '../services/active-presentation.context';
-import { getFormattedText } from '../../../core/utilities';
+import { getFormattedText, getImageDimensions } from '../../../core/utilities';
 import blobService from '../../../services/blob.service';
 
 @Injectable({
@@ -99,9 +94,9 @@ export class McpActions {
   ): Promise<CallToolResult> {
     const slide = this.getSlideOrThrow(args.slideId);
     const shape = slide.addShape({
-      shapeType:args.shapeType,
-      config:this.normalizeInitialConfig(args.initialConfig)
-    })
+      shapeType: args.shapeType,
+      config: this.normalizeInitialConfig(args.initialConfig),
+    });
     const result: CallToolResult = {
       content: [{ type: 'text', text: `Added shape ${shape?.node?._id}` }],
     };
@@ -119,11 +114,13 @@ export class McpActions {
       },
     });
     shapeComponent.updateComponent({
-      newConfig:configs.currentConfig,
-      zIndexActions:args.zIndexActions
-    })
+      newConfig: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
+    });
     const result: CallToolResult = {
-      content: [{ type: 'text', text: `Updated shape ${shapeComponent?.node?._id}` }],
+      content: [
+        { type: 'text', text: `Updated shape ${shapeComponent?.node?._id}` },
+      ],
     };
     return result;
   }
@@ -154,8 +151,8 @@ export class McpActions {
       );
     }
     const text = slide.addText({
-      config:initialConfig
-    })
+      config: initialConfig,
+    });
     return {
       content: [{ type: 'text', text: `Added text ${text?.node?._id}` }],
     };
@@ -180,9 +177,9 @@ export class McpActions {
       );
     }
     const text = textComponent.updateComponent({
-      newConfig:configs.currentConfig,
-      zIndexActions:args.zIndexActions
-    })
+      newConfig: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
+    });
     return {
       content: [{ type: 'text', text: `Updated text ${text?.node?._id}` }],
     };
@@ -197,8 +194,8 @@ export class McpActions {
       args.initialConfig,
     ) as any;
     const image = slide.addImage({
-      config:initialConfig
-    })
+      config: initialConfig,
+    });
     const result: CallToolResult = {
       content: [{ type: 'text', text: `Added Image ${image?.node?._id}` }],
     };
@@ -214,11 +211,13 @@ export class McpActions {
       },
     });
     imageComponent.updateComponent({
-      newConfig:configs.currentConfig,
-      zIndexActions:args.zIndexActions
+      newConfig: configs.currentConfig,
+      zIndexActions: args.zIndexActions,
     });
     return {
-      content: [{ type: 'text', text: `Updated image ${imageComponent?.node?._id}` }],
+      content: [
+        { type: 'text', text: `Updated image ${imageComponent?.node?._id}` },
+      ],
     };
   }
 
@@ -239,18 +238,27 @@ export class McpActions {
     };
   }
 
-  async getAvailableImageList():Promise<CallToolResult>
-  {
+  async getAvailableImageList(): Promise<CallToolResult> {
     const list = await blobService.getAllImages();
-    const imgs = list.map((img)=> {
-      return {
-        id:img.id,
-        description:img.description
-      }
-    })
+    const imgs: any[] = [];
+    for (const img of list) {
+      const {height , width } = await getImageDimensions(img.imageSrc);
+      imgs.push({
+        id: img.id,
+        description: img.description,
+        height: height,
+        width: width,
+      });
+    }
+   
     const text = JSON.stringify(imgs);
     return {
-      content: [{ type: 'resource', resource: {uri:"magicspider://availableImages",text} }],
+      content: [
+        {
+          type: 'resource',
+          resource: { uri: 'magicspider://availableImages', text },
+        },
+      ],
     };
   }
 }

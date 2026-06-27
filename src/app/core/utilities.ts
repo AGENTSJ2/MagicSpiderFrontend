@@ -5,6 +5,33 @@ export async function waitForMilliseconds(milliseconds: number) {
     }, milliseconds);
   });
 }
+export async function getImageDimensions(base64: string): Promise<{
+  width: number;
+  height: number;
+}> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = () => {
+      const dimensions = {
+        width: img.width,
+        height: img.height,
+      };
+
+      img.onload = null;
+      img.onerror = null;
+      img.src = "";
+
+      resolve(dimensions);
+    };
+
+    img.onerror = () => {
+      reject(new Error("Invalid image"));
+    };
+
+    img.src = base64;
+  });
+}
 
 export function getFormattedText(
   text = '',
