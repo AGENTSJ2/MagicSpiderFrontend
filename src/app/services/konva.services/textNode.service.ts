@@ -6,6 +6,7 @@ import {
 } from '../../features/slide-presentation/domain/EventModels/presentationEvents.model';
 import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
 import { Text, TextConfig } from 'konva/lib/shapes/Text';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
