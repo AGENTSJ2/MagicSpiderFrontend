@@ -3,7 +3,7 @@ import { Layer } from 'konva/lib/Layer';
 import { Rect } from 'konva/lib/shapes/Rect';
 import { Transformer } from 'konva/lib/shapes/Transformer';
 import { Stage } from 'konva/lib/Stage';
-import { DocumentConfiguration } from '../domain/models/documentConfiguration.model';
+import { DocumentConfiguration, Ratio } from '../domain/models/documentConfiguration.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
   PresentationEventStream,
@@ -103,9 +103,8 @@ export default class SlideController {
       const desiredHeight = this.DESIRED_SLIDE_HEIGHT;
       const desiredWidth =
         desiredHeight * (options.config.ratio.num / options.config.ratio.den);
-      const containerWidth = options.divElm.offsetWidth;
-      const containerHeight =
-        containerWidth * (options.config.ratio.den / options.config.ratio.num);
+
+      const {containerWidth , containerHeight} = this.getMaxPossibleDimensions(options.config.ratio);
       const xScaleFactor = containerWidth / desiredWidth;
       const yScaleFactor = containerHeight / desiredHeight;
 
@@ -125,7 +124,30 @@ export default class SlideController {
       this.resizeInProgress = false;
     }
   }
+  private getMaxPossibleDimensions(ratio:Ratio) {
 
+    let divMaxHeight = this.slide.containerDiv.offsetHeight;
+    let divMaxWidth = this.slide.containerDiv.offsetWidth;
+    
+    const CMB1_cw = divMaxWidth;
+    const CMB1_ch = (CMB1_cw / ratio.num) * ratio.den;
+
+    if( CMB1_ch <= divMaxHeight && CMB1_cw <= divMaxWidth) {
+      return {
+        containerWidth:CMB1_cw,
+        containerHeight:CMB1_ch,
+      }
+    }
+    
+    const CMB2_ch = divMaxHeight;
+    const CMB2_cw = (CMB2_ch / ratio.den) * ratio.num;
+
+    return {
+      containerWidth:CMB2_cw,
+      containerHeight:CMB2_ch,
+    }
+    
+  }
   isNodeSelected(node: Shape): boolean {
     return this.transformer.nodes().some((nd) => nd == node);
   }
