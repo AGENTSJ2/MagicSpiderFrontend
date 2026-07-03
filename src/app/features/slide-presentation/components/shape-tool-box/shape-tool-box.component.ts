@@ -62,7 +62,10 @@ export class ShapeToolBoxComponent implements OnChanges {
         gradientEnd: [attrs.fillLinearGradientColorStops?.at(3) ?? '#ff0000'],
         gradientOffset: [attrs.fillLinearGradientColorStops?.at(2) ?? 1],
         gradientWidth: [
-          attrs.fillLinearGradientEndPointX ?? attrs.width ?? 100,
+          attrs.fillLinearGradientEndPoint?.x ??
+            attrs.fillLinearGradientEndPointX ??
+            attrs.width ??
+            100,
         ],
       });
     } else {
@@ -84,7 +87,10 @@ export class ShapeToolBoxComponent implements OnChanges {
           gradientEnd: attrs.fillLinearGradientColorStops?.at(3) ?? '#ff0000',
           gradientOffset: attrs.fillLinearGradientColorStops?.at(2) ?? 1,
           gradientWidth:
-            attrs.fillLinearGradientEndPointX ?? attrs.width ?? 100,
+            attrs.fillLinearGradientEndPoint?.x ??
+            attrs.fillLinearGradientEndPointX ??
+            attrs.width ??
+            100,
         },
         {
           emitEvent: false,

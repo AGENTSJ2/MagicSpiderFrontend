@@ -25,18 +25,25 @@ export default class ShapeComponent implements ICanvasComponent {
     this.shapeType = init.shapeType!;
     this.node = init.node!;
     this.config = init.config!;
-    // ✅ Proper config object
-    const config = {
-      ...(this.config?.attrs ? this.config.attrs : {}),
-      x: init.config?.attrs.x ?? 0,
-      y: init.config?.attrs.y ?? 0,
-      width: init.config?.attrs.width ?? 100,
-      height: init.config?.attrs.height ?? 100,
-      fill: init.config?.attrs.fill ?? 'white',
-      stroke: init.config?.attrs.stroke ?? 'black',
-      strokeWidth: init.config?.attrs.strokeWidth ?? 1,
+    const attrs = this.config?.attrs ?? {};
+    const hasGradientFill = attrs.fillLinearGradientColorStops != null;
+    const isRadiusSized = (attrs as any).radius != null;
+
+    const config: ShapeConfig = {
+      ...attrs,
+      x: attrs.x ?? 0,
+      y: attrs.y ?? 0,
+      stroke: attrs.stroke ?? 'black',
+      strokeWidth: attrs.strokeWidth ?? 1,
       draggable: true,
     };
+    if (!isRadiusSized) {
+      config.width = attrs.width ?? 100;
+      config.height = attrs.height ?? 100;
+    }
+    if (!hasGradientFill) {
+      config.fill = attrs.fill ?? 'white';
+    }
 
     switch (init.shapeType) {
       case ShapeType.CIRCLE:
