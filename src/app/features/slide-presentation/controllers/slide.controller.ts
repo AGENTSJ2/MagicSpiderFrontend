@@ -126,20 +126,20 @@ export default class SlideController {
   }
   private getMaxPossibleDimensions(ratio:Ratio) {
 
-    let divMaxHeight = this.slide.containerDiv.offsetHeight;
-    let divMaxWidth = this.slide.containerDiv.offsetWidth;
+    let divHeight = this.slide.containerDiv.offsetHeight || 100;
+    let divWidth = this.slide.containerDiv.offsetWidth || 100;
     
-    const CMB1_cw = divMaxWidth;
+    const CMB1_cw = divWidth;
     const CMB1_ch = (CMB1_cw / ratio.num) * ratio.den;
 
-    if( CMB1_ch <= divMaxHeight && CMB1_cw <= divMaxWidth) {
+    if( CMB1_ch <= divHeight && CMB1_cw <= divWidth) {
       return {
         containerWidth:CMB1_cw,
         containerHeight:CMB1_ch,
       }
     }
     
-    const CMB2_ch = divMaxHeight;
+    const CMB2_ch = divHeight;
     const CMB2_cw = (CMB2_ch / ratio.den) * ratio.num;
 
     return {
