@@ -30,15 +30,23 @@
       <p class="ms-hero-sub">
         Design, build and deliver stunning presentations<br>powered by AI — in minutes.
       </p>
-      <button class="ms-hero-cta" (click)="handleNewPPT()">
-        Start Creating
-        <i class="fi fi-rr-arrow-right d-flex align-items-center"></i>
-      </button>
+      <div class="ms-hero-actions">
+        <button class="ms-hero-cta" (click)="handleNewPPT()">
+          Start Creating
+          <i class="fi fi-rr-arrow-right d-flex align-items-center"></i>
+        </button>
+        @if (presentations.length > 0) {
+          <button class="ms-hero-ghost" (click)="scrollToPresentations()">
+            <i class="fi fi-rr-apps d-flex align-items-center"></i>
+            My Presentations
+          </button>
+        }
+      </div>
     </div>
   </section>
 
   <!-- ── Presentations ── -->
-  <section class="ms-section">
+  <section class="ms-section" #presentationSection>
     <div class="ms-section-head">
       <h2 class="ms-section-title">My Presentations</h2>
       @if (presentations.length > 0) {

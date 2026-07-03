@@ -48,7 +48,7 @@
             </p>
           </div>
           <div class="model-chip user-select-none" (click)="workspaceController.handleOpenSettings('ai')">
-            {{ defModel?.displayName }}
+            {{ defModel?.displayName ?? "Select model"}}
           </div>
         </div>
       </div>

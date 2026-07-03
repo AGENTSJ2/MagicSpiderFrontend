@@ -125,7 +125,7 @@
     align-items: center;
     border: 1px solid var(--border-color-primary);
     position: relative;
-
+    border-radius: var(--border-radius);
     img {
       max-height: 100%;
       width: auto;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   PresentationMetaData,
   PresentationService,
@@ -16,6 +16,10 @@ export class HomeComponent implements OnInit {
     private router: Router,
   ) {}
   presentations: PresentationMetaData[] = [];
+
+  @ViewChild('presentationSection')
+  private presentationSection?: ElementRef<HTMLElement>;
+
   async ngOnInit(): Promise<void> {
     this.presentations = await this.presentationService.getPresentations();
   }
@@ -24,6 +28,13 @@ export class HomeComponent implements OnInit {
     event.stopImmediatePropagation();
     await this.presentationService.removePresentation(ppt.id, true);
     this.presentations = this.presentations.filter((p) => p.id != ppt.id);
+  }
+
+  scrollToPresentations() {
+    this.presentationSection?.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   }
 
   async handleNewPPT() {

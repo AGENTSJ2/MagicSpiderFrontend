@@ -1,26 +1,47 @@
 // ─── Tokens ───────────────────────────────────────────────────────────────────
-$bg:          #090a14;
-$bg-section:  #0c0d1d;
-$card:        #13142a;
-$border:      rgba(255, 255, 255, 0.07);
-$border-h:    rgba(147, 51, 234, 0.55);
-$accent:      #9333ea;
-$accent-alt:  #6d28d9;
-$accent-soft: #a78bfa;
-$blue:        #4A90E2;
-$text:        #f1f5f9;
-$text-sub:    #94a3b8;
-$text-muted:  #475569;
-$danger:      #f87171;
+$blue:        #4a90e2;
+$indigo:      #6366f1;
+$violet:      #8b5cf6;
+$text:        #0f172a;
+$text-sub:    #5b6b83;
+$text-muted:  #94a3b8;
+$border:      #e2e8f0;
+$danger:      #ef4444;
 $thumb-h:     126px;
 $card-w:      210px;
-$radius:      14px;
-$nav-h:       62px;
+$radius:      var(--border-radius);
+$nav-h:       64px;
+
+// ─── Motion ───────────────────────────────────────────────────────────────────
+@keyframes ms-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ms-float {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(24px, -18px); }
+}
+
+@keyframes ms-gradient-pan {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-home *,
+  .ms-home *::before,
+  .ms-home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 
 // ─── Wrapper ──────────────────────────────────────────────────────────────────
 .ms-home {
   min-height: 100vh;
-  background: $bg;
+  background: #fff;
   color: $text;
 }
 
@@ -33,32 +54,32 @@ $nav-h:       62px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: rgba(9, 10, 20, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
-
-
 
 .ms-nav-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  background: linear-gradient(135deg, $accent, $accent-alt);
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, $blue, $indigo);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 600;
   border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 10px rgba(74, 144, 226, 0.28);
+  transition: transform 0.18s, box-shadow 0.18s;
   white-space: nowrap;
 
   &:hover {
-    opacity: 0.9;
-    box-shadow: 0 6px 22px rgba(147, 51, 234, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(74, 144, 226, 0.38);
   }
   &:active { transform: translateY(0); }
 }
@@ -66,107 +87,152 @@ $nav-h:       62px;
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 .ms-hero {
   position: relative;
-  padding: 88px 36px 80px;
+  padding: 96px 48px 92px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(147, 51, 234, 0.16) 0%, transparent 68%),
-    $bg;
+    radial-gradient(ellipse 70% 60% at 78% 10%, rgba(139, 92, 246, 0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 55% at 18% 0%, rgba(74, 144, 226, 0.14) 0%, transparent 68%),
+    linear-gradient(180deg, #f5f8fe 0%, #fff 100%);
 }
 
-// Ambient orbs
+// Ambient orbs — soft drifting color washes behind the constellation canvas
 .ms-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
+  filter: blur(80px);
   pointer-events: none;
+  animation: ms-float 14s ease-in-out infinite;
 }
 
 .ms-orb-1 {
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(147, 51, 234, 0.55) 0%, transparent 70%);
-  top: -120px;
-  left: -100px;
-  opacity: 0.3;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(74, 144, 226, 0.35) 0%, transparent 70%);
+  top: -140px;
+  left: -80px;
 }
 
 .ms-orb-2 {
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(74, 144, 226, 0.5) 0%, transparent 70%);
-  bottom: -40px;
-  right: 260px;
-  opacity: 0.25;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.28) 0%, transparent 70%);
+  bottom: -80px;
+  right: 180px;
+  animation-delay: -7s;
+  animation-duration: 18s;
 }
 
 .ms-hero-content {
   position: relative;
   z-index: 1;
-  max-width: 600px;
+  max-width: 640px;
+
+  > * { animation: ms-fade-up 0.6s ease-out both; }
+  > :nth-child(2) { animation-delay: 0.08s; }
+  > :nth-child(3) { animation-delay: 0.16s; }
+  > :nth-child(4) { animation-delay: 0.24s; }
 }
 
 .ms-hero-tag {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: $accent-soft;
-  background: rgba(167, 139, 250, 0.1);
-  border: 1px solid rgba(167, 139, 250, 0.22);
-  padding: 5px 14px;
-  margin-bottom: 22px;
+  color: $indigo;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  border-radius: 999px;
+  padding: 6px 16px;
+  margin-bottom: 26px;
 }
 
 .ms-hero-title {
-  font-size: 3rem;
+  font-size: 3.4rem;
   font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -1.2px;
+  line-height: 1.12;
+  letter-spacing: -1.6px;
   color: $text;
   margin: 0 0 18px;
 }
 
 .ms-gradient-text {
-  background: linear-gradient(135deg, $accent-soft 0%, $blue 100%);
+  background: linear-gradient(120deg, $blue 0%, $indigo 40%, $violet 70%, $blue 100%);
+  background-size: 250% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: ms-gradient-pan 7s ease-in-out infinite;
 }
 
 .ms-hero-sub {
-  font-size: 1rem;
+  font-size: 1.06rem;
   color: $text-sub;
   line-height: 1.7;
-  margin: 0 0 36px;
+  margin: 0 0 38px;
+}
+
+.ms-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .ms-hero-cta {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 14px 30px;
-  background: linear-gradient(135deg, $accent, $accent-alt);
+  gap: 10px;
+  padding: 15px 32px;
+  background: linear-gradient(135deg, $blue, $indigo);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
   border: none;
+  border-radius: 999px;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.32);
+  transition: transform 0.18s, box-shadow 0.18s;
+
+  i { transition: transform 0.18s; }
 
   &:hover {
-    box-shadow: 0 8px 36px rgba(147, 51, 234, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(74, 144, 226, 0.42);
+
+    i { transform: translateX(3px); }
   }
   &:active { transform: translateY(0); }
 }
 
+.ms-hero-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  background: rgba(255, 255, 255, 0.7);
+  color: $text;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 1px solid $border;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s;
+
+  &:hover {
+    border-color: $blue;
+    background: #fff;
+    transform: translateY(-2px);
+  }
+}
+
 // ─── Presentations section ────────────────────────────────────────────────────
 .ms-section {
-  padding: 32px 36px 48px;
-  background: $bg-section;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 40px 48px 64px;
+  background: #f6f8fc;
+  border-top: 1px solid rgba(15, 23, 42, 0.05);
   min-height: 280px;
 }
 
@@ -174,24 +240,25 @@ $nav-h:       62px;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .ms-section-title {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: $text;
   margin: 0;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
 }
 
 .ms-count {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: $accent-soft;
-  background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.22);
-  padding: 2px 9px;
+  color: $indigo;
+  background: rgba(99, 102, 241, 0.09);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 999px;
+  padding: 2px 10px;
   line-height: 1.6;
 }
 
@@ -199,42 +266,47 @@ $nav-h:       62px;
 .ms-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 18px;
 }
 
 // ─── Card base ────────────────────────────────────────────────────────────────
 .ms-card {
   width: $card-w;
-  background: $card;
+  background: #fff;
   border: 1px solid $border;
+  border-radius: $radius;
   cursor: pointer;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 
   &:hover {
-    border-color: $border-h;
-    box-shadow: 0 10px 36px rgba(147, 51, 234, 0.22);
+    transform: translateY(-4px);
+    border-color: rgba(74, 144, 226, 0.55);
+    box-shadow: 0 16px 36px rgba(51, 88, 155, 0.14);
   }
 }
 
 // ─── Add card ─────────────────────────────────────────────────────────────────
 .ms-add-card {
-  border: 1.5px dashed rgba(255, 255, 255, 0.1);
+  border: 1.5px dashed #c8d3e4;
   background: transparent;
+  box-shadow: none;
 
   &:hover {
-    border-color: $accent;
-    background: rgba(147, 51, 234, 0.06);
-    box-shadow: 0 10px 36px rgba(147, 51, 234, 0.14);
+    border-color: $blue;
+    background: rgba(74, 144, 226, 0.05);
+    box-shadow: 0 12px 28px rgba(51, 88, 155, 0.1);
 
     .ms-add-ring {
-      background: $accent;
-      border-color: $accent;
+      background: linear-gradient(135deg, $blue, $indigo);
+      border-color: transparent;
       color: #fff;
+      transform: scale(1.08);
     }
 
-    span { color: $accent-soft; }
+    span { color: $blue; }
   }
 
   .ms-add-inner {
@@ -247,21 +319,22 @@ $nav-h:       62px;
   }
 
   .ms-add-ring {
-    width: 44px;
-    height: 44px;
-    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    width: 46px;
+    height: 46px;
+    border: 1.5px solid #c8d3e4;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
     color: $text-sub;
-    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.18s;
   }
 
   span {
     font-size: 0.78rem;
     font-weight: 600;
-    color: $text-muted;
+    color: $text-sub;
     transition: color 0.18s;
   }
 }
@@ -271,7 +344,7 @@ $nav-h:       62px;
   position: relative;
   width: 100%;
   height: $thumb-h;
-  background: #0e0f21;
+  background: #eef2f8;
   overflow: hidden;
 
   > img {
@@ -279,6 +352,7 @@ $nav-h:       62px;
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.35s ease;
   }
 
   .ms-thumb-placeholder {
@@ -287,13 +361,13 @@ $nav-h:       62px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(145deg, #181930, #0e0f21);
+    background: linear-gradient(145deg, #f8fafc, #e8eef7);
 
     img {
       width: 52px !important;
       height: auto !important;
       object-fit: contain;
-      opacity: 0.3;
+      opacity: 0.35;
       filter: grayscale(1);
     }
   }
@@ -301,32 +375,37 @@ $nav-h:       62px;
   .ms-thumb-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(9, 10, 20, 0.7);
+    background: rgba(255, 255, 255, 0.82);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.2s;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(3px);
   }
 
   .ms-open-label {
-    color: #fff;
-    font-size: 0.82rem;
+    color: $text;
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    padding: 7px 18px;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    border-radius: 999px;
+    background: #fff;
   }
 
   .ms-del-btn {
     position: absolute;
     top: 8px;
     right: 8px;
-    width: 27px;
-    height: 27px;
-    background: rgba(248, 113, 113, 0.1);
-    border: 1px solid rgba(248, 113, 113, 0.4);
-    color: #fca5a5;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 50%;
+    color: #dc2626;
     font-size: 0.72rem;
     display: flex;
     align-items: center;
@@ -342,8 +421,9 @@ $nav-h:       62px;
   }
 }
 
-.ms-card:hover .ms-thumb-overlay {
-  opacity: 1;
+.ms-card:hover {
+  .ms-thumb-overlay { opacity: 1; }
+  .ms-thumb > img { transform: scale(1.05); }
 }
 
 // ─── Card footer ──────────────────────────────────────────────────────────────
@@ -352,8 +432,8 @@ $nav-h:       62px;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  padding: 9px 11px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 10px 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .ms-card-name {
@@ -372,10 +452,11 @@ $nav-h:       62px;
   gap: 4px;
   font-size: 0.68rem;
   font-weight: 600;
-  color: $text-muted;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 2px 8px;
+  color: $text-sub;
+  background: #f1f5fb;
+  border: 1px solid $border;
+  border-radius: 999px;
+  padding: 2px 9px;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -394,9 +475,10 @@ $nav-h:       62px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $accent-soft;
-    background: rgba(167, 139, 250, 0.08);
-    border: 1px solid rgba(167, 139, 250, 0.2);
+    color: $indigo;
+    background: rgba(99, 102, 241, 0.07);
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    border-radius: 50%;
     margin-bottom: 18px;
   }
 
@@ -412,223 +494,13 @@ $nav-h:       62px;
     color: $text-sub;
     margin: 0;
 
-    strong { color: $accent-soft; }
+    strong { color: $indigo; }
   }
 }
-/* ==========================================================================
-   LIGHT THEME OVERRIDES
-   ========================================================================== */
 
-.ms-home {
-  background: #fff;
-  color: #0f172a;
-}
-
-.ms-nav {
-  background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid var(--border-color-primary);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-}
-
-.ms-brand-name {
-  color: #0f172a;
-}
-
-.ms-brand-accent {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    #6ea8e8
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.ms-logo,
-.ms-nav-btn,
-.ms-hero-cta {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    #3578c7
-  );
-}
-
-.ms-nav-btn:hover,
-.ms-hero-cta:hover {
-  box-shadow:
-    0 8px 24px rgba(74, 144, 226, 0.25);
-}
-
-.ms-hero {
-  background:
-    radial-gradient(
-      ellipse 80% 55% at 50% 0%,
-      rgba(74, 144, 226, 0.12) 0%,
-      transparent 68%
-    ),
-    #fff;
-}
-
-.ms-orb-1 {
-  background: radial-gradient(
-    circle,
-    rgba(74, 144, 226, 0.18) 0%,
-    transparent 70%
-  );
-}
-
-.ms-orb-2 {
-  background: radial-gradient(
-    circle,
-    rgba(74, 144, 226, 0.12) 0%,
-    transparent 70%
-  );
-}
-
-.ms-hero-tag {
-  color: var(--primary-color);
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.15);
-}
-
-.ms-hero-title {
-  color: #0f172a;
-}
-
-.ms-gradient-text {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    #6ea8e8
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.ms-hero-sub {
-  color: #64748b;
-}
-
-.ms-section {
-  background: var(--background-secondary);
-  border-top: 1px solid var(--border-color-primary);
-}
-
-.ms-section-title {
-  color: #0f172a;
-}
-
-.ms-count {
-  color: var(--primary-color);
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.15);
-}
-
-.ms-card {
-  background: #fff;
-  border: 1px solid var(--border-color-primary);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
-}
-
-.ms-card:hover {
-  border-color: var(--primary-color);
-  box-shadow: var(--box-shadow-1);
-}
-
-.ms-add-card {
-  border: 1.5px dashed var(--border-color-primary);
-}
-
-.ms-add-card:hover {
-  border-color: var(--primary-color);
-  background: rgba(74, 144, 226, 0.04);
-}
-
-.ms-add-card:hover .ms-add-ring {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: #fff;
-}
-
-.ms-add-card:hover span {
-  color: var(--primary-color);
-}
-
-.ms-add-ring {
-  border: 1px solid var(--border-color-primary);
-  color: #64748b;
-}
-
-.ms-add-card span {
-  color: #64748b;
-}
-
-.ms-thumb {
-  background: #f8fafc;
-}
-
-.ms-thumb-placeholder {
-  background: linear-gradient(
-    145deg,
-    #f8fafc,
-    #eef2f7
-  ) !important;
-}
-
-.ms-thumb-placeholder img {
-  opacity: 0.35;
-}
-
-.ms-thumb-overlay {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(3px);
-}
-
-.ms-open-label {
-  color: #0f172a !important;
-}
-
-.ms-del-btn {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #dc2626;
-}
-
-.ms-del-btn:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-  color: #fff;
-}
-
-.ms-card-footer {
-  border-top: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.ms-card-name {
-  color: #0f172a;
-}
-
-.ms-slide-count {
-  color: #64748b;
-  background: #f8fafc;
-  border: 1px solid var(--border-color-primary);
-}
-
-.ms-empty-icon {
-  color: var(--primary-color);
-  background: rgba(74, 144, 226, 0.08);
-  border: 1px solid rgba(74, 144, 226, 0.15);
-}
-
-.ms-empty-title {
-  color: #0f172a;
-}
-
-.ms-empty-sub {
-  color: #64748b;
-}
-
-.ms-empty-sub strong {
-  color: var(--primary-color);
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .ms-hero { padding: 64px 24px 60px; }
+  .ms-hero-title { font-size: 2.3rem; letter-spacing: -1px; }
+  .ms-section { padding: 32px 24px 48px; }
 }

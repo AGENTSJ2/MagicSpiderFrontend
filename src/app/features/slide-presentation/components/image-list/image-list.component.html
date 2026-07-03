@@ -30,27 +30,35 @@
       (change)="handleUploadImage($event)"
     />
   </div>
-  <div class="image-list-wrapper flex-fill">
-    @for (item of appImages; track item.id) {
-      <div class="img-prev">
-        <div class="img-thumb" (click)="handleAddImage(item)">
-          <button (click)="handleRemoveImage(item, $event)" class="del-btn">
-            <i
-              class="fi fi-rs-trash d-flex justify-content-center align-items-center"
-            ></i>
-          </button>
-          <img [src]="item.imageSrc" alt="" />
+  @if(loading)
+  {
+    <div class="d-flex justify-content-center align-items-center py-5 w-100 ">
+      <p class="fw-semibold">Loading..</p>
+    </div>
+  }
+  @else {
+    <div class="image-list-wrapper flex-fill">
+      @for (item of appImages; track item.id) {
+        <div class="img-prev">
+          <div class="img-thumb" (click)="handleAddImage(item)">
+            <button (click)="handleRemoveImage(item, $event)" class="del-btn">
+              <i
+                class="fi fi-rs-trash d-flex justify-content-center align-items-center"
+              ></i>
+            </button>
+            <img [src]="item.imageSrc" alt="" />
+          </div>
+          <input
+            type="text"
+            class="img-desc"
+            placeholder="Add description…"
+            [(ngModel)]="item.description"
+            (click)="$event.stopPropagation()"
+            (change)="handleUpdateDescription(item)"
+            (blur)="handleUpdateDescription(item)"
+          />
         </div>
-        <input
-          type="text"
-          class="img-desc"
-          placeholder="Add description…"
-          [(ngModel)]="item.description"
-          (click)="$event.stopPropagation()"
-          (change)="handleUpdateDescription(item)"
-          (blur)="handleUpdateDescription(item)"
-        />
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>

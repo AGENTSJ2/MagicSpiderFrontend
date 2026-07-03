@@ -13,50 +13,52 @@
     font-weight: 700;
     color: #000;
     letter-spacing: 0.8px;
-    font-size: 18px;
+    font-size: 15px;
     margin-bottom: 10px;
   }
   .greetBox
   {
-    line-height: 1.6;
-    font-weight: 400;
-    font-size: 15px;
+    line-height: 1.7;
+    font-weight: 500;
+    font-size: 14px;
   }
 }
 .thinking-section {
-  background: #fffbe6;
+  background: aliceblue;
   border: none;
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
   padding: 12px 14px;
-  .thinking-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .thinking-label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    color: #ad6800;
-  }
-  
-  .thinking-box {
-    max-height: 160px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #ffe58f transparent;
-  }
-  
-  .thinking-text {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-size: 12px;
-    line-height: 1.7;
-    color: #7c5800;
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin: 0;
-  }
+}
+
+.thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.thinking-label {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: rgb(18, 18, 18,);
+}
+
+.thinking-box {
+  max-height: 160px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(201, 230, 255) transparent;
+}
+
+.thinking-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgb(18, 18, 18);
+  font-weight: 500;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
 }
 
 
@@ -68,6 +70,7 @@ textarea
 {
   border: 1px solid lightgray;
   padding: 5px;
+  border-radius: var(--border-radius);
   .promt-control
   {
     position: relative;

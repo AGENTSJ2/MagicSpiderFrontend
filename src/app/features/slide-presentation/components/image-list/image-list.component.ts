@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import blobService, { AppImage } from '../../../../services/blob.service';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { AgentState, LLM_Agents } from '../../../../services/agents';
+import { waitForMilliseconds } from '../../../../core/utilities';
 
 @Component({
   selector: 'app-image-list',
@@ -55,10 +56,12 @@ export class ImageListComponent implements OnDestroy {
       presentation: this.presentation,
     });
   }
-
+  loading = false;
   private async loadImages()
   {
+    this.loading = true;
     this.appImages = await blobService.getAllImages();
+    this.loading = false;
   }
   handleUploadImage(event:Event)
   {
