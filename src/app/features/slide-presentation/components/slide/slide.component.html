@@ -1,3 +1,7 @@
 <div class="slide-wrapper  w-100 d-flex flex-column justify-content-center align-items-center h-100">
-    <div #slide class="slide flex-1"></div>
+    <div #slide
+         class="slide flex-1"
+         [class.zoomed]="zoom > 1"
+         [class.panning]="isPanning"
+         [style.transform]="transform"></div>
 </div>
