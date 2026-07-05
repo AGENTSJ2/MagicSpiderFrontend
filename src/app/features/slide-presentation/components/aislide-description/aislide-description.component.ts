@@ -9,11 +9,12 @@ import {
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { Model } from '@google/genai';
-import { AgentState, AgentStreamEvent, LLM_Agents } from '../../../../services/agents';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
+import { LLM_Agents } from '../../../../services/agents';
+import { AgentInActionStages, AgentState, AgentStreamEvent, InvokeEnabledStages } from '../../../../agents/core/utility';
 
 
 @Component({
@@ -166,10 +167,10 @@ export class AISlideDescriptionComponent {
   }
   isAgentIntractable()
   {
-    return this.agentService.InvokeEnabledStages.includes(this.agentService.contentCreatorState);
+    return InvokeEnabledStages.includes(this.agentService.contentCreatorState);
   }
   isAgentInaction()
   {
-    return this.agentService.AgentInActionStages.includes(this.agentService.contentCreatorState);
+    return AgentInActionStages.includes(this.agentService.contentCreatorState);
   }
 }

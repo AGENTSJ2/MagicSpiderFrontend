@@ -61,6 +61,7 @@ export const KonvaTextAttrsSchema = z
     Note : 
     - text should be line break separated in order to apply list
     - In order to apply list listType should not be none or undefined
+    - Do not add the 1 in text in case of u want to add numbered and the bullet yourself just set it as linebreak separated and apply the list type as numbered or bullet list then add the corresponding style
 
   `);
 
@@ -115,4 +116,24 @@ export const AddImageSchema = addComponentSchema.extend({
 
 export const RemoveSlideSchema = z.object({
   slideId: z.string(),
+});
+
+export const SlideArchitectSchema = z.object({
+  userPrompt: z
+    .string()
+    .describe(
+      'The user request describing what should be created or changed in the presentation',
+    ),
+  scratchBook: z
+    .string()
+    .optional()
+    .describe(
+      'Scratch book content holding the slide contents and notes the design should be based on',
+    ),
+  currentSlideJson: z
+    .string()
+    .optional()
+    .describe(
+      'JSON of the existing presentation slides, used to reference existing slideIds and component ids',
+    ),
 });

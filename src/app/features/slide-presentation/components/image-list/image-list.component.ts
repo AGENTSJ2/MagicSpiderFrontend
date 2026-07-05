@@ -2,8 +2,8 @@ import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import blobService, { AppImage } from '../../../../services/blob.service';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { AgentState, LLM_Agents } from '../../../../services/agents';
-import { waitForMilliseconds } from '../../../../core/utilities';
+import { LLM_Agents } from '../../../../services/agents';
+import { AgentState } from '../../../../agents/core/utility';
 
 @Component({
   selector: 'app-image-list',

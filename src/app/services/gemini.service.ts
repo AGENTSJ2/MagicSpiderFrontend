@@ -184,7 +184,8 @@ export class GeminiService {
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
-
+  readonly MAX_RETRY = 100;
+  
   async streamChat(
     request: Partial<ChatRequest>,
     tools?: McpTool[],

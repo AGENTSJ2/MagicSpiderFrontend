@@ -176,11 +176,10 @@ export class Slide {
       components: componentsInOrder.map((cm) => {
         cm.node.id(cm.node._id.toString());
         const componentNode: any = cm.node.toObject();
+        componentNode.attrs = cm.node.attrs;
         componentNode.attrs.zIndex = cm.node.zIndex();
         if (cm.node.className == 'Image') {
-          const imageId = (cm as ImageComponent).getSerializableConfig().attrs
-            .imageId;
-          componentNode.attrs.imageId = imageId;
+          componentNode.attrs =  (cm as ImageComponent).getSerializableConfig().attrs;
         }
         return {
           node: componentNode,

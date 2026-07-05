@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { AgentStreamEvent, isApiKeyError, LLM_Agents } from '../../../../services/agents';
-import { Subject } from 'rxjs';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivePresentationContext } from '../../services/active-presentation.context';
 import { SettingsComponent } from '../settings/settings.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { isApiKeyError } from '../../../../agents/core/utility';
 
 @Injectable({
   providedIn: 'root',

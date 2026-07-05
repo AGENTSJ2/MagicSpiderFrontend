@@ -1,9 +1,10 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
-import { AgentState, LLM_Agents } from '../../../../services/agents';
 import { GeminiService } from '../../../../services/gemini.service';
 import { Model } from '@google/genai';
 import { Subscription } from 'rxjs';
+import { MagicSpiderAgentLoop } from '../../../../agents/magic-spider-loop';
+import { AgentInActionStages, AgentState, InvokeEnabledStages } from '../../../../agents/core/utility';
 
 @Component({
   selector: 'app-magic-spider-assistant',
@@ -28,9 +29,9 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   constructor(
     public workspaceController: WorkspaceController,
     private geminiService: GeminiService,
-    private agentService: LLM_Agents,
+    private magicSpiderAgentLoop: MagicSpiderAgentLoop,
   ) {
-    this.agentSub = agentService.magicSpiderEventStream.subscribe((ev) => {
+    this.agentSub = magicSpiderAgentLoop.magicSpiderEventStream.subscribe((ev) => {
       switch (ev.action) {
         case AgentState.thinking:
           this.thinkingText += ev.message;
@@ -74,13 +75,13 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
     }
   }
   isAgentIntractable() {
-    return this.agentService.InvokeEnabledStages.includes(
-      this.agentService.magicSpiderState,
+    return InvokeEnabledStages.includes(
+      this.magicSpiderAgentLoop.magicSpiderState,
     );
   }
   isAgentInMotion() {
-    return this.agentService.AgentInActionStages.includes(
-      this.agentService.magicSpiderState,
+    return AgentInActionStages.includes(
+      this.magicSpiderAgentLoop.magicSpiderState,
     );
   }
   ngOnDestroy(): void {
@@ -89,15 +90,15 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
 
   startMagicSpider() {
     if (this.isAgentIntractable()) {
-      this.agentService.triggerMagicSpider({
-        slideContent: this.workspaceController.attachScratchBook
+      this.magicSpiderAgentLoop.triggerMagicSpider({
+        scratchBook: this.workspaceController.attachScratchBook
           ? this.workspaceController.scratchBookContent
           : '',
         presentation: this.workspaceController.activePresentation!,
         userComment: this.userComment,
       });
     } else {
-      this.agentService.InterruptMagicSpider();
+      this.magicSpiderAgentLoop.InterruptMagicSpider();
     }
   }
 }
