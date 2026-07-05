@@ -60,6 +60,13 @@ export default abstract class BaseController {
       XBeforeDrag = this.node.x();
       YBeforeDrag = this.node.y();
     });
+    this.node.on('dragmove',()=>{
+      if(!this.slide.controller.isNodeSelected(this.node))
+      {
+        this.node.x(XBeforeDrag);
+        this.node.y(YBeforeDrag);
+      }
+    });
   }
 
   protected handleTransformEvents() {

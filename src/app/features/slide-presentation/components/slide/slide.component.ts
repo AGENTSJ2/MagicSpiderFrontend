@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
+import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 
 const ZOOM_STORAGE_KEY = 'slide-preferred-zoom';
 const PAN_STORAGE_KEY = 'slide-preferred-pan';
@@ -38,7 +39,7 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   private panOriginX = 0;
   private panOriginY = 0;
 
-  constructor() {
+  constructor(private workspaceController:WorkspaceController) {
     this.zoom = this.loadZoom();
     const pan = this.loadPan();
     this.panX = pan.x;
@@ -155,9 +156,11 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     this.panOriginY = this.panY;
   }
 
-  private updatePan(clientX: number, clientY: number): void {
-    this.panX = this.panOriginX + (clientX - this.panStartX);
-    this.panY = this.panOriginY + (clientY - this.panStartY);
+  private updatePan(clientX: number, clientY: number): void {    
+    if(!this.workspaceController.selectedComponent) {
+      this.panX = this.panOriginX + (clientX - this.panStartX);
+      this.panY = this.panOriginY + (clientY - this.panStartY);
+    }
   }
 
   private endPan(): void {

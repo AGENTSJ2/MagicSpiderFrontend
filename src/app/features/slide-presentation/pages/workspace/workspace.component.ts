@@ -140,7 +140,7 @@ export class WorkspaceComponent {
   }
 
   slideTimeOutMap: Map<string, any> = new Map();
-  selectedComponent?: ICanvasComponent;
+  // selectedComponent?: ICanvasComponent;
   private listenPresentationEvents() {
     const listener = this.presentation.listenEvent();
     listener.subscribe((event) => {
@@ -172,9 +172,9 @@ export class WorkspaceComponent {
   }
 
   setSelectedComponent(component: ICanvasComponent | undefined) {
-    this.selectedComponent = undefined;
+    this.workSpaceController.selectedComponent = undefined;
     setTimeout(() => {
-      this.selectedComponent = component;
+      this.workSpaceController.selectedComponent = component;
     });
   }
 

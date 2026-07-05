@@ -266,19 +266,19 @@
       @case (TooBoxType.TextToolBox) {
         <app-text-tool-box
           [presentation]="presentation"
-          [component]="selectedComponent!"
+          [component]="this.workSpaceController.selectedComponent!"
         ></app-text-tool-box>
       }
       @case (TooBoxType.ShapeTooLBox) {
         <app-shape-tool-box
           [presentation]="presentation"
-          [component]="selectedComponent!"
+          [component]="this.workSpaceController.selectedComponent!"
         ></app-shape-tool-box>
       }
       @case (TooBoxType.ImageToolBox) {
         <app-image-tool-box
           [presentation]="presentation"
-          [component]="selectedComponent!"
+          [component]="this.workSpaceController.selectedComponent!"
         ></app-image-tool-box>
       }
       @case (TooBoxType.None) {
@@ -298,9 +298,9 @@
       <p class="mb-0 flex-fill">Properties</p>
       <button 
         class="comp-del-btn" 
-        (click)="handleRemoveComponent(selectedComponent!)" 
+        (click)="handleRemoveComponent(this.workSpaceController.selectedComponent!)" 
         title="Delete"
-        [style.visibility]="selectedComponent==undefined ? 'hidden':'visible'"
+        [style.visibility]="this.workSpaceController.selectedComponent==undefined ? 'hidden':'visible'"
       >
               <i class="fi fi-rs-trash d-flex align-items-center justify-content-center"></i>
       </button>

@@ -6,6 +6,7 @@ import { ActivePresentationContext } from '../../services/active-presentation.co
 import { SettingsComponent } from '../settings/settings.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { isApiKeyError } from '../../../../agents/core/utility';
+import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,8 @@ export class WorkspaceController {
   showToolBox: boolean = false;
   showImageToolBox:boolean = false;
   attachScratchBook: boolean = true;
+  selectedComponent?: ICanvasComponent;
+
   constructor(
     private presentationService: PresentationService,
     private message: NzMessageService,
