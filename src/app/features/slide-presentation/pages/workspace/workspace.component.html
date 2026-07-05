@@ -1,15 +1,8 @@
 <div class="workspace d-flex flex-column">
   <div class="nav d-flex justify-content-between align-items-center  min-width-0">
-    <div class="d-flex gap-3">
+    <div class="d-flex gap-3 nav-first">
       <app-logo></app-logo>
-      <span
-        contentEditableModel
-        [(ngModel)]="name"
-        contenteditable="true"
-        class="ppt-name"
-        (blur)="handleNameBlur()"
-      >
-      </span>
+      <input type="text" [(ngModel)]="name"  class="ppt-name" (blur)="handleNameBlur()">
     </div>
     <div class="d-flex gap-3 px-2 min-height-0 min-width-0 menu-bar">
       <button
