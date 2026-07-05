@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import blobService, { AppImage } from '../../../../services/blob.service';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { LLM_Agents } from '../../../../services/agents';
 
 @Component({
   selector: 'app-image-list',
@@ -18,7 +17,7 @@ export class ImageListComponent implements OnDestroy {
   generateError = '';
   private agentSub?: Subscription;
 
-  constructor(private agentService: LLM_Agents)
+  constructor()
   {
     this.loadImages();
   }

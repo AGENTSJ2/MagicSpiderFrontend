@@ -13,7 +13,6 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
-import { LLM_Agents } from '../../../../services/agents';
 import { AgentInActionStages, AgentState, AgentStreamEvent, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';
 
