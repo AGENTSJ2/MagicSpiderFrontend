@@ -10,7 +10,7 @@ import {
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 
-export type AgentKey = 'content' | 'assistant' | 'image';
+export type AgentKey = 'content' | 'assistant' | 'architect' | 'image';
 
 export interface GeneratedImage {
   dataUrl: string;
@@ -30,11 +30,13 @@ export class GeminiService {
   private readonly _models: Record<AgentKey, Model | undefined> = {
     content: undefined,
     assistant: undefined,
+    architect: undefined,
     image: undefined,
   };
   private readonly modelKeys: Record<AgentKey, string> = {
     content: 'CONTENT-MODEL',
     assistant: 'ASSISTANT-MODEL',
+    architect: 'ARCHITECT-MODEL',
     image: 'IMAGE-MODEL',
   };
   private readonly apiKeyStorageKey = 'GEMINI-API-KEY';
@@ -112,6 +114,16 @@ export class GeminiService {
         localStorage.setItem(this.modelKeys.assistant, legacy);
       }
       localStorage.removeItem(this.legacyDefModelKey);
+    }
+
+    // The architect was split out of the assistant (slide worker) model. Seed
+    // it from the assistant's stored model on first run so existing users keep
+    // their prior behavior until they pick a distinct architect model.
+    if (!localStorage.getItem(this.modelKeys.architect)) {
+      const assistantModel = localStorage.getItem(this.modelKeys.assistant);
+      if (assistantModel) {
+        localStorage.setItem(this.modelKeys.architect, assistantModel);
+      }
     }
 
     (Object.keys(this.modelKeys) as AgentKey[]).forEach((agent) => {

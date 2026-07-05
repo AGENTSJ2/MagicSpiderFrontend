@@ -113,13 +113,31 @@
       </div>
 
       <div class="settings__field">
-        <label>Magic Assistant model</label>
+        <label>Slide Architect model</label>
+        <nz-select
+          [(ngModel)]="architectModelName"
+          (ngModelChange)="onArchitectModelChange($event)"
+          class="settings__select"
+          nzShowSearch
+          nzPlaceHolder="Select a model for the slide architect"
+          [nzLoading]="loadingModels"
+        >
+          <nz-option
+            *ngFor="let model of models"
+            [nzValue]="model.name"
+            [nzLabel]="model.displayName || model.name!"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <div class="settings__field">
+        <label>Slide Worker model</label>
         <nz-select
           [(ngModel)]="assistantModelName"
           (ngModelChange)="onAssistantModelChange($event)"
           class="settings__select"
           nzShowSearch
-          nzPlaceHolder="Select a model for the magic assistant"
+          nzPlaceHolder="Select a model for the slide worker"
           [nzLoading]="loadingModels"
         >
           <nz-option

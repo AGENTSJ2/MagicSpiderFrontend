@@ -34,6 +34,7 @@ export class SettingsComponent implements OnInit {
   models: Model[] = [];
   contentModelName?: string;
   assistantModelName?: string;
+  architectModelName?: string;
   imageModelName?: string;
   loadingModels = false;
   apiKey = '';
@@ -52,6 +53,7 @@ export class SettingsComponent implements OnInit {
       this.apiKey = this.geminiService.apiKey ?? '';
       this.contentModelName = this.geminiService.getModel('content')?.name;
       this.assistantModelName = this.geminiService.getModel('assistant')?.name;
+      this.architectModelName = this.geminiService.getModel('architect')?.name;
       this.imageModelName = this.geminiService.getModel('image')?.name;
       this.models = await this.geminiService.loadModels();
     } catch (error) {
@@ -87,6 +89,11 @@ export class SettingsComponent implements OnInit {
   onAssistantModelChange(modelName: string): void {
     const model = this.models.find((m) => m.name === modelName);
     this.geminiService.updateModel('assistant', model);
+  }
+
+  onArchitectModelChange(modelName: string): void {
+    const model = this.models.find((m) => m.name === modelName);
+    this.geminiService.updateModel('architect', model);
   }
 
   onImageModelChange(modelName: string): void {

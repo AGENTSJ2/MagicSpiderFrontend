@@ -96,7 +96,7 @@ export class SlideArchitectAgent {
         
         const { stream, provider } = await this.chatService.streamChat(
           {
-            model: this.chatService.getModel('assistant')?.name,
+            model: this.chatService.getModel('architect')?.name,
             messages: messages,
           },
           [],
