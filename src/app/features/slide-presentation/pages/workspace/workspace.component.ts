@@ -14,7 +14,6 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import blobService from '../../../../services/blob.service';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import SlideController from '../../controllers/slide.controller';
 
 @Component({
   selector: 'app-workspace',
@@ -31,6 +30,7 @@ export class WorkspaceComponent {
   pptList!: ElementRef;
   hasUnSavedChanges: boolean = false;
   loading: boolean = false;
+  sidebarCollapsed: boolean = false;
   constructor(
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
@@ -67,6 +67,10 @@ export class WorkspaceComponent {
   selectedToolBox: ToolBoxType = ToolBoxType.None;
   activeEvent?: PresentationEvent;
   initialXandY = { x: 144, y: 144 };
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
   handleAddText() {
     this.presentation.getActiveSlide?.addText({config:{
       attrs:{

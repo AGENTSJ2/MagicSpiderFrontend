@@ -67,6 +67,8 @@ background-size:
   width: 100px;
   height: 100%;
   background-color: white;
+  overflow: hidden;
+  transition: width 0.2s ease;
 
   .menu-item {
     padding: 10px 0px;
@@ -106,8 +108,51 @@ background-size:
 
 .side-wrap {
   position: relative;
+   .collapse-btn {
+    align-self: flex-end;
+    position: absolute;
+    right: -28px;
+    top: -1px;
+    height: 28px;
+    width: 28px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color-primary);
+    background-color: white !important;
+    border-bottom-right-radius: var(--border-radius);
+    color: #555;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    i {
+      font-size: 16px;
+    }
+    &:hover {
+      background-color: var(--background-secondary);
+    }
+  }
 }
+.collapsed {
+  .collapse-btn {
+    right: -100px !important;
+    width: 100px !important;
+  }
+    .side-bar {
+      width: 0px;
+      padding: 0px;
 
+
+      .menu-item {
+        p {
+          display: none;
+        }
+
+        .shape-types {
+          top: 0;
+          right: -140%;
+        }
+      }
+    }
+  }
 .bottom {
   border-top: 1px solid rgba(255, 255, 255, 0.658);
   // padding: 0px 10px;

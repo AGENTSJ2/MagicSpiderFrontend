@@ -85,8 +85,23 @@
     </div>
   </div>
   <div class="d-flex flex-1 min-height-0 min-width-0">
-    <div class="side-wrap">
-      <div class="side-bar px-3 py-4 d-flex flex-column">
+    <div class="side-wrap" [class.collapsed]="sidebarCollapsed">
+      <button
+        class="collapse-btn d-flex justify-content-center align-items-center"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        [attr.title]="sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      >
+        @if (sidebarCollapsed) {
+          View Tab
+        }
+        <i
+          class="fi d-flex justify-content-center align-items-center"
+          [class.fi-rr-angle-small-left]="!sidebarCollapsed"
+          [class.fi-rr-angle-small-right]="sidebarCollapsed"
+        ></i>
+      </button>
+      <div class="side-bar py-4 d-flex flex-column">
         <div class="menu-item d-flex gap-1 flex-column" (click)="addSlide()">
           <i
             class="fi fi-rr-rectangle-vertical-history d-flex justify-content-center align-items-center fs-4"
