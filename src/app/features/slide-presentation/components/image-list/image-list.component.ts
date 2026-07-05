@@ -3,7 +3,6 @@ import { Subscription } from 'rxjs';
 import blobService, { AppImage } from '../../../../services/blob.service';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { LLM_Agents } from '../../../../services/agents';
-import { AgentState } from '../../../../agents/core/utility';
 
 @Component({
   selector: 'app-image-list',
@@ -22,40 +21,12 @@ export class ImageListComponent implements OnDestroy {
   constructor(private agentService: LLM_Agents)
   {
     this.loadImages();
-    this.agentSub = this.agentService.imageGeneratorStream.subscribe((ev) => {
-      switch (ev.action) {
-        case AgentState.invoked:
-        case AgentState.thinking:
-          this.generating = true;
-          this.generateError = '';
-          break;
-        case AgentState.done:
-          this.generating = false;
-          this.imagePrompt = '';
-          this.loadImages();
-          break;
-        case AgentState.error:
-          this.generating = false;
-          this.generateError = ev.message;
-          break;
-      }
-    });
   }
 
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
   }
 
-  generateImage() {
-    const prompt = this.imagePrompt.trim();
-    if (!prompt || this.generating) {
-      return;
-    }
-    this.agentService.triggerImageGenerator({
-      prompt,
-      presentation: this.presentation,
-    });
-  }
   loading = false;
   private async loadImages()
   {

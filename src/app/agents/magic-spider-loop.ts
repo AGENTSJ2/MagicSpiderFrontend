@@ -87,13 +87,10 @@ export class MagicSpiderAgentLoop {
           ),
           imagesAvailable: (availableImages.content.at(0) as any)?.resource
             .text,
+          magicSpiderEvent:this.magicSpiderEvent
         },
         abortController,
-        (event) =>
-          this.magicSpiderEvent.next({
-            ...event,
-            action: AgentState.thinking,
-          }),
+
       );
 
       for (const slidePlan of this.architecture.presentation.slides) {

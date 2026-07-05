@@ -72,15 +72,16 @@ export class SlideWorkerAgent {
       },
     ];
 
-    const responseEvent = new Subject<AgentStreamEvent>();
     const slideJson = JSON.stringify(slide.toJson());
     const tools = await this.mcpHub.listTools();
-
+    
     let retry = 0;
     let completed :boolean = false;
-
+    
     while (!params.abortController.signal.aborted && retry < MAX_RETRY) {
       try {
+        const responseEvent = new Subject<AgentStreamEvent>();
+
         const response = await this.chatService.streamChat(
           {
             model: this.chatService.getModel('assistant')?.name,
@@ -109,12 +110,15 @@ export class SlideWorkerAgent {
             });
           }
         });
+        
         await pipeResponseToStream(
           responseEvent,
           response.stream,
           response.provider,
         );
-        responseEvent.complete();
+        
+        // responseEvent.complete(); 
+
         if (toolCalls.length == 0) {
           console.log('slide completed gracefully');
           completed = true;

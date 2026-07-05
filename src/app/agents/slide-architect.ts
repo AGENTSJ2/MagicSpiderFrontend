@@ -49,9 +49,9 @@ export class SlideArchitectAgent {
       scratchBook?: string;
       currentSlideJson?: string;
       imagesAvailable?: string;
+      magicSpiderEvent?:Subject<AgentStreamEvent>
     },
     abortController?: AbortController,
-    onEvent?: (event: AgentStreamEvent) => void,
   ): Promise<PresentationArchitecture> {
     const messages: Message[] = [
       {
@@ -83,16 +83,17 @@ export class SlideArchitectAgent {
       },
     ];
 
-    const responseEvent = new Subject<AgentStreamEvent>();
-    if (onEvent) {
-      responseEvent.subscribe(onEvent);
-    }
     let completed = false;
     let retry = 0;
     let completedContent:string = "";
 
     while(!completed && retry < MAX_RETRY) {
       try {
+        const responseEvent = new Subject<AgentStreamEvent>();
+        responseEvent.subscribe((event)=>{
+          params.magicSpiderEvent?.next(event);
+        });
+        
         const { stream, provider } = await this.chatService.streamChat(
           {
             model: this.chatService.getModel('assistant')?.name,
@@ -101,6 +102,7 @@ export class SlideArchitectAgent {
           [],
           abortController,
         );
+
         const { contents } = await pipeResponseToStream(
           responseEvent,
           stream,

@@ -15,6 +15,7 @@ import { PresentationService } from '../../../../services/konva.services/present
 import { GeminiService } from '../../../../services/gemini.service';
 import { LLM_Agents } from '../../../../services/agents';
 import { AgentInActionStages, AgentState, AgentStreamEvent, InvokeEnabledStages } from '../../../../agents/core/utility';
+import { ContentCreatorAgent } from '../../../../agents/content-creator';
 
 
 @Component({
@@ -38,7 +39,7 @@ export class AISlideDescriptionComponent {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    public agentService: LLM_Agents,
+    public contentCreatorAgent: ContentCreatorAgent,
     public workspaceController: WorkspaceController,
     private presentationService:PresentationService,
     private geminiService: GeminiService
@@ -88,11 +89,11 @@ export class AISlideDescriptionComponent {
     this.errorMessage = '';
 
     try {
-      this.agentService.triggerContentCreator({
+      this.contentCreatorAgent.triggerContentCreator({
         userProblemStatement: this.problemStatement!.trim(),
         previousContent: prevContent,
       });
-      this.streamSub = this.agentService.contentCreatorStream.subscribe({
+      this.streamSub = this.contentCreatorAgent.contentCreatorStream.subscribe({
         next: (event: AgentStreamEvent) => {
           if (event.action === 'thinking') {
             this.thinkingText += event.message;
@@ -165,12 +166,13 @@ export class AISlideDescriptionComponent {
     },1000);
 
   }
+  
   isAgentIntractable()
   {
-    return InvokeEnabledStages.includes(this.agentService.contentCreatorState);
+    return InvokeEnabledStages.includes(this.contentCreatorAgent.contentCreatorState);
   }
   isAgentInaction()
   {
-    return AgentInActionStages.includes(this.agentService.contentCreatorState);
+    return AgentInActionStages.includes(this.contentCreatorAgent.contentCreatorState);
   }
 }

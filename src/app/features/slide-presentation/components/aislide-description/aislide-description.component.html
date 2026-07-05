@@ -20,13 +20,13 @@
   <ng-container *nzModalContent>
     <div class="modal-body">
       <!-- ── Thinking ───────────────────────────────────────── -->
-      <div class="thinking-section" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking || this.agentService.contentCreatorState == this.AgentState.invoked">
+      <div class="thinking-section" *ngIf="this.contentCreatorAgent.contentCreatorState == this.AgentState.thinking || this.contentCreatorAgent.contentCreatorState == this.AgentState.invoked">
         <div class="thinking-header">
           <span class="thinking-label">Thinking...</span>
         </div>
         <div class="thinking-box" #thinkingBox>
           <pre
-            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="this.agentService.contentCreatorState == this.AgentState.thinking">▌</span></pre>
+            class="thinking-text">{{ thinkingText }}<span class="cursor" *ngIf="this.contentCreatorAgent.contentCreatorState == this.AgentState.thinking">▌</span></pre>
         </div>
       </div>
       <!-- ── Content (Markdown) ─────────────────────────────── -->

@@ -89,11 +89,11 @@ export async function pipeResponseToStream(
         }
       }
     }
-    responseEvent.complete();
+    return {thoughts , contents};
   } catch (error) {
-    responseEvent.error(error);
+    throw error;
   } finally {
-    return { thoughts, contents };
+    responseEvent.complete()
   }
 }
 
