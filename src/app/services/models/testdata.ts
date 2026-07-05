@@ -2,7 +2,6 @@ export const Plan = {
   presentation: {
     slides: [
       {
-        slideId: '04b23cb0-e53d-41f5-b65a-88ae2942da91',
         components: [
           {
             id: '15',
@@ -37,7 +36,6 @@ export const Plan = {
             task: "image: 'BLOB-98f80bc6-3979-4178-b132-c084e5af517a', x: 710, y: 180, width: 513, height: 390, z-order: 8",
           },
         ],
-        completed:true
       },
       {
         components: [
@@ -66,7 +64,6 @@ export const Plan = {
             task: "text: 'No installs. No exports to third-party services. Just open and start creating.', font: medium 20px, fill: #4A90E2, x: 110, y: 430, width: 490, height: 40, z-order: 8",
           },
         ],
-        completed:true
       },
       {
         components: [
@@ -116,10 +113,8 @@ export const Plan = {
             task: "text: 'Everything auto-saves. Manage multiple slides with a click.', font: medium 20px, fill: #4A90E2, x: 110, y: 640, width: 980, height: 30, z-order: 15",
           },
         ],
-        completed:true
       },
       {
-        slideId: '61e4fb1e-5212-4e53-9e69-e09b0ea33792',
         components: [
           {
             task: 'shape: rect, fill: #F8F9FA, x: 0, y: 0, width: 1333, height: 750, z-order: 1',
@@ -383,3 +378,313 @@ export const Plan = {
     ],
   },
 };
+
+// import { GenerateContentResponse } from '@google/genai';
+
+// export const responses :any [] = [
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: 'xqc1znuh',
+//                 name: 'addShape',
+//                 args: {
+//                   initialConfig: {
+//                     attrs: {
+//                       x: 540,
+//                       strokeWidth: 1,
+//                       cornerRadius: 16,
+//                       stroke: '#E9ECEF',
+//                       fill: '#FFFFFF',
+//                       width: 360,
+//                       y: 200,
+//                       height: 300,
+//                     },
+//                     zIndex: 9,
+//                   },
+//                   shapeType: 2,
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: '5mzmb9tq',
+//                 name: 'addText',
+//                 args: {
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                   initialConfig: {
+//                     zIndex: 10,
+//                     attrs: {
+//                       fill: '#212529',
+//                       height: 30,
+//                       y: 240,
+//                       width: 300,
+//                       x: 570,
+//                       fontStyle: 'bold',
+//                       fontSize: 24,
+//                       fontFamily: 'Arial',
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: 'rgrwyr2l',
+//                 name: 'addText',
+//                 args: {
+//                   initialConfig: {
+//                     attrs: {
+//                       width: 300,
+//                       y: 280,
+//                       height: 150,
+//                       fill: '#6C757D',
+//                       fontFamily: 'Arial',
+//                       fontSize: 18,
+//                       x: 570,
+//                     },
+//                     zIndex: 11,
+//                   },
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: '4xksig1t',
+//                 name: 'addShape',
+//                 args: {
+//                   initialConfig: {
+//                     zIndex: 12,
+//                     attrs: {
+//                       cornerRadius: 8,
+//                       x: 920,
+//                       y: 330,
+//                       width: 60,
+//                       height: 40,
+//                       fill: '#4A90E2',
+//                     },
+//                   },
+//                   shapeType: 2,
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: '3q5rp9s0',
+//                 name: 'addText',
+//                 args: {
+//                   initialConfig: {
+//                     zIndex: 13,
+//                     attrs: {
+//                       fontStyle: 'bold',
+//                       x: 940,
+//                       fontFamily: 'Arial',
+//                       fontSize: 24,
+//                       fill: '#FFFFFF',
+//                       width: 20,
+//                       y: 335,
+//                       height: 30,
+//                     },
+//                   },
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: '8lllj9zl',
+//                 name: 'addShape',
+//                 args: {
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                   shapeType: 2,
+//                   initialConfig: {
+//                     zIndex: 14,
+//                     attrs: {
+//                       width: 253,
+//                       y: 200,
+//                       height: 300,
+//                       fill: '#FFFFFF',
+//                       strokeWidth: 1,
+//                       cornerRadius: 16,
+//                       stroke: '#E9ECEF',
+//                       x: 1000,
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: '5ufqdi9q',
+//                 name: 'addText',
+//                 args: {
+//                   initialConfig: {
+//                     zIndex: 15,
+//                     attrs: {
+//                       fontFamily: 'Arial',
+//                       fontSize: 24,
+//                       fontStyle: 'bold',
+//                       x: 1030,
+//                       width: 200,
+//                       y: 240,
+//                       height: 30,
+//                       fill: '#212529',
+//                     },
+//                   },
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               thought: true,
+//               functionCall: {
+//                 id: 'xy7x4b3w',
+//                 name: 'addText',
+//                 args: {
+//                   initialConfig: {
+//                     zIndex: 16,
+//                     attrs: {
+//                       fill: '#6C757D',
+//                       y: 280,
+//                       width: 200,
+//                       height: 150,
+//                       x: 1030,
+//                       fontFamily: 'Arial',
+//                       fontSize: 18,
+//                     },
+//                   },
+//                   slideId: 'e43efd54-f071-45a7-b04b-c754c00084d0',
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//       },
+//     ],
+//   },
+
+//   {
+//     candidates: [
+//       {
+//         content: {
+//           role: 'model',
+//           parts: [
+//             {
+//               text: '',
+//             },
+//           ],
+//         },
+//         finishReason: 'MALFORMED_RESPONSE' as any,
+//       },
+//     ],
+//   },
+// ];
+// export async function* replayGeminiResponses() {
+//   for (const response of responses) {
+//     await new Promise((r) => setTimeout(r, 100));
+//     yield response;
+//   }
+// }
+// export async function test () {
+//   const stream = replayGeminiResponses();
+//   const provider = "gemini";
+//   return {stream , provider};
+// }

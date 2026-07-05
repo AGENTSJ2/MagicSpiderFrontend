@@ -212,7 +212,7 @@ export class GeminiService {
     });
     return { stream: stream, provider: 'google' };
   }
-
+  
   /**
    * Generates an image from a text prompt using Gemini's image generation
    * models (e.g. `gemini-2.5-flash-image`). The model returns the image inline

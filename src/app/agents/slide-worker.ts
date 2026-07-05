@@ -72,7 +72,6 @@ export class SlideWorkerAgent {
       },
     ];
 
-    const slideJson = JSON.stringify(slide.toJson());
     const tools = await this.mcpHub.listTools();
     
     let retry = 0;
@@ -81,6 +80,7 @@ export class SlideWorkerAgent {
     while (!params.abortController.signal.aborted && retry < MAX_RETRY) {
       try {
         const responseEvent = new Subject<AgentStreamEvent>();
+        const slideJson = JSON.stringify(slide.toJson());
 
         const response = await this.chatService.streamChat(
           {
@@ -129,7 +129,7 @@ export class SlideWorkerAgent {
         messages.push(ackMessage);
       } catch (error) {
         retry++;
-        waitForMilliseconds(RETRY_TIME_OUT_MS);
+        await waitForMilliseconds(RETRY_TIME_OUT_MS);
       }
     }
     return completed;

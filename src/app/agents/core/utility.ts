@@ -1,4 +1,4 @@
-import { GenerateContentResponse } from '@google/genai';
+import { FinishReason, GenerateContentResponse } from '@google/genai';
 import { AbortableAsyncIterator, ChatResponse, Tool } from 'ollama';
 import { Subject } from 'rxjs';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
@@ -64,6 +64,11 @@ export async function pipeResponseToStream(
         any
       >) {
         const parts = chunk.candidates?.[0]?.content?.parts ?? [];
+        const reason :any =chunk!.candidates!.at(0)!.finishReason; 
+        if(reason == FinishReason.MALFORMED_FUNCTION_CALL || reason == "MALFORMED_RESPONSE")
+        {
+          throw Error(reason);
+        }
         for (const part of parts) {
           if (part.thought) {
             thoughts += part.text;

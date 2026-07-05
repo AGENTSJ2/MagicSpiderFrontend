@@ -11,6 +11,7 @@ import {
 } from './slide-architect';
 import { McpActions } from '../features/slide-presentation/MCP/mcp.actions';
 import { SlideWorkerAgent } from './slide-worker';
+import { Plan } from '../services/models/testdata';
 
 @Injectable({
   providedIn: 'root',
@@ -92,7 +93,7 @@ export class MagicSpiderAgentLoop {
         abortController,
 
       );
-
+      // this.architecture = Plan
       for (const slidePlan of this.architecture.presentation.slides) {
         if (stop) {
           break;
