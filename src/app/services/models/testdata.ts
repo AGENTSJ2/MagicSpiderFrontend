@@ -1,3 +1,5 @@
+import { PlanProgress } from "../../agents/slide-architect";
+
 export const Plan = {
   presentation: {
     slides: [
@@ -36,6 +38,7 @@ export const Plan = {
             task: "image: 'BLOB-98f80bc6-3979-4178-b132-c084e5af517a', x: 710, y: 180, width: 513, height: 390, z-order: 8",
           },
         ],
+        // planProgress:PlanProgress.complete
       },
       {
         components: [

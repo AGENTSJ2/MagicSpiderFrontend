@@ -13,8 +13,9 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
-import { AgentInActionStages, AgentState, AgentStreamEvent, InvokeEnabledStages } from '../../../../agents/core/utility';
+import { AgentInActionStages, AgentState, AgentStreamEvent, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 
 @Component({
@@ -41,7 +42,8 @@ export class AISlideDescriptionComponent {
     public contentCreatorAgent: ContentCreatorAgent,
     public workspaceController: WorkspaceController,
     private presentationService:PresentationService,
-    private geminiService: GeminiService
+    private geminiService: GeminiService,
+    private message:NzMessageService
   ) {}
 
   get contentModel(): Model | undefined {
@@ -102,7 +104,7 @@ export class AISlideDescriptionComponent {
             this.scrollContOnValue(this.genContentElement?.nativeElement)
           } else if (event.action === AgentState.error) {
             this.errorMessage = event.message;
-            this.workspaceController.handleAgentError(event.message);
+            this.message.error(getAgentErrorMessage(event.message));
           }
           this.cdr.detectChanges();
         },
@@ -111,7 +113,7 @@ export class AISlideDescriptionComponent {
             err instanceof Error
               ? err.message
               : 'Stream error. Please try again.';
-          this.workspaceController.handleAgentError(err);
+          this.message.error(getAgentErrorMessage(err))
           this.cdr.detectChanges();
         },
         complete: () => {

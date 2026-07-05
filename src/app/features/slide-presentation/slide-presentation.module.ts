@@ -28,6 +28,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../shared/shared.module';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { ImageListComponent } from './components/image-list/image-list.component';
+import { SlidePlanViewComponent } from './components/slide-plan-view/slide-plan-view.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { ImageListComponent } from './components/image-list/image-list.component
     MagicSpiderAssistantComponent,
     ContentEditableSpanDirective,
     SettingsComponent,
-    ImageListComponent
+    ImageListComponent,
+    SlidePlanViewComponent
   ],
   imports: [
     CommonModule,

@@ -5,6 +5,7 @@ import { Model } from '@google/genai';
 import { Subscription } from 'rxjs';
 import { MagicSpiderAgentLoop } from '../../../../agents/magic-spider-loop';
 import { AgentInActionStages, AgentState, InvokeEnabledStages } from '../../../../agents/core/utility';
+import { waitForMilliseconds } from '../../../../core/utilities';
 
 @Component({
   selector: 'app-magic-spider-assistant',
@@ -12,8 +13,6 @@ import { AgentInActionStages, AgentState, InvokeEnabledStages } from '../../../.
   styleUrl: './magic-spider-assistant.component.scss',
 })
 export class MagicSpiderAssistantComponent implements OnDestroy {
-  thinkingText = '';
-  contentText = '';
   error = '';
   userComment: string = '';
   @ViewChild('thinkingBox')
@@ -25,37 +24,23 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   get defModel(): Model | undefined {
     return this.geminiService.getModel('assistant');
   }
-
+  
   constructor(
     public workspaceController: WorkspaceController,
     private geminiService: GeminiService,
-    private magicSpiderAgentLoop: MagicSpiderAgentLoop,
+    public magicSpiderAgentLoop: MagicSpiderAgentLoop,
   ) {
+    // this.test();
     this.agentSub = magicSpiderAgentLoop.magicSpiderEventStream.subscribe((ev) => {
-      switch (ev.action) {
-        case AgentState.thinking:
-          this.thinkingText += ev.message;
-          this.scrollThinkingContOnValue();
-          break;
-        case AgentState.function:
-          this.thinkingText += `\nCalling Tool : ${ev.functionCall?.name}\n`;
-          this.scrollThinkingContOnValue();
-          break;
-        case AgentState.content:
-          this.contentText = ev.message;
-          this.scrollThinkingContOnValue();
-          break;
-        case AgentState.done:
-          this.thinkingText = '';
-          break;
-        case AgentState.error:
-          this.thinkingText = '';
-          this.error = ev.message;
-          this.workspaceController.handleAgentError(ev.message);
-          break;
-      }
+      this.scrollThinkingContOnValue();
     });
   }
+  // async test() {
+  //   while(true) {
+  //     this.thinkingText+=" Hello Hello Am i Thinking";
+  //     await waitForMilliseconds(500);
+  //   }
+  // }
   scrollThinkingContOnValue() {
     const el = this.thinkingBoxElement?.nativeElement;
 

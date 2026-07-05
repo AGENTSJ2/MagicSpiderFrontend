@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   AgentState,
   AgentStreamEvent,
+  getAgentErrorMessage,
 } from './core/utility';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -11,7 +12,7 @@ import {
 } from './slide-architect';
 import { McpActions } from '../features/slide-presentation/MCP/mcp.actions';
 import { SlideWorkerAgent } from './slide-worker';
-import { Plan } from '../services/models/testdata';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable({
   providedIn: 'root',
@@ -21,19 +22,45 @@ export class MagicSpiderAgentLoop {
   private magicSpiderInterrupt: Subject<boolean> = new Subject();
   private spiderInterruptSub?: Subscription;
 
-  magicSpiderEventStream: Observable<AgentStreamEvent> =
-    this.magicSpiderEvent.asObservable();
-
   magicSpiderState: AgentState = AgentState.idle;
   architecture?: PresentationArchitecture;
+  magicSpiderEventStream: Observable<AgentStreamEvent> = this.magicSpiderEvent.asObservable();
 
+  private thinkLogs:string = "";
+  private contentLogs:string = "";
+
+  get getThinkLogs() {
+    return this.thinkLogs;
+  }
+  get getContentLogs() {
+    return this.contentLogs;
+  }
   constructor(
     private mcpActions: McpActions,
     private slideArchitect: SlideArchitectAgent,
     private slideWorker: SlideWorkerAgent,
+    private message:NzMessageService
   ) {
     this.magicSpiderEventStream.subscribe((event) => {
       this.magicSpiderState = event.action;
+      switch (event.action) {
+        case AgentState.thinking:
+          this.thinkLogs += event.message;
+          break;
+        case AgentState.function:
+          this.thinkLogs += `\nCalling Tool : ${event.functionCall?.name}\n`;
+          break;
+        case AgentState.content:
+          this.contentLogs = event.message;
+          break;
+        case AgentState.done:
+          this.thinkLogs = '';
+          break;
+        case AgentState.error:
+          this.thinkLogs = '';
+          this.message.error(getAgentErrorMessage(event.message))
+          break;
+      }
     });
   }
 
@@ -73,7 +100,7 @@ export class MagicSpiderAgentLoop {
 
     this.magicSpiderEvent.next({
       action: AgentState.thinking,
-      message: '\nSlide Architect is drafting the presentation blueprint\n',
+      message: '\nSlide Architect is drafting the presentation plan\n',
     });
 
     try {
@@ -93,12 +120,11 @@ export class MagicSpiderAgentLoop {
         abortController,
 
       );
-      // this.architecture = Plan
       for (const slidePlan of this.architecture.presentation.slides) {
         if (stop) {
           break;
         }
-        if (slidePlan.completed) {
+        if (slidePlan.planProgress) {
           continue;
         }
         await this.slideWorker.run({

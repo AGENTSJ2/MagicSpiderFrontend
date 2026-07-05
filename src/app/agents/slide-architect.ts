@@ -11,11 +11,19 @@ import { ThinkingLevel } from '@google/genai';
 export interface ArchitectComponentTask {
   id?: string;
   task: string;
+  // completed?:boolean;
 }
+export enum PlanProgress {
+  idle,
+  inProgress,
+  complete
+}
+
 export interface ArchitectSlidePlan {
   slideId?: string;
   components: ArchitectComponentTask[];
-  completed?: boolean;
+  planProgress?: PlanProgress;
+
 }
 export interface PresentationArchitecture {
   presentation: {
@@ -88,7 +96,7 @@ export class SlideArchitectAgent {
     let retry = 0;
     let completedContent:string = "";
 
-    while(!completed && retry < MAX_RETRY) {
+    while(!completed && retry < MAX_RETRY && !abortController?.signal.aborted) {
       try {
         const responseEvent = new Subject<AgentStreamEvent>();
         responseEvent.subscribe((event)=>{

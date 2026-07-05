@@ -1,0 +1,79 @@
+@if (slides.length) {
+  <div class="plan-card">
+    <div class="plan-header">
+      <div class="plan-title">
+        <i class="fi fi-rr-diagram-project d-flex align-items-center"></i>
+        <span>Plan</span>
+      </div>
+      <span class="plan-count">{{ completedCount }}/{{ totalCount }}</span>
+    </div>
+
+    <div class="plan-slides">
+      @for (
+        slide of slides;
+        track trackBySlide($index, slide);
+        let i = $index
+      ) {
+        <div
+          class="slide-item"
+          [class.is-progress]="isInProgress(slide)"
+          [class.is-done]="isComplete(slide)"
+        >
+          <div
+            class="slide-row"
+            (click)="toggle(i, slide)"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="isExpanded(i, slide)"
+          >
+            <span class="status-dot">
+              @if (isInProgress(slide)) {
+                <nz-spin nzSimple [nzSize]="'small'"></nz-spin>
+              } @else if (isComplete(slide)) {
+                <i class="fi fi-sr-check d-flex align-items-center"></i>
+              } @else {
+                <span class="dot-index">{{ i + 1 }}</span>
+              }
+            </span>
+
+            <span class="slide-name">
+              Slide {{ i + 1 }}
+              @if (isNewSlide(slide)) {
+                <span class="pill pill-new">New</span>
+              }
+            </span>
+
+            <span class="slide-count"
+              >{{ slide.components.length }}
+              {{ slide.components.length === 1 ? "task" : "tasks" }}</span
+            >
+
+            <i
+              class="fi fi-rr-angle-small-down chevron d-flex align-items-center"
+              [class.open]="isExpanded(i, slide)"
+            ></i>
+          </div>
+
+          @if (isExpanded(i, slide)) {
+            <ul class="task-list">
+              @for (
+                component of slide.components;
+                track trackByComponent($index, component)
+              ) {
+                <li class="task-item">
+                  <span class="task-dot" [class.done]="isComplete(slide)"></span>
+                  <span class="task-text">{{ component.task }}</span>
+                  @if (isNewComponent(component)) {
+                    <span class="pill pill-new">Add</span>
+                  } @else {
+                    <span class="pill pill-edit">Edit</span>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

@@ -75,17 +75,6 @@ export class WorkspaceController {
     }
   }
 
-  // Handles errors surfaced by the agents. When the failure is caused by a
-  // missing or invalid API key, prompt the user and open AI Settings so they
-  // can add one. Returns true when the error was an API key error.
-  handleAgentError(error: unknown): boolean {
-    if (!isApiKeyError(error)) {
-      return false;
-    }
-    this.message.warning('An API key is required. Please add your API key in AI Settings.');
-    return true;
-  }
-
   async exportPPT(presentation: Presentation) {
     try {
       await this.presentationService.exportPPTtoPPTX(presentation);

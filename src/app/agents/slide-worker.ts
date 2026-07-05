@@ -7,7 +7,7 @@ import {
   pipeResponseToStream,
 } from './core/utility';
 import { GeminiService } from '../services/gemini.service';
-import { ArchitectSlidePlan } from './slide-architect';
+import { ArchitectSlidePlan, PlanProgress } from './slide-architect';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Message, ToolCall } from 'ollama';
 import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
@@ -79,6 +79,7 @@ export class SlideWorkerAgent {
     
     while (!params.abortController.signal.aborted && retry < MAX_RETRY) {
       try {
+        params.slidePlan.planProgress = PlanProgress.inProgress;
         const responseEvent = new Subject<AgentStreamEvent>();
         const slideJson = JSON.stringify(slide.toJson());
 
@@ -122,7 +123,7 @@ export class SlideWorkerAgent {
         if (toolCalls.length == 0) {
           console.log('slide completed gracefully');
           completed = true;
-          params.slidePlan.completed = true;
+          params.slidePlan.planProgress = PlanProgress.complete;
           break;
         }
         const ackMessage = await this.invokeTools(toolCalls);

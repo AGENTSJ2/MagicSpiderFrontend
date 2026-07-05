@@ -64,9 +64,11 @@ export async function pipeResponseToStream(
         any
       >) {
         const parts = chunk.candidates?.[0]?.content?.parts ?? [];
-        const reason :any =chunk!.candidates!.at(0)!.finishReason; 
-        if(reason == FinishReason.MALFORMED_FUNCTION_CALL || reason == "MALFORMED_RESPONSE")
-        {
+        const reason: any = chunk!.candidates!.at(0)!.finishReason;
+        if (
+          reason == FinishReason.MALFORMED_FUNCTION_CALL ||
+          reason == 'MALFORMED_RESPONSE'
+        ) {
           throw Error(reason);
         }
         for (const part of parts) {
@@ -94,11 +96,11 @@ export async function pipeResponseToStream(
         }
       }
     }
-    return {thoughts , contents};
+    return { thoughts, contents };
   } catch (error) {
     throw error;
   } finally {
-    responseEvent.complete()
+    responseEvent.complete();
   }
 }
 
@@ -140,4 +142,10 @@ export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {
       },
     },
   };
+}
+export function getAgentErrorMessage(error: unknown): string {
+  if (!isApiKeyError(error)) {
+    return "Something Went";
+  }
+  return  'An API key is required. Please add your API key in AI Settings.'
 }
