@@ -248,6 +248,10 @@ export class WorkspaceComponent {
     }
     return true;
   }
+  handleRemoveComponent(component:ICanvasComponent) {
+    const slide : Slide = (component as any).slide as Slide;
+    slide.removeComponent(component)
+  }
 }
 enum ToolBoxType {
   TextToolBox = 'Text',

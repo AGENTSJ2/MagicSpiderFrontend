@@ -2,7 +2,6 @@ import { Shape, ShapeConfig } from 'konva/lib/Shape';
 import {
   ComponentConfig,
   PresentationEvent,
-  PresentationEventStream,
   PresentationEventType,
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
@@ -30,6 +29,9 @@ export default abstract class BaseController {
 
   protected handleNodeClick(): void {
     this.node.on('click', () => {
+      this.slide.selectComponent(this.canvasComponent);
+    });
+    this.node.on('tap', () => {
       this.slide.selectComponent(this.canvasComponent);
     });
   }

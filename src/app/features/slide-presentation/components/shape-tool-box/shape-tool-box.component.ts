@@ -113,14 +113,6 @@ export class ShapeToolBoxComponent implements OnChanges {
 
   private sanitizeValues(values: Record<string, any>): Record<string, any> {
     const attrs: Record<string, any> = { ...values };
-    // Toolbox-only controls; applyChanges() translates these into fill /
-    // fillLinearGradient* attrs itself.
-    // delete attrs['gradientEnabled'];
-    // delete attrs['gradientStart'];
-    // delete attrs['gradientEnd'];
-    // delete attrs['gradientOffset'];
-    // delete attrs['gradientWidth'];
-    // delete attrs['fill'];
 
     if (this.shapeType == ShapeType.CIRCLE) {
       delete attrs['width'];

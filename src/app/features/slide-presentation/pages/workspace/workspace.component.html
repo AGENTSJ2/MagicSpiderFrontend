@@ -257,7 +257,7 @@
 <!-- TOOL BOX DRAWER -->
 <nz-drawer
   [nzVisible]="workSpaceController.showToolBox"
-  nzTitle="Properties"
+  [nzTitle]="toolBoxTitle"
   (nzOnClose)="workSpaceController.toggleToolBox(false)"
   [nzMask]="false"
 >
@@ -293,4 +293,18 @@
       }
     }
   </ng-container>
+  <ng-template #toolBoxTitle>
+    <div class="d-flex justify-content-between min-height-0 min-width-0">
+      <p class="mb-0 flex-fill">Properties</p>
+      <button 
+        class="comp-del-btn" 
+        (click)="handleRemoveComponent(selectedComponent!)" 
+        title="Delete"
+        [style.visibility]="selectedComponent==undefined ? 'hidden':'visible'"
+      >
+              <i class="fi fi-rs-trash d-flex align-items-center justify-content-center"></i>
+      </button>
+        
+    </div>
+  </ng-template>
 </nz-drawer>
