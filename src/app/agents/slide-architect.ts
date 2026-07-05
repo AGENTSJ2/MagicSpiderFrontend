@@ -6,6 +6,7 @@ import { GeminiService } from '../services/gemini.service';
 import { AgentStreamEvent, pipeResponseToStream } from './core/utility';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
+import { ThinkingLevel } from '@google/genai';
 
 export interface ArchitectComponentTask {
   id?: string;
@@ -101,6 +102,7 @@ export class SlideArchitectAgent {
           },
           [],
           abortController,
+          ThinkingLevel.HIGH
         );
 
         const { contents } = await pipeResponseToStream(
@@ -127,6 +129,8 @@ const SlideArchitectPrompt = [
   '{"presentation":{"slides":[{"slideId":"only if the slide already exists","components":[{"id":"only if the component already exists","task":"changes that should be done with detailed but concise things to do"}]}]}}',
   'For existing slides include their slideId from the provided JSON and omit slideId for new slides that must be created',
   'For existing components include their id and omit id for new components, a task may also ask to delete an existing component by its id',
+  'If the request modifies existing content, return only the affected slides and components. Include their existing slideId and component id, and do not include unchanged slides or components.',
+  'If the user has uploaded images, incorporate them into the presentation where appropriate. A well-designed presentation should make effective use of relevant user-provided images.',
   'Each task must be self contained and actionable : state the component type (text, shape or image), its content, position x y, size, colors, font details and z order so the implementer needs no other context',
   'Order the components of a slide background first then foreground',
   'The Slide style should be modern and attractive to look at',

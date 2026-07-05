@@ -7,5 +7,5 @@
 - ### Add Side bar collapse for making it suitable for mobile view
 - ### Add Mobile accessible drag and  other features
 - ### Add change to Navbar for mobile view
-
+- ### Remove Test data and todos
 

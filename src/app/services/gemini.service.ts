@@ -6,6 +6,7 @@ import {
   Modality,
   Model,
   Part,
+  ThinkingLevel,
 } from '@google/genai';
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
@@ -59,7 +60,7 @@ export class GeminiService {
     }
     this.loadAgentModels();
   }
-  
+
   updateApiKey(key?: string): Promise<Model[]> {
     const trimmed = key?.trim();
     if (trimmed) {
@@ -133,7 +134,23 @@ export class GeminiService {
       }
     });
   }
+  private thinkingLevelToBudget(level: ThinkingLevel): number {
+  switch (level) {
+    case ThinkingLevel.MINIMAL:
+      return 512;    // Quick reasoning
 
+    case ThinkingLevel.LOW:
+      return 2048;   // General coding & assistant tasks
+
+    case ThinkingLevel.MEDIUM:
+      return 4096;   // Complex reasoning & planning
+
+    case ThinkingLevel.HIGH:
+      return 8192;
+    default:
+      return -1;     // Let Gemini decide
+  }
+}
   getModel(agent: AgentKey): Model | undefined {
     return this._models[agent];
   }
@@ -196,19 +213,20 @@ export class GeminiService {
     const convertedResult = convertToChatResponse(result);
     return convertedResult;
   }
-  readonly MAX_RETRY = 100;
-  
+
   async streamChat(
     request: Partial<ChatRequest>,
     tools?: McpTool[],
     abortController?: AbortController,
+    thinkingLevel?: ThinkingLevel,
   ) {
     const gemTools = this.getGeminiTools(tools ?? []);
     const systemInstruction = request.messages
-          ?.filter((m) => m.role === 'system')
-          .map((m) => m.content)
-          .join('\n');
-    const otherMessages = request.messages?.filter((m)=>m.role!=='system') ?? [];
+      ?.filter((m) => m.role === 'system')
+      .map((m) => m.content)
+      .join('\n');
+    const otherMessages =
+      request.messages?.filter((m) => m.role !== 'system') ?? [];
     const stream = await this.requireClient().models.generateContentStream({
       model: request.model ?? this.ModelName,
       contents: (otherMessages ?? []).map((msg) => ({
@@ -220,11 +238,19 @@ export class GeminiService {
         systemInstruction: systemInstruction,
         tools: gemTools,
         abortSignal: abortController?.signal,
+        ...(thinkingLevel
+          ? {
+              thinkingConfig: {
+                thinkingLevel,
+                thinkingBudget:this.thinkingLevelToBudget(thinkingLevel)
+              },
+            }
+          : {}),
       },
     });
     return { stream: stream, provider: 'google' };
   }
-  
+
   /**
    * Generates an image from a text prompt using Gemini's image generation
    * models (e.g. `gemini-2.5-flash-image`). The model returns the image inline
@@ -235,8 +261,7 @@ export class GeminiService {
     prompt: string,
     abortController?: AbortController,
   ): Promise<GeneratedImage> {
-    const model =
-      this.getModel('image')?.name ?? this.DefaultImageModel;
+    const model = this.getModel('image')?.name ?? this.DefaultImageModel;
     const response = await this.requireClient().models.generateContent({
       model,
       contents: prompt,
