@@ -76,4 +76,31 @@
       color: #ff4d4f;
     }
   }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    min-height: 0;
+
+    &__sidebar {
+      flex-direction: row;
+      width: 100%;
+      gap: 4px;
+      border-right: none;
+      border-bottom: 1px solid #f0f0f0;
+      padding-right: 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    &__nav-item {
+      flex-shrink: 0;
+      white-space: nowrap;
+      border-radius: 6px;
+    }
+
+    &__content {
+      max-width: 100%;
+      gap: 16px;
+    }
+  }
 }
