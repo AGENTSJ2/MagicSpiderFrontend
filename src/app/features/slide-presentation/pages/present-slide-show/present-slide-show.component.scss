@@ -1,0 +1,126 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: block;
+  background: #0b0b0b;
+}
+
+.present-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.stage-area {
+  width: 100%;
+  height: 100%;
+  padding: 2.5vh 2.5vw;
+
+  // Let the hosted slide fill the presentation area (editor keeps it at 90%).
+  ::ng-deep app-slide {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  ::ng-deep .slide {
+    width: 100%;
+  }
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+
+  &.prev {
+    left: 24px;
+  }
+
+  &.next {
+    right: 24px;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0 !important;
+    cursor: default;
+  }
+}
+
+.present-root:hover .nav-arrow:not(:disabled) {
+  opacity: 1;
+}
+
+.hud {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+
+  .counter {
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    user-select: none;
+  }
+
+  .exit-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+  }
+}
+
+.present-root:hover .hud {
+  opacity: 1;
+}
+
+.present-empty {
+  width: 100%;
+  height: 100%;
+  color: #fff;
+
+  .exit-btn-text {
+    padding: 8px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}

@@ -48,7 +48,7 @@ export default class SlideController {
       y: 0,
       width: this.stage.width(),
       height: this.stage.height(),
-      fill: 'white',
+      fill: 'transparent',
       stroke: 'black',
       strokeWidth: 0,
     });

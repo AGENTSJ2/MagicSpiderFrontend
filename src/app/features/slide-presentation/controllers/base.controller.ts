@@ -40,7 +40,8 @@ export default abstract class BaseController {
     currentConfig: ComponentConfig<ShapeConfig>;
     zIndexActions?: ZIndexActions;
   }) {
-    this.canvasComponent.slide.controller.mainCover.moveToBottom();
+    // this.canvasComponent.slide.controller.mainCover.moveToBottom();
+    // Now rmoved becoause it messed with agent perception of z index
   }
   protected handleDragEvents() {
     let XBeforeDrag: number = this.node.x();

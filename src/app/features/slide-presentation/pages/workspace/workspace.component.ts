@@ -8,7 +8,7 @@ import {
 } from '../../domain/EventModels/presentationEvents.model';
 import { WorkspaceController } from './workspace.controller';
 import { PresentationService } from '../../../../services/konva.services/presentation.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
@@ -35,6 +35,7 @@ export class WorkspaceComponent {
     public workSpaceController: WorkspaceController,
     private presentationService: PresentationService,
     private route: ActivatedRoute,
+    private router: Router,
     private message: NzMessageService,
     private modal: NzModalService,
   ) {
@@ -202,6 +203,16 @@ export class WorkspaceComponent {
     }
     this.presentation.moveSlide(event.previousIndex, event.currentIndex);
     this.hasUnSavedChanges = true;
+  }
+
+  startPresentation() {
+    if (this.presentation.slides.length === 0) {
+      this.message.info('Add a slide before presenting');
+      return;
+    }
+    this.router.navigate(['/workspace/present'], {
+      queryParams: { id: this.presentation.id },
+    });
   }
 
   handleOpenAiDescription() {

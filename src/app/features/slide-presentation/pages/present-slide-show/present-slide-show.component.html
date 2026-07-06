@@ -1,0 +1,44 @@
+@if (loading) {
+  <div class="present-empty d-flex justify-content-center align-items-center">
+    <p class="mb-0">Loading...</p>
+  </div>
+} @else if (presentation && slides.length) {
+  <div class="present-root" (click)="onBackdropClick()">
+    <div class="stage-area d-flex justify-content-center align-items-center">
+      <app-slide
+        *ngIf="presentation.getActiveSlide"
+        [slide]="presentation.getActiveSlide!"
+      ></app-slide>
+    </div>
+
+    <button
+      class="nav-arrow prev d-flex justify-content-center align-items-center"
+      (click)="prev($event)"
+      [disabled]="currentIndex === 0"
+      title="Previous (←)"
+    >
+      <i class="fi fi-rr-angle-small-left d-flex justify-content-center align-items-center"></i>
+    </button>
+
+    <button
+      class="nav-arrow next d-flex justify-content-center align-items-center"
+      (click)="next($event)"
+      [disabled]="currentIndex >= slides.length - 1"
+      title="Next (→)"
+    >
+      <i class="fi fi-rr-angle-small-right d-flex justify-content-center align-items-center"></i>
+    </button>
+
+    <div class="hud d-flex align-items-center gap-3" (click)="$event.stopPropagation()">
+      <span class="counter">{{ currentIndex + 1 }} / {{ slides.length }}</span>
+      <button class="exit-btn d-flex justify-content-center align-items-center" (click)="exit($event)" title="Exit (Esc)">
+        <i class="fi fi-rr-cross-small d-flex justify-content-center align-items-center"></i>
+      </button>
+    </div>
+  </div>
+} @else {
+  <div class="present-empty d-flex flex-column justify-content-center align-items-center gap-3">
+    <p class="mb-0">No slides to present</p>
+    <button class="exit-btn-text" (click)="exit()">Go back</button>
+  </div>
+}

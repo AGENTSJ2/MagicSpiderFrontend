@@ -37,7 +37,9 @@ export class ImageNodeService {
     }
     const { imageSrc, ...attrs } = config.attrs;
     params.node.setAttrs(attrs as ImageConfig);
-    params.node.zIndex(config.zIndex);
+    if(config.zIndex !== undefined) {
+      params.node.zIndex(config.zIndex);
+    }
 
     if (imageSrc && imageSrc !== params.node.getAttr('imageSrc')) {
       const imageElement = new Image();

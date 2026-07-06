@@ -29,6 +29,7 @@ import { SharedModule } from '../shared/shared.module';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { ImageListComponent } from './components/image-list/image-list.component';
 import { SlidePlanViewComponent } from './components/slide-plan-view/slide-plan-view.component';
+import { PresentSlideShowComponent } from './pages/present-slide-show/present-slide-show.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { SlidePlanViewComponent } from './components/slide-plan-view/slide-plan-
     ContentEditableSpanDirective,
     SettingsComponent,
     ImageListComponent,
-    SlidePlanViewComponent
+    SlidePlanViewComponent,
+    PresentSlideShowComponent
   ],
   imports: [
     CommonModule,
