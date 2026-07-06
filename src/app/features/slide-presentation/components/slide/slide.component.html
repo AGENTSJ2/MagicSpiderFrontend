@@ -3,5 +3,6 @@
          class="slide flex-1"
          [class.zoomed]="zoom > 1"
          [class.panning]="isPanning"
-         [style.transform]="transform"></div>
+         [style.transform]="transform" (click)="handleClickInsideSlide($event)">
+    </div>
 </div>

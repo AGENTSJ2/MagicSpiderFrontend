@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { DocumentConfiguration } from '../../domain/models/documentConfiguration.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
@@ -39,7 +47,7 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   private panOriginX = 0;
   private panOriginY = 0;
 
-  constructor(private workspaceController:WorkspaceController) {
+  constructor(private workspaceController: WorkspaceController) {
     this.zoom = this.loadZoom();
     const pan = this.loadPan();
     this.panX = pan.x;
@@ -54,7 +62,10 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     };
     this.observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        this.slide.controller.triggerResize({ divElm: this.cont.nativeElement, config: config });
+        this.slide.controller.triggerResize({
+          divElm: this.cont.nativeElement,
+          config: config,
+        });
       }
     });
     this.observer.observe(this.cont.nativeElement);
@@ -156,8 +167,8 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
     this.panOriginY = this.panY;
   }
 
-  private updatePan(clientX: number, clientY: number): void {    
-    if(!this.workspaceController.selectedComponent) {
+  private updatePan(clientX: number, clientY: number): void {
+    if (!this.workspaceController.selectedComponent) {
       this.panX = this.panOriginX + (clientX - this.panStartX);
       this.panY = this.panOriginY + (clientY - this.panStartY);
     }
@@ -171,7 +182,10 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   }
 
   private applyZoom(value: number): void {
-    this.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.round(value * 1000) / 1000));
+    this.zoom = Math.min(
+      MAX_ZOOM,
+      Math.max(MIN_ZOOM, Math.round(value * 1000) / 1000),
+    );
     // reset pan when back at (or below) natural size so the slide re-centers
     if (this.zoom <= 1) {
       this.panX = 0;
@@ -227,6 +241,16 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
       localStorage.setItem(PAN_STORAGE_KEY, JSON.stringify({ x, y }));
     } catch {
       // ignore persistence failures
+    }
+  }
+
+  handleClickInsideSlide($event: Event) {
+    const target = $event.target as HTMLElement;
+    if (target.closest('.konvajs-content')) {
+      console.log('Clicked inside an .item element');
+      $event.stopImmediatePropagation();
+    } else {
+      this.workspaceController.clearAllSelection();
     }
   }
 }

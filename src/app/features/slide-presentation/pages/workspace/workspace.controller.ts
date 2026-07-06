@@ -87,4 +87,8 @@ export class WorkspaceController {
       console.log(error);
     }
   }
+  clearAllSelection() {
+    this.activePresentation?.getActiveSlide?.controller.clearSelections();
+    this.selectedComponent = undefined;
+  }
 }
