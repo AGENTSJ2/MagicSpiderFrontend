@@ -247,7 +247,6 @@ export class SlideComponent implements AfterViewInit, OnDestroy {
   handleClickInsideSlide($event: Event) {
     const target = $event.target as HTMLElement;
     if (target.closest('.konvajs-content')) {
-      console.log('Clicked inside an .item element');
       $event.stopImmediatePropagation();
     } else {
       this.workspaceController.clearAllSelection();

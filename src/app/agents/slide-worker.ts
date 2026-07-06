@@ -34,6 +34,9 @@ export class SlideWorkerAgent {
           toolName: tool.function.name,
           args: tool.function.arguments,
         });
+        if(result.isError) {
+          throw new InternalMcpError(JSON.stringify(result.content));
+        }
         ackMessage.content += `Successfully called[${tool.function.name}] result : ${JSON.stringify(result.content)} \n`;
       } catch (error) {
         ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
@@ -49,18 +52,6 @@ export class SlideWorkerAgent {
     magicSpiderEvent: Subject<AgentStreamEvent>;
     abortController: AbortController;
   }) {
-    let slide = params.presentation.slides.find(
-      (sl) => sl.slideId == params.slidePlan.slideId,
-    );
-    if (!slide) {
-      slide = params.presentation.addSlide();
-    }
-
-    params.magicSpiderEvent.next({
-      action: AgentState.thinking,
-      message: `\nImplementing slide ${slide.slideId}\n`,
-    });
-
     const messages: Message[] = [
       {
         role: 'system',
@@ -68,7 +59,7 @@ export class SlideWorkerAgent {
       },
       {
         role: 'user',
-        content: `Architecture plan for slide ${slide.slideId} : ${JSON.stringify(params.slidePlan.components)}`,
+        content: `Architecture plan for slide this slide : ${JSON.stringify(params.slidePlan.components)}`,
       },
     ];
 
@@ -76,9 +67,20 @@ export class SlideWorkerAgent {
     
     let retry = 0;
     let completed :boolean = false;
-    
+     params.magicSpiderEvent.next({
+        action: AgentState.thinking,
+        message: `\nImplementing New Slide \n`,
+      });
+    let slide = params.presentation.slides.find(
+      (sl) => sl.slideId == params.slidePlan.slideId,
+    );
     while (!params.abortController.signal.aborted && retry < MAX_RETRY) {
       try {
+        slide = params.presentation.slides.find((sl)=>sl.slideId == slide?.slideId) // Just beacasue of the unusal error
+        if (!slide) {
+          slide = params.presentation.addSlide();
+        }
+
         params.slidePlan.planProgress = PlanProgress.inProgress;
         const responseEvent = new Subject<AgentStreamEvent>();
         const slideJson = JSON.stringify(slide.toJson());

@@ -3,7 +3,7 @@
     <p class="mb-0">Loading...</p>
   </div>
 } @else if (presentation && slides.length) {
-  <div class="present-root" (click)="onBackdropClick()">
+  <div class="present-root" (click)="onBackdropClick($event)">
     <div class="stage-area d-flex justify-content-center align-items-center">
       <app-slide
         *ngIf="presentation.getActiveSlide"

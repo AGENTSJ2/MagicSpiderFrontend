@@ -120,6 +120,7 @@ export class MagicSpiderAgentLoop {
         abortController,
 
       );
+      // this.architecture = Plan;
       for (const slidePlan of this.architecture.presentation.slides) {
         if (stop) {
           break;

@@ -88,9 +88,10 @@ export class PresentSlideShowComponent implements OnInit {
     }
   }
 
-  onBackdropClick(): void {
+  onBackdropClick($event:Event): void {
     // Click anywhere on the stage to advance, like a normal slideshow.
     this.next();
+    $event.stopImmediatePropagation();
   }
 
   exit(event?: Event): void {
