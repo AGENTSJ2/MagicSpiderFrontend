@@ -103,6 +103,14 @@ export class Presentation {
     }
     this.slides.splice(slideIdx, 1);
     slide?.destroy();
+
+    if(this.getActiveSlide == slide) {
+      this.setActiveSlide = undefined;
+      setTimeout(()=>{
+        let nextIdx = slideIdx - 1 < 0 ? 0 : slideIdx - 1;
+        this.setActiveSlide = this.slides.at(nextIdx);
+      })
+    }
     return slide;
   }
 }

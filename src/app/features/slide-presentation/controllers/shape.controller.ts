@@ -43,7 +43,7 @@ export default class ShapeController extends BaseController {
     document.addEventListener('keydown', this.handleKeyboardStrokes);
   }
 
-  public applyConfigurations(event: {
+  override applyConfigurations(event: {
     currentConfig: ComponentConfig<ShapeConfig>;
     zIndexActions?: ZIndexActions;
   }) :ShapeComponent{
@@ -53,6 +53,7 @@ export default class ShapeController extends BaseController {
       zIndexActions: event.zIndexActions,
       config: config,
     });
+    super.applyConfigurations(event);
     return this.canvasComponent;
   }
 

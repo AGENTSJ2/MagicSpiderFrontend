@@ -14,7 +14,6 @@ import { textNodeService } from '../../../services/konva.services/textNode.servi
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 
 export default class TextController extends BaseController {
-  private readonly positionSlack = 5;
   private eventSubscription!: Subscription;
   override node: Konva.Text;
   override canvasComponent: TextComponent;
@@ -36,7 +35,7 @@ export default class TextController extends BaseController {
     document.addEventListener('keydown', this.handleKeyboardStrokes);
   }
 
-  applyConfigurations(event: {
+  override applyConfigurations(event: {
     currentConfig: ComponentConfig<TextConfig>;
     zIndexActions?: ZIndexActions;
   }) {
@@ -46,6 +45,7 @@ export default class TextController extends BaseController {
       config: config,
       zIndexActions: event.zIndexActions,
     });
+    super.applyConfigurations(event);
     return this.canvasComponent;
   }
 

@@ -1,7 +1,6 @@
-import { Image as KonvaImage, ImageConfig } from 'konva/lib/shapes/Image';
+import { Image as KonvaImage, } from 'konva/lib/shapes/Image';
 import {
   ComponentConfig,
-  PresentationEvent,
   PresentationEventStream,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
@@ -9,7 +8,6 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
 import { imageNodeService } from '../../../services/konva.services/image.service';
 import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
-import blobService from '../../../services/blob.service';
 
 export default class ImageController extends BaseController {
   override node: KonvaImage;
@@ -37,7 +35,7 @@ export default class ImageController extends BaseController {
     document.removeEventListener('keydown', this.handleKeyboardStrokes);
   }
 
-  applyConfigurations(event: {
+  override applyConfigurations(event: {
     currentConfig: ComponentConfig<SerializableImageConfig>;
     zIndexActions?: ZIndexActions;
   }) :ImageComponent{
@@ -47,6 +45,7 @@ export default class ImageController extends BaseController {
       node: this.node,
       zIndexActions: event.zIndexActions,
     });
+    super.applyConfigurations(event);
     return this.canvasComponent;
   }
 

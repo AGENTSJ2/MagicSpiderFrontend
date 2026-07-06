@@ -110,34 +110,24 @@ background-size:
     padding: 10px 0px;
     position: relative;
     cursor: pointer;
-    .shape-types {
-      position: absolute;
-      display: flex;
-      opacity: 0;
-      flex-direction: column;
-      gap: 5px;
-      padding: 5px;
-      background-color: white;
-      border: 1px solid var(--border-color-primary);
-      top: -50%;
-      right: -130%;
-      z-index: 1;
-
-      .shape-type {
-        border-bottom: 1px solid var(--border-color-primary);
-        padding: 5px;
-
-        &:last-child {
-          border-bottom: none;
-        }
-      }
-    }
     &:hover
     {
       background-color: var(--background-secondary);
     }
-    &:hover .shape-types {
-      opacity: 1;
+  }
+}
+
+::ng-deep .shape-types {
+  padding: 5px;
+
+  .shape-type {
+    border: 1px solid var(--border-color-primary);
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--background-secondary);
     }
   }
 }

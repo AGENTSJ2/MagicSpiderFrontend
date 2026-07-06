@@ -3,6 +3,7 @@ import {
   ComponentConfig,
   PresentationEvent,
   PresentationEventType,
+  ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
@@ -35,7 +36,12 @@ export default abstract class BaseController {
       this.slide.selectComponent(this.canvasComponent);
     });
   }
-
+  protected applyConfigurations(event: {
+    currentConfig: ComponentConfig<ShapeConfig>;
+    zIndexActions?: ZIndexActions;
+  }) {
+    this.canvasComponent.slide.controller.mainCover.moveToBottom();
+  }
   protected handleDragEvents() {
     let XBeforeDrag: number = this.node.x();
     let YBeforeDrag: number = this.node.y();
@@ -60,9 +66,8 @@ export default abstract class BaseController {
       XBeforeDrag = this.node.x();
       YBeforeDrag = this.node.y();
     });
-    this.node.on('dragmove',()=>{
-      if(!this.slide.controller.isNodeSelected(this.node))
-      {
+    this.node.on('dragmove', () => {
+      if (!this.slide.controller.isNodeSelected(this.node)) {
         this.node.x(XBeforeDrag);
         this.node.y(YBeforeDrag);
       }
@@ -131,7 +136,7 @@ export default abstract class BaseController {
   }
 
   protected handleRotationEvents() {}
-  
+
   protected handleRemove() {
     this.slide.removeComponent(this.canvasComponent);
   }
@@ -159,7 +164,7 @@ export default abstract class BaseController {
     };
     return configs;
   }
-  
+
   undoEvent(presentationEvent: PresentationEvent) {
     switch (presentationEvent.eventType) {
       case PresentationEventType.ADD:
