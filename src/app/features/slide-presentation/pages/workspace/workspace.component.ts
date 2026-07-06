@@ -164,9 +164,7 @@ export class WorkspaceComponent {
         }, 1000);
         this.slideTimeOutMap.set(slideId!, timeOutTracker);
       }
-      if (event.eventType == PresentationEventType.SELECT) {
-        this.selectedToolBox = this.getToolBoxType(targetComponent!);
-      }
+      this.selectedToolBox = this.getToolBoxType(targetComponent!);
       this.setSelectedComponent(targetComponent);
     });
   }
@@ -179,7 +177,7 @@ export class WorkspaceComponent {
   }
 
   getToolBoxType(comp: ICanvasComponent): ToolBoxType {
-    switch (comp.node.className) {
+    switch (comp?.node?.className) {
       case 'Text':
         return ToolBoxType.TextToolBox;
       case 'Image':
