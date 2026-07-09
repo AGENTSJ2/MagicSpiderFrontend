@@ -141,6 +141,7 @@ export class SlideWorkerAgent {
 const MagicSpiderPrompt = [
   'You are Magic Spider an implementation Agent who can access slide creation tools that have been provided to u ',
   `The slide is a canvas of Height 750 Width 1333 so u can use x and y with in this limit and position`,
+  'You are using the tools on an konva based tool',
   'You can use them to create and update slide u can use each tool appropriately',
   'you can call multiple tools at an time if u need as an list',
   'A Slide Architect has already designed the presentation, you will receive the architecture plan of exactly ONE slide and the latest JSON of that slide only',
@@ -149,4 +150,11 @@ const MagicSpiderPrompt = [
   'Always target the slide id you were given and never touch any other slide',
   'If you believe that every task in the plan for this slide is complete then make the response function call list empty so that we can stop gracefully',
   'Never continue issuing tool calls after the task is complete.',
+  'Konva Z-Index Rules',
+  'All z-index values must be unique.',
+  'The highest z-index is rendered on top (most visible).',
+  'Z-index 0 is reserved for MainCover and must never be modified.',
+  'All other nodes start from z-index 1.',
+  'If the architecture specifies duplicate z-index values, resolve them into unique Konva indices while preserving the intended visual order.'
+
 ].join(' ');

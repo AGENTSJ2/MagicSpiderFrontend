@@ -7,6 +7,8 @@ import { SettingsComponent } from '../settings/settings.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { isApiKeyError } from '../../../../agents/core/utility';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
+import { MagicSpiderAgentLoop } from '../../../../agents/magic-spider-loop';
+import { ContentCreatorAgent } from '../../../../agents/content-creator';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +25,9 @@ export class WorkspaceController {
     private presentationService: PresentationService,
     private message: NzMessageService,
     private presentationContext: ActivePresentationContext,
-    private modal:NzModalService
+    private modal:NzModalService,
+    private magicSpiderLoop:MagicSpiderAgentLoop,
+    private contentCreator:ContentCreatorAgent
   ) {}
 
   public get activePresentation(): Presentation | undefined {
@@ -31,6 +35,10 @@ export class WorkspaceController {
   }
 
   public set setActivePresentation(v: Presentation | undefined) {
+    if(v == undefined) {
+      this.magicSpiderLoop.InterruptMagicSpider();
+      this.contentCreator.interruptContentCreator();
+    }
     this.presentationContext.activePresentation = v;
   }
 

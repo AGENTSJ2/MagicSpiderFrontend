@@ -51,6 +51,7 @@ export default class SlideController {
       fill: 'transparent',
       stroke: 'black',
       strokeWidth: 0,
+      listening:false
     });
     this.transformer = new Transformer({
       rotateEnabled: true,

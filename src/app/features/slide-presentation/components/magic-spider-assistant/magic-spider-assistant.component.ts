@@ -30,17 +30,11 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
     private geminiService: GeminiService,
     public magicSpiderAgentLoop: MagicSpiderAgentLoop,
   ) {
-    // this.test();
     this.agentSub = magicSpiderAgentLoop.magicSpiderEventStream.subscribe((ev) => {
       this.scrollThinkingContOnValue();
     });
   }
-  // async test() {
-  //   while(true) {
-  //     this.thinkingText+=" Hello Hello Am i Thinking";
-  //     await waitForMilliseconds(500);
-  //   }
-  // }
+  
   scrollThinkingContOnValue() {
     const el = this.thinkingBoxElement?.nativeElement;
 
@@ -71,6 +65,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   }
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
+    this.magicSpiderAgentLoop.InterruptMagicSpider();
   }
 
   startMagicSpider() {

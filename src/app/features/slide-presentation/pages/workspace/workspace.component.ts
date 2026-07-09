@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { ShapeType } from '../../domain/canvasModels/shapeComponent.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
@@ -20,7 +20,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
-export class WorkspaceComponent {
+export class WorkspaceComponent implements OnDestroy{
   presentation!: Presentation;
   TooBoxType = ToolBoxType;
   ShapeType = ShapeType;
@@ -260,6 +260,9 @@ export class WorkspaceComponent {
   handleRemoveComponent(component:ICanvasComponent) {
     const slide : Slide = (component as any).slide as Slide;
     slide.removeComponent(component)
+  }
+  ngOnDestroy(): void {
+    this.workSpaceController.setActivePresentation = undefined;
   }
 }
 enum ToolBoxType {

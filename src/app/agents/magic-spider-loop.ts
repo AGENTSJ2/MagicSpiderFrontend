@@ -76,6 +76,7 @@ export class MagicSpiderAgentLoop {
 
   InterruptMagicSpider() {
     this.magicSpiderInterrupt.next(true);
+    console.warn("Loop Interrupted");
   }
 
   private async MagicSpiderAgentLoop(params: {
