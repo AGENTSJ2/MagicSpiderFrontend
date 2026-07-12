@@ -149,21 +149,3 @@ export function getAgentErrorMessage(error: unknown): string {
   }
   return  'An API key is required. Please add your API key in AI Settings.'
 }
-export function sanitizeJson(text: string): string {
-  return text
-    // Remove markdown code fences
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-
-    // Replace smart quotes
-    .replace(/[“”]/g, '"')
-    .replace(/[‘’]/g, "'")
-
-    // Remove invalid escapes (preserve valid JSON escapes)
-    .replace(/\\([^"\\/bfnrtu])/g, "$1")
-
-    // Remove trailing commas
-    .replace(/,\s*([}\]])/g, "$1")
-
-    .trim();
-}

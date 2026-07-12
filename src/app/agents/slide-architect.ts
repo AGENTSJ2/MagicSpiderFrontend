@@ -3,11 +3,12 @@ import { Message } from 'ollama';
 import { DesignPrinciplesPrompt } from '../features/slide-presentation/MCP/prompts/designPrinciples';
 import { Injectable } from '@angular/core';
 import { GeminiService } from '../services/gemini.service';
-import { AgentStreamEvent, pipeResponseToStream, sanitizeJson } from './core/utility';
+import { AgentStreamEvent, pipeResponseToStream } from './core/utility';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
 import { ThinkingLevel } from '@google/genai';
 import { PresentationArchitecture } from './core/model';
+import { jsonrepair } from "jsonrepair";
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ export class SlideArchitectAgent {
   constructor(private chatService: GeminiService) {}
 
   private parseArchitecture(raw: string): PresentationArchitecture {
-    const sanitized = sanitizeJson(raw);
+    const sanitized = jsonrepair(raw);
     const start = sanitized.indexOf('{');
     const end = sanitized.lastIndexOf('}');
     if (start < 0 || end <= start) {
