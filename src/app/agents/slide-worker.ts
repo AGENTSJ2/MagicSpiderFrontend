@@ -40,7 +40,7 @@ export class SlideWorkerAgent {
         ackMessage.content += `Successfully called[${tool.function.name}] result : ${JSON.stringify(result.content)} \n`;
       } catch (error) {
         ackMessage.content += `An Error occur while calling [${tool.function.name}] Error: ${(error as InternalMcpError).message}\n`;
-        console.log(error);
+        console.error(error);
       }
     }
     return ackMessage;
@@ -132,6 +132,7 @@ export class SlideWorkerAgent {
         messages.push(ackMessage);
         retry = 0;
       } catch (error) {
+        console.error(error);
         retry++;
         await waitForMilliseconds(RETRY_TIME_OUT_MS);
       }

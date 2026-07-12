@@ -100,6 +100,7 @@ export class SlideArchitectAgent {
         completed = true;
         completedContent = contents;    
       } catch (error) {
+        console.error(error);
         retry++
         await waitForMilliseconds(RETRY_TIME_OUT_MS);
       }

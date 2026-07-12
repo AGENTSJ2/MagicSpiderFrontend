@@ -79,6 +79,7 @@ export class ContentCreatorAgent {
         message: 'Completed',
       });
     } catch (error) {
+      console.error(error);
       this.contentCreatorSubject.next({
         action: AgentState.error,
         message: error?.toString() ?? 'Unknown error',

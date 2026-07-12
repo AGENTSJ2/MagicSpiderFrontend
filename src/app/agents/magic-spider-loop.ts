@@ -164,6 +164,7 @@ export class MagicSpiderAgentLoop {
       });
       this.architecture = undefined;
     } catch (error) {
+      console.error(error);
       this.magicSpiderEvent.next({
         action: AgentState.error,
         message: error?.toString() ?? 'Unknown error',

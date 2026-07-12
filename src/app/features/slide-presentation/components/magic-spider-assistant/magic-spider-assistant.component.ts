@@ -76,6 +76,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
         presentation: this.workspaceController.activePresentation!,
         userComment: this.userComment,
       });
+      this.userComment = '';
     } else {
       this.magicSpiderAgentLoop.InterruptMagicSpider();
     }

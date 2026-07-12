@@ -71,6 +71,7 @@ export class ImageGeneratorAgent {
         message: 'Completed',
       });
     } catch (error) {
+      console.error(error);
       this.imageGeneratorSubject.next({
         action: AgentState.error,
         message: error?.toString() ?? 'Unknown error',
