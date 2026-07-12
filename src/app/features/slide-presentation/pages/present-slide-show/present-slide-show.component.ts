@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { WorkspaceController } from '../workspace/workspace.controller';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { Slide } from '../../domain/canvasModels/slide.model';
-import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { PresentationService } from '../../services/presentation.service';
 
 @Component({
   selector: 'app-present-slide-show',

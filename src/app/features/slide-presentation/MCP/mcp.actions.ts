@@ -4,7 +4,6 @@ import ShapeComponent from '../domain/canvasModels/shapeComponent.model';
 import { InternalMcpError } from './mcp.erros';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 import { ImageComponent } from '../domain/canvasModels/imageComponent';
-import { slideService } from '../../../services/konva.services/slide.service';
 import { Slide } from '../domain/canvasModels/slide.model';
 import { ICanvasComponent } from '../domain/canvasModels/ICanvasComponent';
 import {
@@ -36,13 +35,12 @@ export class McpActions {
     }
     return presentation;
   }
-
+  
   private getSlideOrThrow(slideId: string): Slide {
     const presentation = this.getPresentationOrThrow();
-    const slide = slideService.getSlideById({
-      slideId,
-      presentation: presentation,
-    });
+    const slide = presentation.slides.find(
+      (sl) => sl.slideId == slideId,
+    );
     if (!slide) {
       throw new InternalMcpError(`No slide of ${slideId} is found`);
     }

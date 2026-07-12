@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   PresentationMetaData,
   PresentationService,
-} from '../../services/konva.services/presentation.service';
+} from '../../features/slide-presentation/services/presentation.service';
 import { Router } from '@angular/router';
 
 @Component({

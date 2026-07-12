@@ -7,7 +7,7 @@ import {
   PresentationEventType,
 } from '../../domain/EventModels/presentationEvents.model';
 import { WorkspaceController } from './workspace.controller';
-import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { PresentationService } from '../../services/presentation.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICanvasComponent } from '../../domain/canvasModels/ICanvasComponent';
 import { NzMessageService } from 'ng-zorro-antd/message';

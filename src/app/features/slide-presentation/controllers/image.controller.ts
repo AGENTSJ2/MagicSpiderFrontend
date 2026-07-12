@@ -1,4 +1,4 @@
-import { Image as KonvaImage, } from 'konva/lib/shapes/Image';
+import { ImageConfig, Image as KonvaImage, } from 'konva/lib/shapes/Image';
 import {
   ComponentConfig,
   PresentationEventStream,
@@ -6,7 +6,6 @@ import {
 } from '../domain/EventModels/presentationEvents.model';
 import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
-import { imageNodeService } from '../../../services/konva.services/image.service';
 import { ImageComponent, SerializableImageConfig } from '../domain/canvasModels/imageComponent';
 
 export default class ImageController extends BaseController {
@@ -34,15 +33,54 @@ export default class ImageController extends BaseController {
     this.node.remove();
     document.removeEventListener('keydown', this.handleKeyboardStrokes);
   }
+  private updateImageNode(params: {
+    currentConfig: ComponentConfig<SerializableImageConfig>;
+    zIndexActions?: ZIndexActions;
+  }): KonvaImage | undefined {
+    const config = params.currentConfig;
+    if (!config) {
+      return;
+    }
+    const { imageSrc, ...attrs } = config.attrs;
+    this.node.setAttrs(attrs as ImageConfig);
+    if(config.zIndex !== undefined) {
+      this.node.zIndex(config.zIndex);
+    }
 
+    if (imageSrc && imageSrc !== this.node.getAttr('imageSrc')) {
+      const imageElement = new Image();
+      imageElement.onload = () => {
+        this.node.image(imageElement);
+        this.node.setAttr('imageSrc', imageSrc);
+        this.node.getLayer()?.batchDraw();
+      };
+      imageElement.src = imageSrc;
+    }
+    if (params?.zIndexActions != undefined) {
+      switch (params.zIndexActions) {
+        case ZIndexActions.moveToFront:
+          this.node.moveToTop();
+          break;
+        case ZIndexActions.moveToBack:
+          this.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          this.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          this.node.moveUp();
+          break;
+      }
+    }
+    return this.node;
+  }
   override applyConfigurations(event: {
     currentConfig: ComponentConfig<SerializableImageConfig>;
     zIndexActions?: ZIndexActions;
   }) :ImageComponent{
     const config = event.currentConfig;
-    imageNodeService.updateImageNode({
+    this.updateImageNode({
       currentConfig: config,
-      node: this.node,
       zIndexActions: event.zIndexActions,
     });
     super.applyConfigurations(event);

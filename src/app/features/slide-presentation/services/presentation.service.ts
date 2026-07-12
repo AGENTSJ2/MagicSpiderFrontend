@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Presentation } from '../../features/slide-presentation/domain/canvasModels/presenatation.model';
-import { Slide } from '../../features/slide-presentation/domain/canvasModels/slide.model';
+import { Presentation } from '../domain/canvasModels/presenatation.model';
+import { Slide } from '../domain/canvasModels/slide.model';
 import ShapeComponent, {
   ShapeType,
-} from '../../features/slide-presentation/domain/canvasModels/shapeComponent.model';
+} from '../domain/canvasModels/shapeComponent.model';
 import pptxgen from 'pptxgenjs';
 import { Image } from 'konva/lib/shapes/Image';
-import { TextComponent } from '../../features/slide-presentation/domain/canvasModels/textComponent.model';
-import { ImageComponent } from '../../features/slide-presentation/domain/canvasModels/imageComponent';
-import blobService from '../blob.service';
+import { TextComponent } from '../domain/canvasModels/textComponent.model';
+import { ImageComponent } from '../domain/canvasModels/imageComponent';
+import blobService from '../../../services/blob.service';
 import {
   PresentationData,
   StoredPresentation,
-} from '../../data/presentation.data';
+} from '../../../data/presentation.data';
 
 @Injectable({
   providedIn: 'root',

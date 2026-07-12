@@ -3,14 +3,11 @@ import { Slide } from '../domain/canvasModels/slide.model';
 import BaseController from './base.controller';
 import {
   ComponentConfig,
-  PresentationEvent,
   PresentationEventStream,
-  PresentationEventType,
   ZIndexActions,
 } from '../domain/EventModels/presentationEvents.model';
 import { Subscription } from 'rxjs';
 import { TextConfig } from 'konva/lib/shapes/Text';
-import { textNodeService } from '../../../services/konva.services/textNode.service';
 import { TextComponent } from '../domain/canvasModels/textComponent.model';
 
 export default class TextController extends BaseController {
@@ -34,14 +31,37 @@ export default class TextController extends BaseController {
     this.handleDragEvents();
     document.addEventListener('keydown', this.handleKeyboardStrokes);
   }
-
+  private updateTextNode(params: {
+    zIndexActions?: ZIndexActions;
+    config: ComponentConfig<TextConfig>;
+  }) {
+    this.node.setAttrs(params.config.attrs);
+    if(params.config.zIndex !== undefined) {
+      this.node.zIndex(params.config.zIndex);
+    }
+    if (params?.zIndexActions != undefined) {
+      switch (params.zIndexActions) {
+        case ZIndexActions.moveToFront:
+          this.node.moveToTop();
+          break;
+        case ZIndexActions.moveToBack:
+          this.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          this.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          this.node.moveUp();
+          break;
+      }
+    }
+  }
   override applyConfigurations(event: {
     currentConfig: ComponentConfig<TextConfig>;
     zIndexActions?: ZIndexActions;
   }) {
     const config = event.currentConfig;
-    textNodeService.updateTextNode({
-      node: this.node,
+    this.updateTextNode({
       config: config,
       zIndexActions: event.zIndexActions,
     });

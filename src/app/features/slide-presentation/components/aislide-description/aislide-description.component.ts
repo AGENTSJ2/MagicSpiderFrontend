@@ -11,7 +11,7 @@ import { Subject, Subscription } from 'rxjs';
 import { Model } from '@google/genai';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
-import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { PresentationService } from '../../services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
 import { AgentInActionStages, AgentState, AgentStreamEvent, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';

@@ -10,7 +10,6 @@ import {
 import ShapeComponent, {
   ShapeType,
 } from '../domain/canvasModels/shapeComponent.model';
-import { shapeNodeService } from '../../../services/konva.services/shapeNode.service';
 
 export default class ShapeController extends BaseController {
   override node: Shape;
@@ -42,14 +41,37 @@ export default class ShapeController extends BaseController {
     super.handleDragEvents();
     document.addEventListener('keydown', this.handleKeyboardStrokes);
   }
-
+  private updateShapeNode(params: {
+    zIndexActions?: ZIndexActions;
+    config: ComponentConfig<ShapeConfig>;
+  }) {
+    this.node.setAttrs(params.config.attrs);
+    if(params.config.zIndex !== undefined) {
+      this.node.zIndex(params.config.zIndex);
+    }
+    if (params?.zIndexActions != undefined) {
+      switch (params.zIndexActions) {
+        case ZIndexActions.moveToFront:
+          this.node.moveToTop();
+          break;
+        case ZIndexActions.moveToBack:
+          this.node.moveToBottom();
+          break;
+        case ZIndexActions.moveDown:
+          this.node.moveDown();
+          break;
+        case ZIndexActions.moveUp:
+          this.node.moveUp();
+          break;
+      }
+    }
+  }
   override applyConfigurations(event: {
     currentConfig: ComponentConfig<ShapeConfig>;
     zIndexActions?: ZIndexActions;
   }) :ShapeComponent{
     const config = event.currentConfig;
-    shapeNodeService.updateShapeNode({
-      node: this.node,
+    this.updateShapeNode({
       zIndexActions: event.zIndexActions,
       config: config,
     });

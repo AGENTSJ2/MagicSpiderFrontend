@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
-import { PresentationService } from '../../../../services/konva.services/presentation.service';
+import { PresentationService } from '../../services/presentation.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ActivePresentationContext } from '../../services/active-presentation.context';
 import { SettingsComponent } from '../settings/settings.component';
