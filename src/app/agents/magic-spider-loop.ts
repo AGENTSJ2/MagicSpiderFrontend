@@ -10,7 +10,7 @@ import { SlideArchitectAgent } from './slide-architect';
 import { McpActions } from '../features/slide-presentation/MCP/mcp.actions';
 import { SlideWorkerAgent } from './slide-worker';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { PresentationArchitecture } from './core/model';
+import { PlanProgress, PresentationArchitecture } from './core/model';
 import { PreferencesService } from '../features/slide-presentation/services/preferences.service';
 
 @Injectable({
@@ -127,7 +127,7 @@ export class MagicSpiderAgentLoop {
           if (stop) {
             break;
           }
-          if (slidePlan.planProgress) {
+          if (slidePlan.planProgress == PlanProgress.complete) {
             continue;
           }
           worksOnProgress.push(
@@ -145,7 +145,7 @@ export class MagicSpiderAgentLoop {
           if (stop) {
             break;
           }
-          if (slidePlan.planProgress) {
+          if (slidePlan.planProgress == PlanProgress.complete) {
             continue;
           }
 
