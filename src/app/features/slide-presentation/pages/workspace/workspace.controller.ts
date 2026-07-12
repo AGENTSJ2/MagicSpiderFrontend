@@ -36,6 +36,7 @@ export class WorkspaceController {
 
   public set setActivePresentation(v: Presentation | undefined) {
     if(v == undefined) {
+      console.warn("Presentation changed");
       this.magicSpiderLoop.InterruptMagicSpider();
       this.contentCreator.interruptContentCreator();
     }

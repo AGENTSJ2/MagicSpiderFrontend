@@ -6,13 +6,12 @@ import {
 } from './core/utility';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Observable, Subject, Subscription } from 'rxjs';
-import {
-  PresentationArchitecture,
-  SlideArchitectAgent,
-} from './slide-architect';
+import { SlideArchitectAgent } from './slide-architect';
 import { McpActions } from '../features/slide-presentation/MCP/mcp.actions';
 import { SlideWorkerAgent } from './slide-worker';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { PresentationArchitecture } from './core/model';
+import { PreferencesService } from '../features/slide-presentation/services/preferences.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,10 +23,11 @@ export class MagicSpiderAgentLoop {
 
   magicSpiderState: AgentState = AgentState.idle;
   architecture?: PresentationArchitecture;
-  magicSpiderEventStream: Observable<AgentStreamEvent> = this.magicSpiderEvent.asObservable();
+  magicSpiderEventStream: Observable<AgentStreamEvent> =
+    this.magicSpiderEvent.asObservable();
 
-  private thinkLogs:string = "";
-  private contentLogs:string = "";
+  private thinkLogs: string = '';
+  private contentLogs: string = '';
 
   get getThinkLogs() {
     return this.thinkLogs;
@@ -39,7 +39,8 @@ export class MagicSpiderAgentLoop {
     private mcpActions: McpActions,
     private slideArchitect: SlideArchitectAgent,
     private slideWorker: SlideWorkerAgent,
-    private message:NzMessageService
+    private message: NzMessageService,
+    private preferences: PreferencesService,
   ) {
     this.magicSpiderEventStream.subscribe((event) => {
       this.magicSpiderState = event.action;
@@ -58,7 +59,7 @@ export class MagicSpiderAgentLoop {
           break;
         case AgentState.error:
           this.thinkLogs = '';
-          this.message.error(getAgentErrorMessage(event.message))
+          this.message.error(getAgentErrorMessage(event.message));
           break;
       }
     });
@@ -76,7 +77,7 @@ export class MagicSpiderAgentLoop {
 
   InterruptMagicSpider() {
     this.magicSpiderInterrupt.next(true);
-    console.warn("Loop Interrupted");
+    console.warn('Loop Interrupted');
   }
 
   private async MagicSpiderAgentLoop(params: {
@@ -116,25 +117,45 @@ export class MagicSpiderAgentLoop {
           ),
           imagesAvailable: (availableImages.content.at(0) as any)?.resource
             .text,
-          magicSpiderEvent:this.magicSpiderEvent
+          magicSpiderEvent: this.magicSpiderEvent,
         },
         abortController,
-
       );
-      // this.architecture = Plan;
-      for (const slidePlan of this.architecture.presentation.slides) {
-        if (stop) {
-          break;
+      if (this.preferences.parallelSlideGeneration) { //  for parallel slide execution
+        const worksOnProgress: Promise<boolean>[] = [];
+        for (const slidePlan of this.architecture.presentation.slides) {
+          if (stop) {
+            break;
+          }
+          if (slidePlan.planProgress) {
+            continue;
+          }
+          worksOnProgress.push(
+            this.slideWorker.run({
+              slidePlan,
+              presentation: params.presentation,
+              abortController: abortController,
+              magicSpiderEvent: this.magicSpiderEvent,
+            }),
+          );
         }
-        if (slidePlan.planProgress) {
-          continue;
+        await Promise.all(worksOnProgress);
+      } else {
+        for (const slidePlan of this.architecture.presentation.slides) {
+          if (stop) {
+            break;
+          }
+          if (slidePlan.planProgress) {
+            continue;
+          }
+
+          await this.slideWorker.run({
+            slidePlan,
+            presentation: params.presentation,
+            abortController: abortController,
+            magicSpiderEvent: this.magicSpiderEvent,
+          });
         }
-        await this.slideWorker.run({
-          slidePlan,
-          presentation: params.presentation,
-          abortController: abortController,
-          magicSpiderEvent: this.magicSpiderEvent,
-        });
       }
 
       this.magicSpiderEvent.next({

@@ -147,25 +147,27 @@
           ></nz-option>
         </nz-select>
       </div>
+    </ng-container>
+    <!-- Preferences -->
+    <ng-container *ngIf="activeSection === 'pref'">
+      <h2 class="settings__title">Preferences</h2>
 
-      <!-- <div class="settings__field">
-        <label>Image Generator model</label>
-        <nz-select
-          [(ngModel)]="imageModelName"
-          (ngModelChange)="onImageModelChange($event)"
-          class="settings__select"
-          nzShowSearch
-          nzAllowClear
-          nzPlaceHolder="Defaults to gemini-2.5-flash-image"
-          [nzLoading]="loadingModels"
-        >
-          <nz-option
-            *ngFor="let model of models"
-            [nzValue]="model.name"
-            [nzLabel]="model.displayName || model.name!"
-          ></nz-option>
-        </nz-select>
-      </div> -->
+      <div class="settings__field">
+        <label>Slide generation</label>
+        <div class="settings__toggle">
+          <nz-switch
+            [ngModel]="parallelSlideGeneration"
+            (ngModelChange)="onParallelSlideGenerationChange($event)"
+          ></nz-switch>
+          <span class="settings__toggle-label">
+            {{ parallelSlideGeneration ? 'Generate all slides at the same time' : 'Generate slides one at a time' }}
+          </span>
+        </div>
+        <p class="settings__hint">
+          When enabled, all slides are generated in parallel. When disabled,
+          slides are generated sequentially, one after another.
+        </p>
+      </div>
     </ng-container>
   </section>
 </div>

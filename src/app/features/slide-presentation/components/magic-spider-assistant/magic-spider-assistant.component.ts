@@ -65,7 +65,6 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   }
   ngOnDestroy(): void {
     this.agentSub?.unsubscribe();
-    this.magicSpiderAgentLoop.InterruptMagicSpider();
   }
 
   startMagicSpider() {

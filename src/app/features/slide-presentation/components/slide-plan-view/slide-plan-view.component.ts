@@ -1,10 +1,6 @@
 import { Component, Input } from '@angular/core';
-import {
-  ArchitectComponentTask,
-  ArchitectSlidePlan,
-  PlanProgress,
-  PresentationArchitecture,
-} from '../../../../agents/slide-architect';
+import { ArchitectComponentTask, ArchitectSlidePlan, PlanProgress, PresentationArchitecture } from '../../../../agents/core/model';
+
 
 @Component({
   selector: 'app-slide-plan-view',

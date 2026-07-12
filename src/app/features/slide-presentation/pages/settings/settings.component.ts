@@ -2,8 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ApiError, Model } from '@google/genai';
 import { GeminiService } from '../../../../services/gemini.service';
 import { UserService } from '../../../../services/user.service';
+import { PreferencesService } from '../../services/preferences.service';
 
-type SettingsSection = 'user' | 'ai';
+type SettingsSection = 'user' | 'ai' | 'pref';
 
 interface SettingsNavItem {
   key: SettingsSection;
@@ -21,6 +22,7 @@ export class SettingsComponent implements OnInit {
   readonly navItems: SettingsNavItem[] = [
     { key: 'user', label: 'User Settings', icon: 'user' },
     { key: 'ai', label: 'AI Settings', icon: 'robot' },
+    { key:"pref", label: "Preference" , icon: "" }
   ];
   @Input() activeSection: SettingsSection = 'user';
 
@@ -40,9 +42,13 @@ export class SettingsComponent implements OnInit {
   apiKey = '';
   apiKeyError = '';
 
+  // Preferences
+  parallelSlideGeneration = false;
+
   constructor(
     private userService: UserService,
     private geminiService: GeminiService,
+    private preferencesService: PreferencesService,
   ) {}
 
   async ngOnInit() {
@@ -55,6 +61,8 @@ export class SettingsComponent implements OnInit {
       this.assistantModelName = this.geminiService.getModel('assistant')?.name;
       this.architectModelName = this.geminiService.getModel('architect')?.name;
       this.imageModelName = this.geminiService.getModel('image')?.name;
+      this.parallelSlideGeneration =
+        this.preferencesService.parallelSlideGeneration;
       this.models = await this.geminiService.loadModels();
     } catch (error) {
       console.error(error);
@@ -99,5 +107,12 @@ export class SettingsComponent implements OnInit {
   onImageModelChange(modelName: string): void {
     const model = this.models.find((m) => m.name === modelName);
     this.geminiService.updateModel('image', model);
+  }
+
+  onParallelSlideGenerationChange(enabled: boolean): void {
+    this.parallelSlideGeneration = enabled;
+    this.preferencesService.updatePreferences({
+      parallelSlideGeneration: enabled,
+    });
   }
 }

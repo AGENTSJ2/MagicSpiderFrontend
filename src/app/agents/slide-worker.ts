@@ -7,13 +7,13 @@ import {
   pipeResponseToStream,
 } from './core/utility';
 import { GeminiService } from '../services/gemini.service';
-import { ArchitectSlidePlan, PlanProgress } from './slide-architect';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Message, ToolCall } from 'ollama';
 import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
 import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
+import { ArchitectSlidePlan, PlanProgress } from './core/model';
 
 @Injectable({
   providedIn: 'root',
@@ -130,6 +130,7 @@ export class SlideWorkerAgent {
         }
         const ackMessage = await this.invokeTools(toolCalls);
         messages.push(ackMessage);
+        retry = 0;
       } catch (error) {
         retry++;
         await waitForMilliseconds(RETRY_TIME_OUT_MS);

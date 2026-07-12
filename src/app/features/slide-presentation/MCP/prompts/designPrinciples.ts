@@ -1,20 +1,21 @@
 export const DesignPrinciplesPrompt = [
-  // ===== CORE MINDSET =====
-  'DESIGN PHILOSOPHY: Approach every slide as a deliberate composition, not a container to fill.',
-  'Think like a professional presentation designer, not a document generator. The goal is a slide that looks intentionally crafted by an experienced designer.',
-  'Before placing any element, mentally map the entire layout first: decide the focal point, the visual hierarchy, and the flow of the eye from top to bottom.',
-  'Think in terms of a grid system. Divide the 1333x750 canvas into invisible columns and rows, and align elements to these guides so nothing feels arbitrarily placed.',
-  'Divide the slide into logical regions BEFORE placing any content, and reserve space for future elements so later items are not crammed into whatever is left over.',
+  // // ===== CORE MINDSET =====
+  // 'DESIGN PHILOSOPHY: Approach every slide as a deliberate composition, not a container to fill.',
+  // 'Think like a professional presentation designer, not a document generator. The goal is a slide that looks intentionally crafted by an experienced designer.',
+  // 'Before placing any element, mentally map the entire layout first: decide the focal point, the visual hierarchy, and the flow of the eye from top to bottom.',
+  // 'Think in terms of a grid system. Divide the 1333x750 canvas into invisible columns and rows, and align elements to these guides so nothing feels arbitrarily placed.',
+  // 'Divide the slide into logical regions BEFORE placing any content, and reserve space for future elements so later items are not crammed into whatever is left over.',
 
-  // ===== PREVENTING OVERLAP (CRITICAL) =====
-  'COLLISION AVOIDANCE IS MANDATORY: Every element occupies a bounding box (x, y, width, height). No two bounding boxes may ever intersect unless intentional layering (e.g. text on a solid card) is the goal.',
-  'Never assume an element fits. Carefully estimate its rendered dimensions before placing it.',
-  "Before finalizing each element position, verify: does this box overlap any previously placed box? Compute the right edge (x + width) and bottom edge (y + height) and confirm they do not cross into another element's region.",
-  'Continuously track which regions of the canvas are already occupied. Before creating any element, confirm sufficient empty space actually exists for it.',
-  'Maintain a minimum gap of at least 24 canvas units between distinct elements so the layout breathes and never looks cramped or collided.',
-  'Reserve safe margins: keep all content at least 60 canvas units from the canvas edges (usable area approximately x:60 to x:1273, y:60 to y:690). Nothing should bleed off-screen or touch the border unless it is a deliberate full-bleed background.',
-  'When stacking text blocks, account for the full rendered height of each block (line count × line height) before placing the next element below it. Never assume text is a single line.',
-
+  // // ===== PREVENTING OVERLAP (CRITICAL) =====
+  // 'COLLISION AVOIDANCE IS MANDATORY: Every element occupies a bounding box (x, y, width, height). No two bounding boxes may ever intersect unless intentional layering (e.g. text on a solid card) is the goal.',
+  // 'Never assume an element fits. Carefully estimate its rendered dimensions before placing it.',
+  // "Before finalizing each element position, verify: does this box overlap any previously placed box? Compute the right edge (x + width) and bottom edge (y + height) and confirm they do not cross into another element's region.",
+  // 'Continuously track which regions of the canvas are already occupied. Before creating any element, confirm sufficient empty space actually exists for it.',
+  // 'Maintain a minimum gap of at least 24 canvas units between distinct elements so the layout breathes and never looks cramped or collided.',
+  // 'Reserve safe margins: keep all content at least 60 canvas units from the canvas edges (usable area approximately x:60 to x:1273, y:60 to y:690). Nothing should bleed off-screen or touch the border unless it is a deliberate full-bleed background.',
+  // 'When stacking text blocks, account for the full rendered height of each block (line count × line height) before placing the next element below it. Never assume text is a single line.',
+  // 
+  'Choose a cohesive color palette at the beginning and apply it consistently across all slides. Base the palette on established color theory, ensuring appropriate contrast, visual hierarchy, and harmony. Use accent colors sparingly to draw attention to key elements, maintain consistent colors for similar components throughout the presentation, and avoid introducing new colors without a clear semantic purpose. The result should feel unified, professional, and visually balanced from start to finish.',
   // ===== VISUAL HIERARCHY =====
   'Establish a clear hierarchy with size and weight: one dominant title (largest), supporting subtitles (medium), and body content (smallest). The size jumps between levels should be obvious, not subtle.',
   'Use scale intentionally: titles around 48-72 canvas units, subheadings 28-36 canvas units, body text 18-24 canvas units. The biggest element should immediately tell the viewer what the slide is about.',

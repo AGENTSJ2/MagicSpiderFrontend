@@ -23,6 +23,7 @@ import { ContentEditableSpanDirective } from '../.././directives/content-editabl
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { QuillModule } from 'ngx-quill'
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../shared/shared.module';
@@ -62,6 +63,7 @@ import { PresentSlideShowComponent } from './pages/present-slide-show/present-sl
     NzDropDownModule,
     NzMessageModule,
     NzSelectModule,
+    NzSwitchModule,
     QuillModule.forRoot(),
     DragDropModule,
     SharedModule
