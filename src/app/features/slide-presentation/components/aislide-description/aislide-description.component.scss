@@ -57,6 +57,7 @@
       font-size: 14px;
       line-height: 1.6;
       transition: border-color 0.2s, box-shadow 0.2s;
+      overflow-wrap:anywhere;
     }
     
     .problem-input:focus,
@@ -275,6 +276,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-shrink: 0;
 }
 .ql-editor
 {
