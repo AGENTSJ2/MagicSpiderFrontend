@@ -1,6 +1,10 @@
 .parent
 {
   overflow: auto;
+  scrollbar-width: none;
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
 }
 .greet-section
 {
