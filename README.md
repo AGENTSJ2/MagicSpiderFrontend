@@ -1,5 +1,12 @@
-<img width="549" height="549" alt="magicSpider" src="https://github.com/user-attachments/assets/ae2c81b1-f149-43f0-b64d-79f90005f3e7" />
-# Magic Spider
+<div align="center">
+  <img width="200" height="200" alt="magicSpider" src="https://github.com/user-attachments/assets/ae2c81b1-f149-43f0-b64d-79f90005f3e7" />
+</div>
+<div align="center">
+    <h1>
+        Magic Spider
+    </h1>
+</div>
+
 https://magic-spider.vercel.app/
 
 Magic Spider is an browser based Presentation creator which uses AI Agents to create and update slides.
