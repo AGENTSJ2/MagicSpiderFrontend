@@ -1,3 +1,4 @@
+<img width="549" height="549" alt="magicSpider" src="https://github.com/user-attachments/assets/d052f176-8cca-4438-86d3-5d11a1d32e70" />
 # Magic Spider
 https://magic-spider.vercel.app/
 
