@@ -264,9 +264,8 @@ $nav-h:       64px;
 
 // ─── Card grid ────────────────────────────────────────────────────────────────
 .ms-grid {
-  display: grid;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(auto-fit, minmax(210px,1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 }
 
