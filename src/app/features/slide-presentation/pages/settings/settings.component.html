@@ -75,8 +75,7 @@
           </button>
         </ng-template>
         <p class="settings__hint" *ngIf="!apiKeyError">
-          Stored only in this browser. Restrict the key by HTTP referrer and API
-          in Google Cloud Console so a leaked key can't be reused elsewhere.
+          This key is saved in your browser's local storage and never sent anywhere except when you use it. For your security, remove the key after you're done using it.
         </p>
         <p class="settings__hint settings__hint--error" *ngIf="apiKeyError">
           {{ apiKeyError }}
