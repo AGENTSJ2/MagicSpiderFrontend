@@ -145,7 +145,7 @@ export function convertMcpToolToOpenAiTool(mcpTool: McpTool): Tool {
 }
 export function getAgentErrorMessage(error: unknown): string {
   if (!isApiKeyError(error)) {
-    return "Something Went";
+    return "Something Went Wrong";
   }
   return  'An API key is required. Please add your API key in AI Settings.'
 }
