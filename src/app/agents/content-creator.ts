@@ -15,6 +15,13 @@ import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
   providedIn: 'root',
 })
 export class ContentCreatorAgent {
+  private readonly contentCreatorSubject: Subject<AgentStreamEvent & {final:boolean}> = new Subject();
+  private readonly interruptContentCreatorSubject: Subject<boolean> = new Subject();
+  private contentInterruptSub?: Subscription;
+  readonly contentCreatorStream: Observable<AgentStreamEvent & {final:boolean}> =
+    this.contentCreatorSubject.asObservable();
+  contentCreatorState: AgentState = AgentState.idle;
+
   constructor(private chatService: GeminiService) {
     this.contentCreatorStream.subscribe((event) => {
       if(event.action == AgentState.error && !event.final) {
@@ -24,12 +31,6 @@ export class ContentCreatorAgent {
     });
   }
 
-  private readonly contentCreatorSubject: Subject<AgentStreamEvent & {final:boolean}> = new Subject();
-  private readonly interruptContentCreatorSubject: Subject<boolean> = new Subject();
-  readonly contentCreatorStream: Observable<AgentStreamEvent & {final:boolean}> =
-    this.contentCreatorSubject.asObservable();
-  contentCreatorState: AgentState = AgentState.idle;
-  
   private async ContentCreatorAgent(params: {
     userProblemStatement: string;
     previousContent: string;
@@ -55,7 +56,8 @@ export class ContentCreatorAgent {
           action: AgentState.invoked,
           message: 'Content creator has been invoked',
         });
-        this.interruptContentCreatorSubject.subscribe((ev) => {
+        this.contentInterruptSub?.unsubscribe();
+        this.contentInterruptSub = this.interruptContentCreatorSubject.subscribe((ev) => {
           if (ev) {
             abortController.abort();
             forceStop = true;
@@ -106,7 +108,7 @@ export class ContentCreatorAgent {
         }
       } finally {
         localContentCreatorSubject.complete();
-        this.interruptContentCreatorSubject.unsubscribe();
+        this.contentInterruptSub?.unsubscribe();
       }
     }
   }
