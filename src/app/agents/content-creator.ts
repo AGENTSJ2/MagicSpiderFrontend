@@ -8,6 +8,8 @@ import {
 } from './core/utility';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GeminiService } from '../services/gemini.service';
+import { waitForMilliseconds } from '../core/utilities';
+import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
 
 @Injectable({
   providedIn: 'root',
@@ -15,17 +17,19 @@ import { GeminiService } from '../services/gemini.service';
 export class ContentCreatorAgent {
   constructor(private chatService: GeminiService) {
     this.contentCreatorStream.subscribe((event) => {
+      if(event.action == AgentState.error && !event.final) {
+        return;
+      }
       this.contentCreatorState = event.action;
     });
   }
 
-  private contentCreatorSubject: Subject<AgentStreamEvent> = new Subject();
-  private interruptContentCreatorSubject: Subject<boolean> = new Subject();
-  private contentInterruptSub?: Subscription;
-  contentCreatorStream: Observable<AgentStreamEvent> =
+  private readonly contentCreatorSubject: Subject<AgentStreamEvent & {final:boolean}> = new Subject();
+  private readonly interruptContentCreatorSubject: Subject<boolean> = new Subject();
+  readonly contentCreatorStream: Observable<AgentStreamEvent & {final:boolean}> =
     this.contentCreatorSubject.asObservable();
   contentCreatorState: AgentState = AgentState.idle;
-
+  
   private async ContentCreatorAgent(params: {
     userProblemStatement: string;
     previousContent: string;
@@ -33,60 +37,77 @@ export class ContentCreatorAgent {
     if (params.userProblemStatement.length == 0) {
       return;
     }
+    let retry = 0;
+    let forceStop = false;
+
     const abortController = new AbortController();
-    const localContentCreatorSubject = new Subject<AgentStreamEvent>();
-    try {
-      localContentCreatorSubject.subscribe((ev) => {
-        this.contentCreatorSubject.next(ev);
-      });
-      localContentCreatorSubject.next({
-        action: AgentState.invoked,
-        message: 'Content creator has been invoked',
-      });
-      this.contentInterruptSub?.unsubscribe();
-      this.interruptContentCreatorSubject.subscribe((ev) => {
-        if (ev) {
+    
+    while(retry < MAX_RETRY && !forceStop) {
+      const localContentCreatorSubject = new Subject<AgentStreamEvent>();
+      try {
+        localContentCreatorSubject.subscribe((ev) => {
+          this.contentCreatorSubject.next({
+            ...ev,
+            final:false
+          });
+        });
+        localContentCreatorSubject.next({
+          action: AgentState.invoked,
+          message: 'Content creator has been invoked',
+        });
+        this.interruptContentCreatorSubject.subscribe((ev) => {
           if (ev) {
             abortController.abort();
+            forceStop = true;
           }
+        });
+        // Agent working
+        const { stream, provider } = await this.chatService.streamChat(
+          {
+            model: this.chatService.getModel('content')?.name,
+            messages: [
+              {
+                role: 'system',
+                content: ContentCreatorPrompt,
+              },
+              ...(params.previousContent.length != 0
+                ? [{ role: 'assistant', content: params.previousContent }]
+                : []),
+              {
+                role: 'user',
+                content: params.userProblemStatement,
+              },
+            ],
+          },
+          [],
+          abortController,
+        );
+        
+        await pipeResponseToStream(localContentCreatorSubject, stream, provider);
+        this.contentCreatorSubject.next({
+          action: AgentState.done,
+          message: 'Completed',
+          final:false
+        });
+
+        break;
+
+      } catch (error) {
+        retry++;
+        console.error(error);
+        const wasLastTry = retry == MAX_RETRY || forceStop;
+        this.contentCreatorSubject.next({
+          action: AgentState.error,
+          message: error?.toString() ?? 'Unknown error',
+          final: wasLastTry
+        });
+        if(!wasLastTry) {
+          await waitForMilliseconds(RETRY_TIME_OUT_MS);
         }
-      });
-      // Agent working
-      const { stream, provider } = await this.chatService.streamChat(
-        {
-          model: this.chatService.getModel('content')?.name,
-          messages: [
-            {
-              role: 'system',
-              content: ContentCreatorPrompt,
-            },
-            ...(params.previousContent.length != 0
-              ? [{ role: 'assistant', content: params.previousContent }]
-              : []),
-            {
-              role: 'user',
-              content: params.userProblemStatement,
-            },
-          ],
-        },
-        [],
-        abortController,
-      );
-      
-      await pipeResponseToStream(localContentCreatorSubject, stream, provider);
-      this.contentCreatorSubject.next({
-        action: AgentState.done,
-        message: 'Completed',
-      });
-    } catch (error) {
-      console.error(error);
-      this.contentCreatorSubject.next({
-        action: AgentState.error,
-        message: error?.toString() ?? 'Unknown error',
-      });
-    } finally {
-      localContentCreatorSubject.complete();
-      this.contentInterruptSub?.unsubscribe();
+      } finally {
+        localContentCreatorSubject.complete();
+        this.interruptContentCreatorSubject.unsubscribe();
+      }
     }
   }
 

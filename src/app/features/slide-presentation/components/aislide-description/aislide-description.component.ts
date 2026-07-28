@@ -13,9 +13,9 @@ import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../services/presentation.service';
 import { GeminiService } from '../../../../services/gemini.service';
-import { AgentInActionStages, AgentState, AgentStreamEvent, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
+import { AgentInActionStages, AgentState, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzMessageRef, NzMessageService } from 'ng-zorro-antd/message';
 
 
 @Component({
@@ -28,7 +28,6 @@ export class AISlideDescriptionComponent {
   @Output() close: EventEmitter<boolean> = new EventEmitter();
   problemStatement?: string = '';
   thinkingText = '';
-  errorMessage = '';
   AgentState = AgentState;
   private streamSub?: Subscription;
   private interrupt$ = new Subject<boolean>();
@@ -77,25 +76,31 @@ export class AISlideDescriptionComponent {
     this.interrupt$.next(true);
     this.problemStatement = '';
     this.thinkingText = '';
-    this.errorMessage = '';
     this.cdr.detectChanges();
   }
 
-  // ── Generate ──────────────────────────────────────────────────────────────
+  private showErrorMessage(message:string) {
+     if(!this.errorMesgRef) {
+      this.errorMesgRef =  this.message.error(message);
+      this.errorMesgRef.onClose.subscribe((ev)=>{
+        this.errorMesgRef = undefined;
+      })
+    }
+  }
 
+  // ── Generate ──────────────────────────────────────────────────────────────
+  errorMesgRef?: NzMessageRef;
   async trigger(): Promise<void> {
     this.thinkingText = '';
     const prevContent = this.workspaceController.scratchBookContent;
     this.workspaceController.scratchBookContent = '';
-    this.errorMessage = '';
-
     try {
       this.contentCreatorAgent.triggerContentCreator({
         userProblemStatement: this.problemStatement!.trim(),
         previousContent: prevContent,
       });
       this.streamSub = this.contentCreatorAgent.contentCreatorStream.subscribe({
-        next: (event: AgentStreamEvent) => {
+        next: (event) => {
           if (event.action === 'thinking') {
             this.thinkingText += event.message;
             this.scrollContOnValue(this.thinkingBoxElement?.nativeElement)
@@ -103,26 +108,21 @@ export class AISlideDescriptionComponent {
             this.workspaceController.scratchBookContent += event.message;
             this.scrollContOnValue(this.genContentElement?.nativeElement)
           } else if (event.action === AgentState.error) {
-            this.errorMessage = event.message;
-            this.message.error(getAgentErrorMessage(event.message));
+            if(event.final) {
+              this.showErrorMessage(getAgentErrorMessage(event.message))
+            }
           }
           this.cdr.detectChanges();
         },
         error: (err: unknown) => {
-          this.errorMessage =
-            err instanceof Error
-              ? err.message
-              : 'Stream error. Please try again.';
-          this.message.error(getAgentErrorMessage(err))
           this.cdr.detectChanges();
+          this.showErrorMessage("Something Went Wrong");
         },
         complete: () => {
           this.cdr.detectChanges();
         },
       });
     } catch (err: unknown) {
-      this.errorMessage =
-        err instanceof Error ? err.message : 'Failed to start generation.';
       this.cdr.detectChanges();
       console.log(err);
       
