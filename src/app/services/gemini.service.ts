@@ -238,14 +238,6 @@ export class GeminiService {
         systemInstruction: systemInstruction,
         tools: gemTools,
         abortSignal: abortController?.signal,
-        // ...(thinkingLevel
-        //   ? {
-        //       thinkingConfig: {
-        //         thinkingLevel,
-        //         thinkingBudget:this.thinkingLevelToBudget(thinkingLevel)
-        //       },
-        //     }
-        //   : {}),
       },
     });
     return { stream: stream, provider: 'google' };
