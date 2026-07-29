@@ -8,12 +8,13 @@ import {
 } from './core/utility';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { GeminiService } from '../services/gemini.service';
+import { OllamaChatService } from '../services/Ollama.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentCreatorAgent {
-  constructor(private chatService: GeminiService) {
+  constructor(private chatService: OllamaChatService) {
     this.contentCreatorStream.subscribe((event) => {
       this.contentCreatorState = event.action;
     });

@@ -3,6 +3,7 @@ import { ApiError, Model } from '@google/genai';
 import { GeminiService } from '../../../../services/gemini.service';
 import { UserService } from '../../../../services/user.service';
 import { PreferencesService } from '../../services/preferences.service';
+import { OllamaChatService } from '../../../../services/Ollama.service';
 
 type SettingsSection = 'user' | 'ai' | 'pref';
 
@@ -47,7 +48,7 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private geminiService: GeminiService,
+    private geminiService: OllamaChatService,
     private preferencesService: PreferencesService,
   ) {}
 

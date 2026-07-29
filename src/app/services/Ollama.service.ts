@@ -1,17 +1,34 @@
 import { Injectable } from '@angular/core';
 import { AbortableAsyncIterator, ChatRequest, ChatResponse, Message, Ollama } from 'ollama';
-import { GenerateContentResponse, ThinkingLevel } from '@google/genai';
+import { GenerateContentResponse, GeneratedImage, Modality, Model, ThinkingLevel } from '@google/genai';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 import { convertMcpToolToOpenAiTool } from '../agents/core/utility';
+import { AgentKey } from './gemini.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OllamaChatService  {
-  readonly AvailableModel = 'gemma4:e4b';
+  readonly AvailableModel = 'gemma4:e2b';
   private readonly ollama = new Ollama({
     host: 'http://192.168.0.160:5000',
   });
+  apiKey:string= ""
+  async updateApiKey(key?: string): Promise<Model[]> {
+    return [];
+  };
+
+  async loadModels(): Promise<Model[]>{
+    return [];
+  };
+
+  getModel(agent: AgentKey): Model | undefined {
+    return undefined;
+  };
+
+  updateModel(agent: AgentKey, model?: Model): void {
+    
+  };
 
   async streamChat(
     request: Partial<ChatRequest>,
@@ -23,11 +40,11 @@ export class OllamaChatService  {
     provider: string;
   }> {
     const stream = await this.ollama.chat({
+      ...request,
       model: this.AvailableModel,
       keep_alive: '1h',
       tools: tools?.map(convertMcpToolToOpenAiTool),
       think: this.mapThinkingLevel(thinkingLevel),
-      ...request,
       stream: true,
     });
 
@@ -67,4 +84,11 @@ export class OllamaChatService  {
     });
     return stream;
   }
+
+  async generateImage(
+      prompt: string,
+      abortController?: AbortController,
+    ): Promise<GeneratedImage> {
+      throw Error("Unimplemented");
+    }
 }

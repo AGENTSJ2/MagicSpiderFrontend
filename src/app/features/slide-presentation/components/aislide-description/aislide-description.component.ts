@@ -16,6 +16,7 @@ import { GeminiService } from '../../../../services/gemini.service';
 import { AgentInActionStages, AgentState, AgentStreamEvent, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { OllamaChatService } from '../../../../services/Ollama.service';
 
 
 @Component({
@@ -42,7 +43,7 @@ export class AISlideDescriptionComponent {
     public contentCreatorAgent: ContentCreatorAgent,
     public workspaceController: WorkspaceController,
     private presentationService:PresentationService,
-    private geminiService: GeminiService,
+    private geminiService: OllamaChatService,
     private message:NzMessageService
   ) {}
 

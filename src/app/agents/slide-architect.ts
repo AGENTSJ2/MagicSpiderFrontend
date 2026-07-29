@@ -9,14 +9,15 @@ import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
 import { ThinkingLevel } from '@google/genai';
 import { PresentationArchitecture } from './core/model';
 import { jsonrepair } from "jsonrepair";
+import { OllamaChatService } from '../services/Ollama.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SlideArchitectAgent {
-  constructor(private chatService: GeminiService) {}
+  constructor(private chatService: OllamaChatService) {}
 
-  private parseArchitecture(raw: string): PresentationArchitecture {
+  private parseArchitecture(raw: string): PresentationArchitecture {    
     const sanitized = jsonrepair(raw);
     const start = sanitized.indexOf('{');
     const end = sanitized.lastIndexOf('}');

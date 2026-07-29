@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { MagicSpiderAgentLoop } from '../../../../agents/magic-spider-loop';
 import { AgentInActionStages, AgentState, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { waitForMilliseconds } from '../../../../core/utilities';
+import { OllamaChatService } from '../../../../services/Ollama.service';
 
 @Component({
   selector: 'app-magic-spider-assistant',
@@ -27,7 +28,7 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   
   constructor(
     public workspaceController: WorkspaceController,
-    private geminiService: GeminiService,
+    private geminiService: OllamaChatService,
     public magicSpiderAgentLoop: MagicSpiderAgentLoop,
   ) {
     this.agentSub = magicSpiderAgentLoop.magicSpiderEventStream.subscribe((ev) => {

@@ -14,13 +14,14 @@ import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
 import { ArchitectSlidePlan, PlanProgress } from './core/model';
+import { OllamaChatService } from '../services/Ollama.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SlideWorkerAgent {
   constructor(
-    private chatService: GeminiService,
+    private chatService: OllamaChatService,
     private mcpHub: McpHub,
   ) {}
   private async invokeTools(toolCalls: ToolCall[]): Promise<Message> {

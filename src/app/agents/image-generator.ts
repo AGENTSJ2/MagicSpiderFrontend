@@ -4,6 +4,7 @@ import { AgentInActionStages, AgentState, AgentStreamEvent, InvokeEnabledStages 
 import { Observable, Subject, Subscription } from 'rxjs';
 import blobService from '../services/blob.service';
 import { GeminiService } from '../services/gemini.service';
+import { OllamaChatService } from '../services/Ollama.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,7 @@ export class ImageGeneratorAgent {
   imageGeneratorStream: Observable<AgentStreamEvent> =
     this.imageGeneratorSubject.asObservable();
   imageGeneratorState: AgentState = AgentState.idle;
-  constructor(private chatService: GeminiService) {
+  constructor(private chatService: OllamaChatService) {
     this.imageGeneratorStream.subscribe((event) => {
       this.imageGeneratorState = event.action;
     });
@@ -54,7 +55,7 @@ export class ImageGeneratorAgent {
         message: 'Generating image...',
       });
 
-      const image = await this.chatService.generateImage(
+      const image :any = await this.chatService.generateImage(
         [ImageGeneratorPrompt, params.prompt].join('\n'),
         abortController,
       );
