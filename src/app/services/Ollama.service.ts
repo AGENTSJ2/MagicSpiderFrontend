@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { AbortableAsyncIterator, ChatRequest, ChatResponse, Message, Ollama } from 'ollama';
-import { IAIService } from './interfaces/IAI.service';
 import { GenerateContentResponse, ThinkingLevel } from '@google/genai';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
 import { convertMcpToolToOpenAiTool } from '../agents/core/utility';
