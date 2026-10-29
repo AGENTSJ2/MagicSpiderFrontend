@@ -8,15 +8,14 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { Model } from '@google/genai';
 import { Presentation } from '../../domain/canvasModels/presenatation.model';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
 import { PresentationService } from '../../services/presentation.service';
-import { GeminiService } from '../../../../services/gemini.service';
 import { AgentInActionStages, AgentState, AgentStreamEvent, getAgentErrorMessage, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { ContentCreatorAgent } from '../../../../agents/content-creator';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { OllamaChatService } from '../../../../services/Ollama.service';
+import { AiService } from '../../../../services/ai.service';
+import { LlmModel } from '../../../../services/llm-provider';
 
 
 @Component({
@@ -43,12 +42,12 @@ export class AISlideDescriptionComponent {
     public contentCreatorAgent: ContentCreatorAgent,
     public workspaceController: WorkspaceController,
     private presentationService:PresentationService,
-    private geminiService: OllamaChatService,
+    private aiService: AiService,
     private message:NzMessageService
   ) {}
 
-  get contentModel(): Model | undefined {
-    return this.geminiService.getModel('content');
+  get contentModel(): LlmModel | undefined {
+    return this.aiService.getProvider().getModel('content');
   }
 
   editorModules = {

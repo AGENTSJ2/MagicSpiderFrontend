@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  FinishReason,
   GenerateContentParameters,
   GenerateContentResponse,
   GoogleGenAI,
@@ -10,18 +11,21 @@ import {
 } from '@google/genai';
 import { ChatRequest, ChatResponse } from 'ollama';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types';
-
-export type AgentKey = 'content' | 'assistant' | 'architect' | 'image';
-
-export interface GeneratedImage {
-  dataUrl: string;
-  text: string;
-}
+import {
+  AgentKey,
+  GeneratedImage,
+  LlmChunk,
+  LlmModel,
+  LlmProvider,
+  LlmThinkingLevel,
+} from './llm-provider';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GeminiService {
+export class GeminiService extends LlmProvider {
+  readonly id = 'gemini';
+  readonly label = 'Gemini';
   private readonly ModelName: string = 'gemma-4-31b-it';
   private readonly DefaultImageModel: string = 'gemini-2.5-flash-image';
   private gemini?: GoogleGenAI;
@@ -51,7 +55,12 @@ export class GeminiService {
     return !!this._apiKey;
   }
 
+  get isConfigured(): boolean {
+    return this.hasApiKey;
+  }
+
   constructor() {
+    super();
     const storedKey = localStorage.getItem(this.apiKeyStorageKey)?.trim();
     if (storedKey) {
       this._apiKey = storedKey;
@@ -155,7 +164,7 @@ export class GeminiService {
     return this._models[agent];
   }
 
-  updateModel(agent: AgentKey, model?: Model) {
+  updateModel(agent: AgentKey, model?: LlmModel) {
     if (model) {
       localStorage.setItem(this.modelKeys[agent], JSON.stringify(model));
     } else {
@@ -218,8 +227,8 @@ export class GeminiService {
     request: Partial<ChatRequest>,
     tools?: McpTool[],
     abortController?: AbortController,
-    thinkingLevel?: ThinkingLevel,
-  ) {
+    thinkingLevel?: LlmThinkingLevel,
+  ): Promise<AsyncIterable<LlmChunk>> {
     const gemTools = this.getGeminiTools(tools ?? []);
     const systemInstruction = request.messages
       ?.filter((m) => m.role === 'system')
@@ -240,7 +249,7 @@ export class GeminiService {
         abortSignal: abortController?.signal,
       },
     });
-    return { stream: stream, provider: 'google' };
+    return toLlmChunks(stream);
   }
 
   /**
@@ -288,6 +297,36 @@ export class GeminiService {
     }
     image.text = text;
     return image;
+  }
+}
+
+async function* toLlmChunks(
+  stream: AsyncGenerator<GenerateContentResponse>,
+): AsyncGenerator<LlmChunk> {
+  for await (const chunk of stream) {
+    const parts = chunk.candidates?.[0]?.content?.parts ?? [];
+    const reason: any = chunk.candidates?.at(0)?.finishReason;
+    if (
+      reason == FinishReason.MALFORMED_FUNCTION_CALL ||
+      reason == 'MALFORMED_RESPONSE'
+    ) {
+      throw Error(reason);
+    }
+    for (const part of parts) {
+      if (part.thought) {
+        yield { thinking: part.text ?? '' };
+        continue;
+      }
+      if (part.functionCall) {
+        yield {
+          toolCalls: [
+            { name: part.functionCall.name!, args: part.functionCall.args },
+          ],
+        };
+        continue;
+      }
+      yield { content: part.text };
+    }
   }
 }
 

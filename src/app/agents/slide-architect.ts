@@ -2,20 +2,19 @@ import { Subject } from 'rxjs';
 import { Message } from 'ollama';
 import { DesignPrinciplesPrompt } from '../features/slide-presentation/MCP/prompts/designPrinciples';
 import { Injectable } from '@angular/core';
-import { GeminiService } from '../services/gemini.service';
 import { AgentStreamEvent, pipeResponseToStream } from './core/utility';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
-import { ThinkingLevel } from '@google/genai';
 import { PresentationArchitecture } from './core/model';
 import { jsonrepair } from "jsonrepair";
-import { OllamaChatService } from '../services/Ollama.service';
+import { AiService } from '../services/ai.service';
+import { LlmThinkingLevel } from '../services/llm-provider';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SlideArchitectAgent {
-  constructor(private chatService: OllamaChatService) {}
+  constructor(private aiService: AiService) {}
 
   private parseArchitecture(raw: string): PresentationArchitecture {    
     const sanitized = jsonrepair(raw);
@@ -84,21 +83,18 @@ export class SlideArchitectAgent {
           params.magicSpiderEvent?.next(event);
         });
         
-        const { stream, provider } = await this.chatService.streamChat(
+        const provider = this.aiService.getProvider();
+        const stream = await provider.streamChat(
           {
-            model: this.chatService.getModel('architect')?.name,
+            model: provider.getModel('architect')?.name,
             messages: messages,
           },
           [],
           abortController,
-          ThinkingLevel.HIGH
+          LlmThinkingLevel.HIGH
         );
 
-        const { contents } = await pipeResponseToStream(
-          responseEvent,
-          stream,
-          provider,
-        );
+        const { contents } = await pipeResponseToStream(responseEvent, stream);
         completed = true;
         completedContent = contents;    
       } catch (error) {

@@ -1,7 +1,7 @@
-import { FinishReason, GenerateContentResponse } from '@google/genai';
-import { AbortableAsyncIterator, ChatResponse, Tool } from 'ollama';
+import { Tool } from 'ollama';
 import { Subject } from 'rxjs';
 import { Tool as McpTool } from '@modelcontextprotocol/sdk/types.js';
+import { LlmChunk } from '../../services/llm-provider';
 
 export enum AgentState {
   invoked = 'invoked',
@@ -32,73 +32,35 @@ export const AgentInActionStages = [
 
 export async function pipeResponseToStream(
   responseEvent: Subject<AgentStreamEvent>,
-  stream:
-    | AbortableAsyncIterator<ChatResponse>
-    | AsyncGenerator<GenerateContentResponse, any, any>,
-  provider: string,
+  stream: AsyncIterable<LlmChunk>,
 ): Promise<{ thoughts: string; contents: string }> {
   let thoughts: string = '';
   let contents: string = '';
   try {
-    if (provider == 'ollama') {
-      for await (const chunk of stream as AbortableAsyncIterator<ChatResponse>) {
-        if (chunk.message.thinking) {
-          thoughts += chunk.message.thinking;
-          responseEvent.next({
-            action: AgentState.thinking,
-            message: chunk.message.thinking,
-          });
-        }
-        if (chunk.message.content) {
-          contents += chunk.message.content;
-          responseEvent.next({
-            action: AgentState.content,
-            message: chunk.message.content,
-          });
-        }
+    for await (const chunk of stream) {
+      if (chunk.thinking) {
+        thoughts += chunk.thinking;
+        responseEvent.next({
+          action: AgentState.thinking,
+          message: chunk.thinking,
+        });
       }
-    } else {
-      for await (const chunk of stream as AsyncGenerator<
-        GenerateContentResponse,
-        any,
-        any
-      >) {
-        const parts = chunk.candidates?.[0]?.content?.parts ?? [];
-        const reason: any = chunk!.candidates!.at(0)!.finishReason;
-        if (
-          reason == FinishReason.MALFORMED_FUNCTION_CALL ||
-          reason == 'MALFORMED_RESPONSE'
-        ) {
-          throw Error(reason);
-        }
-        for (const part of parts) {
-          if (part.thought) {
-            thoughts += part.text;
-            responseEvent.next({
-              action: AgentState.thinking,
-              message: part.text ?? '',
-            });
-            continue;
-          }
-          if (part.functionCall) {
-            responseEvent.next({
-              action: AgentState.function,
-              message: '',
-              functionCall: part.functionCall,
-            });
-            continue;
-          }
-          contents += part.text;
-          responseEvent.next({
-            action: AgentState.content,
-            message: part.text!,
-          });
-        }
+      if (chunk.content) {
+        contents += chunk.content;
+        responseEvent.next({
+          action: AgentState.content,
+          message: chunk.content,
+        });
+      }
+      for (const toolCall of chunk.toolCalls ?? []) {
+        responseEvent.next({
+          action: AgentState.function,
+          message: '',
+          functionCall: toolCall,
+        });
       }
     }
     return { thoughts, contents };
-  } catch (error) {
-    throw error;
   } finally {
     responseEvent.complete();
   }

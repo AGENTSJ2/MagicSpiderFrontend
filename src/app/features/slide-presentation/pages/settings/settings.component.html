@@ -52,6 +52,66 @@
       <h2 class="settings__title">AI Settings</h2>
 
       <div class="settings__field">
+        <label>Provider</label>
+        <nz-select
+          [(ngModel)]="provider"
+          (ngModelChange)="onProviderChange($event)"
+          class="settings__select"
+        >
+          <nz-option
+            *ngFor="let p of providers"
+            [nzValue]="p.value"
+            [nzLabel]="p.label"
+          ></nz-option>
+        </nz-select>
+      </div>
+
+      <ng-container *ngIf="provider === 'ollama'">
+        <div class="settings__field">
+          <label for="ollama-host">Ollama Server URL</label>
+          <input
+            id="ollama-host"
+            nz-input
+            placeholder="https://your-ollama-server:11434"
+            [(ngModel)]="ollamaHost"
+            (keyup.enter)="saveOllamaConfig()"
+          />
+        </div>
+
+        <div class="settings__field">
+          <label for="ollama-api-key">API Key (optional)</label>
+          <input
+            id="ollama-api-key"
+            nz-input
+            type="password"
+            autocomplete="new-password"
+            placeholder="Sent as a Bearer token"
+            [(ngModel)]="ollamaApiKey"
+            (keyup.enter)="saveOllamaConfig()"
+          />
+        </div>
+
+        <div class="settings__field">
+          <button
+            nz-button
+            nzType="primary"
+            [nzLoading]="loadingModels"
+            [disabled]="!ollamaHost.trim()"
+            (click)="saveOllamaConfig()"
+          >
+            Save &amp; Connect
+          </button>
+          <p class="settings__hint" *ngIf="!ollamaError">
+            Stored only in this browser. The server must allow this app's origin
+            (OLLAMA_ORIGINS) for requests to succeed.
+          </p>
+          <p class="settings__hint settings__hint--error" *ngIf="ollamaError">
+            {{ ollamaError }}
+          </p>
+        </div>
+      </ng-container>
+
+      <div class="settings__field" *ngIf="provider === 'gemini'">
         <label for="api-key">API Key</label>
         <nz-input-group [nzSuffix]="apiKeySuffix">
           <input
@@ -81,17 +141,6 @@
         <p class="settings__hint settings__hint--error" *ngIf="apiKeyError">
           {{ apiKeyError }}
         </p>
-      </div>
-
-      <div class="settings__field">
-        <label>Provider</label>
-        <nz-select [(ngModel)]="provider" class="settings__select">
-          <nz-option
-            *ngFor="let p of providers"
-            [nzValue]="p.value"
-            [nzLabel]="p.label"
-          ></nz-option>
-        </nz-select>
       </div>
 
       <div class="settings__field">

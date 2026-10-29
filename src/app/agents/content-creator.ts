@@ -7,14 +7,13 @@ import {
   pipeResponseToStream,
 } from './core/utility';
 import { Observable, Subject, Subscription } from 'rxjs';
-import { GeminiService } from '../services/gemini.service';
-import { OllamaChatService } from '../services/Ollama.service';
+import { AiService } from '../services/ai.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentCreatorAgent {
-  constructor(private chatService: OllamaChatService) {
+  constructor(private aiService: AiService) {
     this.contentCreatorStream.subscribe((event) => {
       this.contentCreatorState = event.action;
     });
@@ -53,9 +52,10 @@ export class ContentCreatorAgent {
         }
       });
       // Agent working
-      const { stream, provider } = await this.chatService.streamChat(
+      const provider = this.aiService.getProvider();
+      const stream = await provider.streamChat(
         {
-          model: this.chatService.getModel('content')?.name,
+          model: provider.getModel('content')?.name,
           messages: [
             {
               role: 'system',
@@ -74,7 +74,7 @@ export class ContentCreatorAgent {
         abortController,
       );
       
-      await pipeResponseToStream(localContentCreatorSubject, stream, provider);
+      await pipeResponseToStream(localContentCreatorSubject, stream);
       this.contentCreatorSubject.next({
         action: AgentState.done,
         message: 'Completed',

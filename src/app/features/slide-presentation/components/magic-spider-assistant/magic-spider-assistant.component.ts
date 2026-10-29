@@ -1,12 +1,11 @@
 import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { WorkspaceController } from '../../pages/workspace/workspace.controller';
-import { GeminiService } from '../../../../services/gemini.service';
-import { Model } from '@google/genai';
 import { Subscription } from 'rxjs';
 import { MagicSpiderAgentLoop } from '../../../../agents/magic-spider-loop';
 import { AgentInActionStages, AgentState, InvokeEnabledStages } from '../../../../agents/core/utility';
 import { waitForMilliseconds } from '../../../../core/utilities';
-import { OllamaChatService } from '../../../../services/Ollama.service';
+import { AiService } from '../../../../services/ai.service';
+import { LlmModel } from '../../../../services/llm-provider';
 
 @Component({
   selector: 'app-magic-spider-assistant',
@@ -22,13 +21,13 @@ export class MagicSpiderAssistantComponent implements OnDestroy {
   agentSub?: Subscription;
   
 
-  get defModel(): Model | undefined {
-    return this.geminiService.getModel('assistant');
+  get defModel(): LlmModel | undefined {
+    return this.aiService.getProvider().getModel('assistant');
   }
-  
+
   constructor(
     public workspaceController: WorkspaceController,
-    private geminiService: OllamaChatService,
+    private aiService: AiService,
     public magicSpiderAgentLoop: MagicSpiderAgentLoop,
   ) {
     this.agentSub = magicSpiderAgentLoop.magicSpiderEventStream.subscribe((ev) => {

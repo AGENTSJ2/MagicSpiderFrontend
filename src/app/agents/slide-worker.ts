@@ -6,7 +6,6 @@ import {
   convertMcpToolToOpenAiTool,
   pipeResponseToStream,
 } from './core/utility';
-import { GeminiService } from '../services/gemini.service';
 import { Presentation } from '../features/slide-presentation/domain/canvasModels/presenatation.model';
 import { Message, ToolCall } from 'ollama';
 import { McpHub } from '../features/slide-presentation/MCP/mcp_hub';
@@ -14,14 +13,14 @@ import { InternalMcpError } from '../features/slide-presentation/MCP/mcp.erros';
 import { waitForMilliseconds } from '../core/utilities';
 import { MAX_RETRY, RETRY_TIME_OUT_MS } from './core/constants';
 import { ArchitectSlidePlan, PlanProgress } from './core/model';
-import { OllamaChatService } from '../services/Ollama.service';
+import { AiService } from '../services/ai.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SlideWorkerAgent {
   constructor(
-    private chatService: OllamaChatService,
+    private aiService: AiService,
     private mcpHub: McpHub,
   ) {}
   private async invokeTools(toolCalls: ToolCall[]): Promise<Message> {
@@ -86,9 +85,10 @@ export class SlideWorkerAgent {
         const responseEvent = new Subject<AgentStreamEvent>();
         const slideJson = JSON.stringify(slide.toJson());
 
-        const response = await this.chatService.streamChat(
+        const provider = this.aiService.getProvider();
+        const response = await provider.streamChat(
           {
-            model: this.chatService.getModel('assistant')?.name,
+            model: provider.getModel('assistant')?.name,
             messages: [
               ...messages,
               {
@@ -115,11 +115,7 @@ export class SlideWorkerAgent {
           }
         });
         
-        await pipeResponseToStream(
-          responseEvent,
-          response.stream,
-          response.provider,
-        );
+        await pipeResponseToStream(responseEvent, response);
         
         // responseEvent.complete(); 
 
